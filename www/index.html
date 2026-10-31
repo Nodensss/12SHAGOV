@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f6f4ef" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#16191a" media="(prefers-color-scheme: dark)">
+  <meta name="description" content="Офлайн-дневник для работы по 12 шагам: пересказ шагов, польза и риски по данным исследования, вопросы, вечерний обзор.">
+  <title>12 шагов</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="topbar">
+    <button class="icon-btn back" id="backBtn" type="button" aria-label="Назад" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+    </button>
+    <h1 class="topbar-title" id="title">12 шагов</h1>
+    <span class="saved" id="saved" aria-live="polite"></span>
+  </header>
+
+  <main id="view" class="view" tabindex="-1"></main>
+
+  <nav class="tabbar" aria-label="Разделы">
+    <a href="#/" data-tab="home">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z" /></svg>
+      <span>Главная</span>
+    </a>
+    <a href="#/steps" data-tab="steps">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h5v-4h4v-4h4V8h5" /></svg>
+      <span>Шаги</span>
+    </a>
+    <a href="#/journal" data-tab="journal">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h11a1 1 0 011 1v16a1 1 0 01-1 1H6zM6 3v18M10 8h5M10 12h5" /></svg>
+      <span>Дневник</span>
+    </a>
+    <a href="#/more" data-tab="more">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h.01M12 12h.01M19 12h.01" /></svg>
+      <span>Ещё</span>
+    </a>
+  </nav>
+
+  <dialog id="dialog" class="dialog">
+    <form method="dialog">
+      <h2 id="dialogTitle"></h2>
+      <div id="dialogBody"></div>
+      <div class="dialog-actions">
+        <button value="cancel" class="btn ghost" id="dialogCancel">Отмена</button>
+        <button value="ok" class="btn primary" id="dialogOk">Да</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="js/content.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

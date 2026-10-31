@@ -1,0 +1,75 @@
+apply plugin: 'com.android.application'
+
+// Постоянный ключ подписи берётся из переменных окружения (в GitHub Actions — из секретов).
+// Без них сборка подписывается debug-ключом текущего компьютера. См. README, раздел про подпись.
+def releaseKeystore = System.getenv('SHAGI_KEYSTORE_FILE')
+def hasReleaseKey = releaseKeystore && file(releaseKeystore).exists()
+// В GitHub Actions номер запуска увеличивает versionCode, чтобы обновление ставилось поверх.
+def ciBuild = (System.getenv('GITHUB_RUN_NUMBER') ?: '0').toInteger()
+
+android {
+    namespace = "io.github.nodensss.shagi"
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "io.github.nodensss.shagi"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1 + ciBuild
+        versionName "1.0." + ciBuild
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    signingConfigs {
+        shagi {
+            if (hasReleaseKey) {
+                storeFile file(releaseKeystore)
+                storePassword System.getenv('SHAGI_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('SHAGI_KEY_ALIAS')
+                keyPassword System.getenv('SHAGI_KEY_PASSWORD')
+            }
+        }
+    }
+    buildTypes {
+        debug {
+            if (hasReleaseKey) signingConfig signingConfigs.shagi
+        }
+        release {
+            if (hasReleaseKey) signingConfig signingConfigs.shagi
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}

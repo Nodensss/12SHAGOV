@@ -1,0 +1,10 @@
+{
+  "appId": "io.github.nodensss.shagi",
+  "appName": "12 шагов",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false,
+    "captureInput": false,
+    "webContentsDebuggingEnabled": false
+  }
+}
