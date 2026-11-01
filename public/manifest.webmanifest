@@ -1,0 +1,13 @@
+{
+  "id": "./",
+  "name": "Свой путь — 12 шагов",
+  "short_name": "Свой путь",
+  "description": "Короткие практики и личные заметки",
+  "lang": "ru",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f3ed",
+  "theme_color": "#405a46",
+  "icons": [{ "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

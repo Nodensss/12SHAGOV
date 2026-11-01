@@ -1,0 +1,191 @@
+{
+  "generatedAt": "2026-10-31T04:37:23+00:00",
+  "policy": "Original files preserved byte-for-byte. No edition is merged with another.",
+  "files": [
+    {
+      "file": "docs/libNarco/eto-rabotaet_-kak-i-pochemu-chernovik.pdf",
+      "sha256": "08e0284779bf06c585c5bcf2e9d79f2d2db6ff6c2661c20adbe8c0a570969729",
+      "bytes": 853367
+    },
+    {
+      "file": "docs/libNarco/rukovodstvo.pdf",
+      "sha256": "83fefac4e23e9407c82068dae00320ebcc747be9dd9b9cf1ec196fd9df2f31d3",
+      "bytes": 1018327
+    },
+    {
+      "file": "docs/libNarco/russian-basic-text.pdf",
+      "sha256": "733c4b6f38951adcbdec5b89ee5cd6105bec0093933e61c0401f1c38308c22f6",
+      "bytes": 1370542
+    },
+    {
+      "file": "docs/libNarco/БТ6__спец_тираж_.pdf",
+      "sha256": "facea5783c381c03c31086eafca3fbadf76d30574cb87688ee0a395aae0a606c",
+      "bytes": 1402346
+    },
+    {
+      "file": "docs/libNarco/Белый буклет АН.pdf",
+      "sha256": "09afa9c8261e672a69e8cdd0005f789fa82d979ff5a965f34006489235f82294",
+      "bytes": 465921
+    },
+    {
+      "file": "docs/libNarco/ЖИТЬ-ЧИСТЫМИ.txt",
+      "sha256": "1e01ae7ef62857291936df746b6428b72ee68eed3335697a2365b0f6da0b0bdc",
+      "bytes": 917688
+    },
+    {
+      "file": "docs/libNarco/Книга_о_Традициях.pdf",
+      "sha256": "dfd0311eca207a7268bc87b925aca133e2e0eba60f12d6f906fc35240b5061b7",
+      "bytes": 1332846
+    },
+    {
+      "file": "docs/libNarco/РУКОВОДСТВО_К_РАБОТЕ_ПО_ШАГАМ_В_АН__черновик_2021_.pdf",
+      "sha256": "fa6d7d5013aa72bb79b243e39654d24e4614cd8fe5b838eee2120d7e76980c93",
+      "bytes": 813965
+    },
+    {
+      "file": "docs/materials/ТЗ_Модуль_Шаг_01_Первый.md",
+      "sha256": "f08fa5e7b1931b2002dbb0b2e1b387522b8f8e3393fcf1b94654bc9c94863bc7",
+      "bytes": 3073
+    },
+    {
+      "file": "docs/materials/ТЗ_Модуль_Шаг_02_Второй.md",
+      "sha256": "f6d998b28a5d8e146bd81d4601a3f0326d750de73a96878d8283a9138e298556",
+      "bytes": 3073
+    },
+    {
+      "file": "docs/materials/ТЗ_Модуль_Шаг_03_Третий.md",
+      "sha256": "dae775f19cc53510ab6b0a2c37e0222944cee4321bcbb60f541e29672ddac1a2",
+      "bytes": 2916
+    },
+    {
+      "file": "docs/materials/ТЗ_Модуль_Шаг_04_Четвёртый.md",
+      "sha256": "6c68ef208f9b231df7625fb5bc9b8f7a6a7c4ba91a549918e7eb5e861a6dd600",
+      "bytes": 3185
+    },
+    {
+      "file": "docs/materials/ТЗ_Модуль_Шаг_05_Пятый.md",
+      "sha256": "4c6fb8b1f7d74d52801c6980f7c3e0f8a3841303661973f3e7e37d5ee63ac59d",
+      "bytes": 2974
+    },
+    {
+      "file": "docs/materials/ТЗ_Модуль_Шаг_06_Шестой.md",
+      "sha256": "096fe0078de763de81d9db0309b3dc4cecb1b7a8822f92fe6227d715f1b29b6c",
+      "bytes": 2879
+    },
+    {
+      "file": "docs/materials/ТЗ_Модуль_Шаг_07_Седьмой.md",
+      "sha256": "7cc236f3f52f10bdd2d35f7ab58ee310a21bd3ccf9a2fb713c38b41437386add",
+      "bytes": 2891
+    },
+    {
+      "file": "docs/materials/ТЗ_Модуль_Шаг_08_Восьмой.md",
+      "sha256": "f6f894b0eabb049208b5290491e52ab632a8aec80b6e3f85a60d70431d8766f6",
+      "bytes": 3016
+    },
+    {
+      "file": "docs/materials/ТЗ_Модуль_Шаг_09_Девятый.md",
+      "sha256": "00fad0c4ca171d2e93cb1eb1ff884d8aa13f600f774ff888f01febde556dd0b6",
+      "bytes": 3104
+    },
+    {
+      "file": "docs/materials/ТЗ_Модуль_Шаг_10_Десятый.md",
+      "sha256": "6d11f98a5e7ee978620c4f85f000d2be028f41728020bd4ba79f6d9d0b580787",
+      "bytes": 2824
+    },
+    {
+      "file": "docs/materials/ТЗ_Модуль_Шаг_11_Одиннадцатый.md",
+      "sha256": "28cfbe3842af5fb2a10e0d9f8b9dd5bfe136daa9a32f1bd3c122eb188ac07c46",
+      "bytes": 2828
+    },
+    {
+      "file": "docs/materials/ТЗ_Модуль_Шаг_12_Двенадцатый.md",
+      "sha256": "75c24f1294fd0f83d4f8cf69eaa5a45d4816bb7a450439c701963ed7af48ac26",
+      "bytes": 3141
+    },
+    {
+      "file": "docs/materials/ТЗ_Приложение_12_Шагов.md",
+      "sha256": "53f331cce0e688bf24e080412a90a2252bc3299c95cfedb9709b70db4b78ad97",
+      "bytes": 15944
+    },
+    {
+      "file": "docs/materials/Шаг_01_Первый.txt",
+      "sha256": "a2b7983d70bbfd0bf068b1d8769de09035db45724f2e3e921615168dd52fd542",
+      "bytes": 437213
+    },
+    {
+      "file": "docs/materials/Шаг_02_Второй.txt",
+      "sha256": "4ba1e492d03afcbe4847777f41bc2c756782b1eee97fd409952852f4832abad6",
+      "bytes": 303885
+    },
+    {
+      "file": "docs/materials/Шаг_03_Третий.txt",
+      "sha256": "f65cc931f91ee12ea12dddd2d67a8f493f2592648962fd7e502098421a02a15e",
+      "bytes": 310413
+    },
+    {
+      "file": "docs/materials/Шаг_04_Четвёртый.txt",
+      "sha256": "87f66315b84dc7cb7ca7164ecb76b7bd9ba5d5001881a9cd2260f2581b99a58d",
+      "bytes": 403914
+    },
+    {
+      "file": "docs/materials/Шаг_05_Пятый.txt",
+      "sha256": "ef88737e318a6b4d3f216ac62b72afaaac239fa57216d77cf321467c4bbfa477",
+      "bytes": 293890
+    },
+    {
+      "file": "docs/materials/Шаг_06_Шестой.txt",
+      "sha256": "1da07529d3f075d9d7ec26fe86d408f392d0d5f93a688679d8e71e5e17fb11c3",
+      "bytes": 232900
+    },
+    {
+      "file": "docs/materials/Шаг_07_Седьмой.txt",
+      "sha256": "9334939b31372e1d37a37eb17c23f178beef4b9a3a92f05b999c9e5a5d2cbc4d",
+      "bytes": 237138
+    },
+    {
+      "file": "docs/materials/Шаг_08_Восьмой.txt",
+      "sha256": "d99b5c0dce86c16a9dbe68ac28584ae8fca8f580f8787cf82a4e509940375999",
+      "bytes": 287363
+    },
+    {
+      "file": "docs/materials/Шаг_09_Девятый.txt",
+      "sha256": "e1b3fc7a47c9bca9ee8e1238c2fcb7c96a26732162b7862018296c66b5b5d93e",
+      "bytes": 342263
+    },
+    {
+      "file": "docs/materials/Шаг_10_Десятый.txt",
+      "sha256": "792a9971633d22e9ce5d70e6296eed50c3a4b6c4a5fc13c2135c6d55c3448d96",
+      "bytes": 226276
+    },
+    {
+      "file": "docs/materials/Шаг_11_Одиннадцатый.txt",
+      "sha256": "711fc243d53ad9bace4ded4284168892559482d5e4f94228b8d8b18d7d83200a",
+      "bytes": 236776
+    },
+    {
+      "file": "docs/materials/Шаг_12_Двенадцатый.txt",
+      "sha256": "0b842794f21e0ec1d357a11be64b2b3cd79fb72b0d4cac162f2e531c41eae98c",
+      "bytes": 272067
+    },
+    {
+      "file": "docs/step01.md",
+      "sha256": "2c169e075b708d9cd0581de6c0d94e1fc46df58b95b10cc7a748127d7b9e7971",
+      "bytes": 61890
+    },
+    {
+      "file": "docs/step02.md",
+      "sha256": "7f2ec7128d84bfdd0a0614a2f83b9e3f2c6de62d56ae6d2d2a989e7a1d8912ad",
+      "bytes": 56593
+    },
+    {
+      "file": "docs/step03.md",
+      "sha256": "3ff5088afdb8e41c53b445149abd4f0cf0905b80c8c46703ca05a8a492f26bac",
+      "bytes": 62276
+    }
+  ],
+  "combined": {
+    "file": "outputs/Все_12_шагов_полный_текст.txt",
+    "sha256": "1219a2904995570aaf35d75a7e1858458af2f1258b5cb2b42e516dfe144f0c56",
+    "bytes": 3587116
+  }
+}

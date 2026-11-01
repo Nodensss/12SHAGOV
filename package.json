@@ -1,0 +1,16 @@
+{
+  "name": "12shagov",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "Свой путь — приватное приложение для знакомства с Двенадцатью Шагами",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "start": "node scripts/serve.mjs",
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "check": "node --check public/app.js && node --check public/storage.js && node --check public/exercises.js && node --check public/sw.js",
+    "content": "python3 scripts/import_content.py --help"
+  },
+  "engines": { "node": ">=22" }
+}

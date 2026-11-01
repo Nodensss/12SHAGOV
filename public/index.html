@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f3ed">
+  <meta name="description" content="Двенадцать шагов: короткие практики, чтение и приватные заметки в своём темпе.">
+  <title>Свой путь — 12 шагов</title>
+  <link rel="icon" type="image/svg+xml" href="./icon.svg">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <a class="sr-only skip-link" href="#app">Перейти к содержимому</a>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Главная навигация">
+      <a class="brand" href="#home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span><strong>свой путь</strong><small>12 шагов · личный темп</small></span></a>
+      <nav class="side-nav">
+        <a href="#home" class="nav-link" data-nav="home"><span class="nav-icon" aria-hidden="true">⌂</span>Мой путь</a>
+        <a href="#steps" class="nav-link" data-nav="steps"><span class="nav-icon" aria-hidden="true">▦</span>Все шаги</a>
+        <a href="#notes" class="nav-link" data-nav="notes"><span class="nav-icon" aria-hidden="true">▤</span>Мои заметки</a>
+        <a href="#library" class="nav-link" data-nav="library"><span class="nav-icon" aria-hidden="true">⌕</span>Библиотека</a>
+        <a href="#settings" class="nav-link" data-nav="settings"><span class="nav-icon" aria-hidden="true">⚙</span>Настройки</a>
+      </nav>
+      <div class="side-note"><span aria-hidden="true">✳</span><p>Здесь можно остановиться, пропустить вопрос и вернуться позже.</p></div>
+      <button class="button button-secondary support-button" data-action="support">Мне нужна поддержка</button>
+      <div class="sidebar-foot">Личное остаётся на устройстве.<br><span id="offline-status" role="status">Подготовка офлайн-режима…</span></div>
+    </aside>
+    <main class="main-area">
+      <header class="topbar"><div class="breadcrumb" id="breadcrumb">Мой путь</div><div class="button-row"><button class="button button-quiet button-small" data-action="lock" id="lock-button" hidden>Заблокировать</button><a class="top-settings" href="#settings" aria-label="Доступность и настройки">Aa <span>Доступность</span></a></div></header>
+      <div id="app" tabindex="-1"><p class="empty-state">Открываем ваш путь…</p></div>
+      <footer class="app-footer">Приложение — инструмент для размышления. Живая поддержка, встречи, спонсорство и профессиональная помощь остаются важны.</footer>
+    </main>
+  </div>
+  <nav class="mobile-nav" aria-label="Навигация на телефоне">
+    <a href="#home" data-nav="home"><span aria-hidden="true">⌂</span>Путь</a><a href="#steps" data-nav="steps"><span aria-hidden="true">▦</span>Шаги</a><a href="#notes" data-nav="notes"><span aria-hidden="true">▤</span>Заметки</a><a href="#library" data-nav="library"><span aria-hidden="true">⌕</span>Читать</a><a href="#settings" data-nav="settings"><span aria-hidden="true">⚙</span>Ещё</a>
+  </nav>
+  <button class="support-button mobile-support" data-action="support" aria-label="Мне нужна поддержка">♡ Поддержка</button>
+  <dialog id="modal" class="modal" aria-labelledby="modal-title"></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
