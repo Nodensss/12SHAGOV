@@ -3,6 +3,7 @@ import { createStore, loadPreferences, savePreferences } from './storage.js';
 import { createExerciseRenderer } from './exercises.js';
 import { canReadSource, findPassages, sourceStatusLabel } from './content.js';
 import { freshState, normalize } from './model.js';
+import { renderEditorialSummary } from './reader.js';
 
 const app = document.querySelector('#app');
 const modal = document.querySelector('#modal');
@@ -114,6 +115,20 @@ function sourceQuote(id) {
   }
   return '<blockquote class="source-quote">' + h(item.quote) + '</blockquote>' + meta + '<p class="tiny">Дословный текст источника. Введение, истории и вопросы ниже написаны для приложения.</p>';
 }
+function summaryPage(id) {
+  const summary = content.summaries.find(s => s.step === id);
+  if (!summary) return '<div class="reader-page"><div class="reader-toolbar">' + link('← К шагу ' + id,'#step/' + id,'button button-quiet') + '</div>' + heading('Конспект недоступен','Вернитесь к шагу и попробуйте позже.') + '</div>';
+  const rendered = renderEditorialSummary(summary.text);
+  return '<div class="reader-page"><div class="reader-toolbar">' + link('← К шагу ' + id,'#step/' + id,'button button-quiet') +
+    '<div class="reader-toolbar-actions"><span class="reader-location">Шаг ' + id + ' / Конспект</span>' + action('⛶ На весь экран','reader-fullscreen','button button-quiet button-small') + '</div></div>' +
+    '<header class="reader-hero"><div class="reader-hero-main"><div class="eyebrow">Авторский конспект · шаг ' + String(id).padStart(2,'0') + '</div><h1 tabindex="-1">' + h(summary.title) +
+    '</h1><p>Структурированный просмотр исходного файла. Можно перейти к нужному разделу или читать подряд.</p>' +
+    '<div class="reader-source"><strong>Статус: редакторский материал</strong><span>Источник: ' + h(summary.file) + '. Не утверждённый текст литературы.</span></div></div>' +
+    '<div class="reader-hero-card" aria-hidden="true"><span>В этом конспекте</span><strong>' + rendered.outline.length + ' разделов</strong><p>Выберите тему в оглавлении или читайте подряд.</p></div></header>' +
+    '<div class="reader-layout"><nav class="reader-toc" aria-label="Разделы конспекта"><h2>Содержание</h2><div class="reader-toc-list">' +
+    rendered.outline.map((item,index) => '<button type="button" data-reader-section="' + item.id + '"><span>' + String(index+1).padStart(2,'0') + '</span>' + h(item.label) + '</button>').join('') +
+    '</div></nav><article class="reader-article" aria-label="Текст конспекта">' + rendered.html + '</article></div></div>';
+}
 function calendar() {
   const now = new Date(), y = now.getFullYear(), m = now.getMonth(), days = new Date(y,m+1,0).getDate();
   const start = (new Date(y,m,1).getDay()+6)%7;
@@ -127,17 +142,17 @@ function calendar() {
 function stepPage(id) {
   const s = stepBy(id), d = draftFor(id);
   return '<div class="page step-layout"><div class="step-main"><div class="step-title-row"><div><div class="eyebrow">Шаг ' + id + ' · ' + h(s.verb) + '</div><h1 tabindex="-1">' + h(s.name) + '</h1><p class="step-kicker">' + h(s.short) + '</p></div><span class="step-number-big" aria-hidden="true">' + String(id).padStart(2,'0') + '</span></div>' +
-    '<nav class="section-nav" aria-label="Разделы шага"><button data-section="intro">Введение</button><button data-section="exercise">Попробовать</button><button data-section="reflection">Подумать</button><button data-section="source">Источник</button></nav>' +
-    '<section class="content-card" id="intro"><div class="eyebrow">Коротко о шаге</div><p class="intro-copy">' + h(s.intro) + '</p><div class="story-box"><strong>Вымышленная ситуация.</strong> ' + h(s.story) + '</div>' +
-    '<div class="reading-controls">' + action('▶ Слушать','speak','button button-quiet button-small') + action('Пауза / продолжить','speech-pause','button button-quiet button-small') + action('Остановить','speech-stop','button button-quiet button-small') + '</div><p class="tiny" id="audio-status" aria-live="polite">Текст выше служит расшифровкой аудио. Только локальный голос браузера.</p></section>' +
-    '<section class="activity-card" id="exercise"><div class="eyebrow">Попробовать · 3–5 минут</div><h2>' + h(s.activityTitle) + '</h2><p class="activity-intro">' + h(s.activityIntro) + '</p>' +
+    '<nav class="section-nav" aria-label="Разделы шага"><button data-section="intro"><span class="section-nav-index">01</span><span>Знакомство</span></button><button data-section="exercise"><span class="section-nav-index">02</span><span>Практика</span></button><button data-section="reflection"><span class="section-nav-index">03</span><span>Размышление</span></button><button data-section="source"><span class="section-nav-index">04</span><span>Источники</span></button></nav>' +
+    '<section class="content-card" id="intro"><div class="eyebrow">01 / Знакомство</div><div class="intro-grid"><div><h2>Смысл шага</h2><p class="intro-copy">' + h(s.intro) + '</p></div><div class="story-box"><h3>Небольшая ситуация</h3><p>' + h(s.story) + '</p><span class="tiny">Вымышленный пример для размышления</span></div></div>' +
+    '<div class="reading-controls">' + action('▶ Слушать введение','speak','button button-quiet button-small') + action('Пауза / продолжить','speech-pause','button button-quiet button-small') + action('Остановить','speech-stop','button button-quiet button-small') + '</div><p class="tiny" id="audio-status" aria-live="polite">Читается только введение локальным голосом браузера.</p></section>' +
+    '<section class="activity-card" id="exercise"><div class="eyebrow">02 / Практика · 3–5 минут</div><h2>' + h(s.activityTitle) + '</h2><p class="activity-intro">' + h(s.activityIntro) + '</p>' +
     (id===7 ? '<p class="field-label">Формат практики</p>' + options('practiceMode',['Написать','Тихая практика']) : '') +
     '<div class="activity-area">' + exercise(id) + '</div>' +
     (id===1 ? '<p class="field-label">Что повторялось? Можно выбрать несколько наблюдений.</p>' + options('consequences',['Менял(а) обещания','Уставал(а)','Терял(а) выбор','Просил(а) поддержки'],true) : '') +
     '<p class="tiny">Можно использовать вымышленную ситуацию и оставить личные поля пустыми.</p></section>' +
-    '<section class="content-card" id="reflection"><div class="eyebrow">Подумать</div><h2>Вопросы для себя</h2><p class="tiny">Вопросы приложения; это не дословный опросник из литературы.</p><div class="question-list">' + s.questions.map(questionBlock).join('') + '</div></section>' +
+    '<section class="content-card" id="reflection"><div class="eyebrow">03 / Размышление</div><h2>Вопросы для себя</h2><p class="tiny">Вопросы приложения; это не дословный опросник из литературы.</p><div class="question-list">' + s.questions.map(questionBlock).join('') + '</div></section>' +
     '<section class="content-card"><h2>Взять на разговор</h2>' + field('О чём я хочу поговорить со спонсором или доверенным человеком?', 'discussion', 'Этот черновик не отправляется') + '</section>' +
-    '<section class="content-card" id="source"><div class="eyebrow">Дословный источник</div>' + sourceQuote(id) + (id<=3 ? '<p>' + action('Открыть конспект шага ' + id,'summary','button button-quiet', 'data-id="' + id + '"') + '</p>' : '') + '</section>' +
+    '<section class="content-card" id="source"><div class="eyebrow">04 / Источники</div><h2>Текст и происхождение</h2>' + sourceQuote(id) + (id<=3 ? '<p>' + action('Читать авторский конспект на весь экран →','summary','button button-quiet', 'data-id="' + id + '"') + '</p>' : '') + '</section>' +
     (id===10 ? calendar() : '') +
     '<div class="step-actions">' + action(id===10 ? 'Сохранить чек-ин за сегодня' : 'Сохранить черновик','save','button button-primary') + action('Пауза и выйти','pause','button button-quiet') + action('Удалить записи шага','delete-step','button button-quiet') + '</div>' +
     '<p class="draft-status" role="status">Сохранено на устройстве</p></div><aside class="step-aside"><div class="aside-card"><h3>Ваш темп</h3><p>Можно пропустить вопрос и вернуться позже. Здесь нет оценок и обязательных ответов.</p>' + action(state.bookmarks[id] ? 'Убрать закладку' : 'В закладки','bookmark','button button-quiet button-small','aria-pressed="' + !!state.bookmarks[id] + '"') + '</div>' +
@@ -181,17 +196,19 @@ function render({focus=false, restore=false}={}) {
   if (!state || store.isLocked()) { renderLock(); return; }
   const route = location.hash.slice(1).split('/');
   currentStep = route[0]==='step' && stepBy(route[1]) ? Number(route[1]) : 0;
-  let view = currentStep ? 'step' : ['home','steps','notes','library','settings'].includes(route[0]) ? route[0] : 'home';
-  $('#breadcrumb').textContent = currentStep ? 'Мой путь / Шаг ' + currentStep : ({home:'Мой путь / Сегодня',steps:'Все шаги',notes:'Мои заметки',library:'Библиотека',settings:'Настройки'})[view];
+  const summaryId = route[0]==='summary' && [1,2,3].includes(Number(route[1])) ? Number(route[1]) : 0;
+  let view = currentStep ? 'step' : summaryId ? 'summary' : ['home','steps','notes','library','settings'].includes(route[0]) ? route[0] : 'home';
+  document.body.classList.toggle('reader-mode', view==='summary');
+  $('#breadcrumb').textContent = currentStep ? 'Мой путь / Шаг ' + currentStep : view==='summary' ? 'Шаг ' + summaryId + ' / Конспект' : ({home:'Мой путь / Сегодня',steps:'Все шаги',notes:'Мои заметки',library:'Библиотека',settings:'Настройки'})[view];
   document.querySelectorAll('[data-nav]').forEach(el => {
-    const active = el.dataset.nav === view || currentStep && el.dataset.nav==='steps';
+    const active = el.dataset.nav === view || currentStep && el.dataset.nav==='steps' || summaryId && el.dataset.nav==='library';
     el.classList.toggle('active',!!active);
     if (active) el.setAttribute('aria-current','page'); else el.removeAttribute('aria-current');
   });
   $('#lock-button').hidden = !store.hasPin();
   document.body.classList.remove('vault-locked');
-  app.innerHTML = view==='home' ? home() : view==='steps' ? '<div class="page">' + heading('Все двенадцать шагов','Свободный маршрут. Выберите то, с чем хотите познакомиться сейчас.') + '<div class="step-grid">' + steps.map(stepCard).join('') + '</div></div>' : view==='step' ? stepPage(currentStep) : view==='notes' ? notesPage() : view==='library' ? libraryPage() : settingsPage();
-  document.title = currentStep ? 'Шаг ' + currentStep + ' — Свой путь' : 'Свой путь — 12 шагов';
+  app.innerHTML = view==='home' ? home() : view==='steps' ? '<div class="page">' + heading('Все двенадцать шагов','Свободный маршрут. Выберите то, с чем хотите познакомиться сейчас.') + '<div class="step-grid">' + steps.map(stepCard).join('') + '</div></div>' : view==='step' ? stepPage(currentStep) : view==='summary' ? summaryPage(summaryId) : view==='notes' ? notesPage() : view==='library' ? libraryPage() : settingsPage();
+  document.title = currentStep ? 'Шаг ' + currentStep + ' — Свой путь' : view==='summary' ? 'Конспект шага ' + summaryId + ' — Свой путь' : 'Свой путь — 12 шагов';
   applyPrefs();
   if (focus) app.querySelector('h1')?.focus({preventScroll:true});
   if (restore && currentStep) window.scrollTo({top: Number(draftFor(currentStep).readPosition)||0});
@@ -270,7 +287,7 @@ async function clearPersonalData() {
   finally{maintenance=false;render();}
 }
 function renderLock() {
-  document.body.classList.add('vault-locked');
+  document.body.classList.remove('reader-mode');document.body.classList.add('vault-locked');
   app.innerHTML='<div class="page lock-screen">' + heading('Личное пространство закрыто','Введите PIN на этом устройстве, чтобы продолжить.') + '<form id="unlock-form"><div class="field"><label for="unlock-pin">PIN</label><input type="password" id="unlock-pin" name="pin" inputmode="numeric" autocomplete="current-password" minlength="4" maxlength="12" required></div><p role="alert" id="unlock-error"></p><button class="button button-primary" ' + (maintenance?'disabled':'') + '>Открыть записи</button></form><p class="tiny">PIN не передаётся на сервер. Если он забыт, записи можно только удалить и начать заново.</p>' + action('Удалить данные и начать заново','reset-locked','button button-quiet',maintenance?'disabled':'') + '</div>';
   $('#lock-button').hidden=true; document.title='Свой путь — заблокировано';
 }
@@ -311,6 +328,13 @@ document.addEventListener('click', async event => {
   const target=event.target.closest('button,[data-action]'); if(!target)return;
   try {
     if(target.dataset.action==='close-modal'){modal.close();modal.innerHTML='';return;}
+    if(target.dataset.action==='reader-fullscreen'||target.dataset.action==='fullscreen'){
+      if(document.fullscreenElement)await document.exitFullscreen();
+      else if(document.fullscreenEnabled && document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen();
+      else toast('Браузер ограничил полноэкранный режим. Нажмите F11 для разворота окна.');
+      return;
+    }
+    if(target.dataset.readerSection){document.getElementById(target.dataset.readerSection)?.scrollIntoView({behavior:'smooth'});return;}
     if(maintenance)return;
     if(target.dataset.action==='reset-locked'){
       if(confirm('Окончательно удалить защищённые личные данные на этом устройстве?')){await clearPersonalData();}
@@ -353,7 +377,7 @@ document.addEventListener('click', async event => {
       case 'delete-all':if(confirm('Окончательно удалить все личные заметки, контакты и прогресс на этом устройстве?')){await clearPersonalData();toast('Личные данные удалены.');}break;
       case 'summary':{
         const summary=content.summaries.find(s=>s.step===Number(target.dataset.id));
-        if(summary)openDialog(summary.title,'<p class="notice">Авторский конспект. Статус — редакторский материал, не утверждённый текст литературы. Источник: '+h(summary.file)+'</p><div class="source-text">'+h(summary.text)+'</div>');
+        if(summary)location.hash='#summary/'+summary.step;
         break;
       }
       case 'export':await flush();download('мои-заметки-12-шагов.json',JSON.stringify({format:'12shagov-backup',version:2,exportedAt:new Date().toISOString(),data:state},null,2),'application/json');toast('Копия содержит личный текст без шифрования.');break;
@@ -436,6 +460,11 @@ window.addEventListener('scroll',()=>{
   scrollTimer=setTimeout(()=>{if(currentStep&&state&&!store.isLocked()&&!maintenance){draftFor(currentStep).readPosition=window.scrollY;scheduleSave();}},400);
 },{passive:true});
 window.addEventListener('hashchange',()=>routeChanged().catch(error=>toast(error.message)));
+document.addEventListener('fullscreenchange',()=>{
+  document.querySelectorAll('[data-action="reader-fullscreen"],[data-action="fullscreen"]').forEach(button=>{
+    button.textContent=document.fullscreenElement?'Выйти из полного экрана':'⛶ На весь экран';
+  });
+});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&store?.hasPin()&&!maintenance)lock().catch(()=>{});else if(document.hidden&&state)flush().catch(()=>{});});
 window.addEventListener('storage',async event=>{
   if(event.key!=='12shagov-v2'&&event.key!==null)return;
