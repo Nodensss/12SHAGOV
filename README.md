@@ -2,17 +2,17 @@
 
 ## Запуск веб-приложения на Linux
 
-Веб-приложение с 12 интерактивными модулями находится в [ветке `main`](https://github.com/Nodensss/12SHAGOV/tree/main). Нужен Node.js 22 или новее:
+Веб-приложение с 12 интерактивными модулями находится в [ветке `main`](https://github.com/Nodensss/12SHAGOV/tree/main). Для запуска на Linux достаточно Python 3:
 
 ```bash
 git clone --branch main --single-branch https://github.com/Nodensss/12SHAGOV.git 12SHAGOV-linux
 cd 12SHAGOV-linux
-npm start
+python3 -m http.server 4173 --bind 127.0.0.1 --directory public
 ```
 
-Откройте <http://localhost:4173>. Команда `npm start` относится к ветке `main`; текущая ветка содержит Android-проект с отдельными командами ниже.
+Откройте <http://localhost:4173>. Текущая ветка содержит Android-проект с отдельными командами ниже.
 
-Если репозиторий уже клонирован, выполните в его каталоге `git fetch origin main:refs/remotes/origin/main`, затем `git switch main` и `npm start`.
+Если репозиторий уже клонирован, выполните в его каталоге `git fetch origin main:refs/remotes/origin/main`, затем `git switch main` и команду Python выше. При установленном Node.js 22+ вместо неё можно выполнить `npm start`.
 
 Приложение, чтобы идти по 12 шагам в своём темпе: к каждому шагу — краткий пересказ,
 что может помочь, чем может обернуться, «здоровое прочтение», опыт участников и вопросы
