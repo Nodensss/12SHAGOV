@@ -7,12 +7,14 @@
 Нужен Node.js 22 или новее. Внешних зависимостей и установки пакетов нет.
 
 ~~~sh
-git clone https://github.com/Nodensss/12SHAGOV.git
+git clone --branch main --single-branch https://github.com/Nodensss/12SHAGOV.git
 cd 12SHAGOV
 npm start
 ~~~
 
 Откройте [http://localhost:4173](http://localhost:4173). Сервер слушает только это устройство. Остановить: Ctrl+C. Если порт занят, выполните npm start -- --port 4174.
+
+У репозитория сейчас другая ветка по умолчанию — Android-проект. Для этого веб-приложения на Linux нужна именно ветка `main`.
 
 Другой вариант без Node.js:
 
