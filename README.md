@@ -4,22 +4,22 @@
 
 ## Быстрый запуск
 
-Нужен Node.js 22 или новее. Внешних зависимостей и установки пакетов нет.
+Для запуска на Linux достаточно Python 3. Устанавливать `npm` не нужно.
 
 ~~~sh
 git clone --branch main --single-branch https://github.com/Nodensss/12SHAGOV.git
 cd 12SHAGOV
-npm start
+python3 -m http.server 4173 --bind 127.0.0.1 --directory public
 ~~~
 
-Откройте [http://localhost:4173](http://localhost:4173). Сервер слушает только это устройство. Остановить: Ctrl+C. Если порт занят, выполните npm start -- --port 4174.
+Откройте [http://localhost:4173](http://localhost:4173). Сервер слушает только это устройство. Остановить: Ctrl+C. Если порт занят, замените `4173` на `4174` в команде и адресе.
 
 У репозитория сейчас другая ветка по умолчанию — Android-проект. Для этого веб-приложения на Linux нужна именно ветка `main`.
 
-Другой вариант без Node.js:
+Если у вас есть Node.js 22 или новее и `npm` находится в `PATH`, можно запустить встроенный сервер:
 
 ~~~sh
-python3 -m http.server 4173 --bind 127.0.0.1 --directory public
+npm start
 ~~~
 
 Раздавайте веб-сервером только public/ или dist/. Исходные документы находятся отдельно от веб-версии в docs/.
