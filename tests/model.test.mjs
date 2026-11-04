@@ -85,3 +85,71 @@ test('direct callers cannot trigger accessors while normalizing', () => {
   Object.defineProperty(field, 'unsafe', { enumerable: true, get() { throw new Error('Do not execute'); } });
   assert.deepEqual(normalizeDraft({ fields: field }).fields, {});
 });
+
+test('journey progress and existing exercise records survive a JSON backup roundtrip', () => {
+  const completedAt = '2026-11-04T10:20:30.000Z';
+  const initial = normalize({
+    drafts: {
+      1: {
+        fields: { discussion: 'О чём поговорить' }, answers: { 0: 'Мой ответ' }, skipped: { 1: true },
+        cardLanes: { 0: 'до', 1: 'после' }, selections: { consequences: ['Просил(а) поддержки'] },
+        opened: completedAt,
+        journey: { phase: 'takeaway', visited: ['intro', 'exercise', 'reflection', 'takeaway'], completedAt, takeaway: 'Поддержка доступна' },
+      },
+      8: { fields: { amendsWho: 'Псевдоним' }, entries: [{ id: 'entry-1', who: 'Псевдоним', what: 'Короткое наблюдение' }] },
+    },
+    lastStep: 1, bookmarks: { 1: true },
+    daily: { '2026-11-04': { fields: { dayImportant: 'Обычный день' }, journey: { phase: 'exercise', visited: ['intro'] } } },
+  });
+  // Storage and backup imports both normalize JSON-decoded state.
+  const loaded = normalize(JSON.parse(JSON.stringify(initial)));
+  const backup = JSON.parse(JSON.stringify({ data: loaded }));
+  const restored = normalize(backup.data);
+  assert.deepEqual(loaded, initial);
+  assert.deepEqual(restored, initial);
+  assert.deepEqual(restored.drafts[1].journey, {
+    phase: 'takeaway', visited: ['intro', 'exercise', 'reflection', 'takeaway'], completedAt, takeaway: 'Поддержка доступна',
+  });
+  assert.deepEqual(restored.drafts[1].answers, { 0: 'Мой ответ' });
+  assert.deepEqual(restored.drafts[1].cardLanes, { 0: 'до', 1: 'после' });
+  assert.deepEqual(restored.drafts[8].entries, [{ id: 'entry-1', who: 'Псевдоним', what: 'Короткое наблюдение' }]);
+  assert.equal(Object.hasOwn(restored.drafts[8], 'journey'), false);
+});
+
+test('model integration cleans malformed journeys without discarding older exercise data', () => {
+  const restored = normalize({ drafts: {
+    1: { fields: { discussion: 'Старая заметка' }, answers: { 0: 'Ответ' }, journey: null },
+    2: { selections: { supports: ['Люди'] }, journey: ['exercise'] },
+    3: {
+      zoneCards: { 0: 'Могу сделать сам(а)' },
+      journey: {
+        phase: 'source', visited: ['exercise', 'intro', 'exercise', {}, 'unexpected'],
+        completedAt: '2026-02-31T10:00:00.000Z', takeaway: { text: 'Неверный формат' }, unexpected: 'discard',
+      },
+    },
+  } });
+  assert.deepEqual(restored.drafts[1].fields, { discussion: 'Старая заметка' });
+  assert.deepEqual(restored.drafts[1].answers, { 0: 'Ответ' });
+  assert.deepEqual(restored.drafts[2].selections, { supports: ['Люди'] });
+  assert.equal(Object.hasOwn(restored.drafts[1], 'journey'), false);
+  assert.equal(Object.hasOwn(restored.drafts[2], 'journey'), false);
+  assert.deepEqual(restored.drafts[3].journey, { phase: 'intro', visited: ['intro', 'exercise'], completedAt: null, takeaway: '' });
+  assert.deepEqual(restored.drafts[3].zoneCards, { 0: 'Могу сделать сам(а)' });
+});
+
+test('normalized journey state neither aliases a backup nor executes journey accessors', () => {
+  const backup = { drafts: { 1: { journey: { phase: 'exercise', visited: ['intro'], takeaway: 'Личный вывод' } } } };
+  const restored = normalize(backup);
+  restored.drafts[1].journey.phase = 'reflection';
+  restored.drafts[1].journey.visited.push('exercise');
+  restored.drafts[1].journey.takeaway = 'Другой вывод';
+  assert.deepEqual(backup.drafts[1].journey, { phase: 'exercise', visited: ['intro'], takeaway: 'Личный вывод' });
+
+  const draft = {}, journey = {};
+  const fail = () => { throw new Error('Do not execute journey accessor'); };
+  Object.defineProperty(draft, 'journey', { enumerable: true, get: fail });
+  Object.defineProperty(journey, 'phase', { enumerable: true, get: fail });
+  const clean = normalize({ drafts: { 1: draft, 2: { journey } } });
+  assert.equal(Object.hasOwn(clean.drafts[1], 'journey'), false);
+  assert.deepEqual(clean.drafts[2].journey, { phase: 'intro', visited: [], completedAt: null, takeaway: '' });
+});

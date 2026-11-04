@@ -1,5 +1,5 @@
-const CACHE = '12shagov-shell-v4';
-const ASSETS = ['./', './index.html', './styles.css', './app.js', './steps.js', './exercises.js', './storage.js', './content.js', './model.js', './reader.js', './manifest.webmanifest', './icon.svg', './data/content.json', './data/sources.json'];
+const CACHE = '12shagov-shell-v5';
+const ASSETS = ['./', './index.html', './styles.css', './journey.css', './journey.js', './journey-view.js', './app.js', './steps.js', './exercises.js', './storage.js', './content.js', './model.js', './reader.js', './manifest.webmanifest', './icon.svg', './data/content.json', './data/sources.json'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
 });

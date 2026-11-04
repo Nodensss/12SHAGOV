@@ -1,3 +1,5 @@
+import { normalizeJourney } from './journey.js';
+
 const MAX_TEXT = 100000;
 const FORBIDDEN_KEYS = new Set(['__proto__', 'prototype', 'constructor']);
 const MAX_MAP_ITEMS = 300;
@@ -90,6 +92,8 @@ export function normalizeDraft(value) {
     const item = property(input, key);
     if (timestamp(item)) output[key] = item;
   }
+  const journey = property(input, 'journey');
+  if (plain(journey)) output.journey = normalizeJourney(journey);
   const position = property(input, 'readPosition');
   if (typeof position === 'number' && Number.isFinite(position) && position >= 0) output.readPosition = position;
   const dates = property(input, 'checkinDates');
