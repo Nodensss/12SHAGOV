@@ -4,11 +4,14 @@ import { createExerciseRenderer } from './exercises.js';
 import { canReadSource, findPassages, sourceStatusLabel } from './content.js';
 import { freshState, normalize } from './model.js';
 import { renderEditorialSummary } from './reader.js';
+import { sessionPhases, getJourney } from './journey.js';
+import { createJourneyRenderer } from './journey-view.js';
 
 const app = document.querySelector('#app');
 const modal = document.querySelector('#modal');
 let state = freshState(), store, content = { steps: [], summaries: [], passages: [] }, sources = [];
 let prefs = { font: 100, contrast: false, speechRate: 1, privatePreview: false };
+let fullStep = false;
 let currentStep = 0, saveTimer, toastTimer, timerInterval, timerEnd = 0;
 let contentAvailable = false, sourceSearch = '', noteSearch = '', pendingSave = Promise.resolve();
 let maintenance = false, lockPromise = null, unsavedWarning = false;
@@ -80,20 +83,7 @@ function options(group, values, multiple = false) {
   }).join('') + '</div>';
 }
 const exercise = createExerciseRenderer({ draftFor, field, options, esc: h });
-function stepCard(s) {
-  const d = state.drafts[s.id];
-  const status = !d?.opened ? 'Не открывал' : (state.visitCount[s.id] || 0) > 1 ? 'Возвращаюсь' : 'Знакомлюсь';
-  return '<a class="step-card" href="#step/' + s.id + '" aria-label="Шаг ' + s.id + '. ' + h(s.name) + '"><span class="step-status ' + (d?.opened ? 'touched' : '') + '">' + status + '</span><span class="step-num">' + String(s.id).padStart(2,'0') + '</span><strong>' + h(s.name) + '</strong><small>' + h(s.short) + '</small>' + (state.bookmarks[s.id] ? '<span class="tiny">В закладках</span>' : '') + '</a>';
-}
-function home() {
-  const next = state.lastStep || 1, s = stepBy(next);
-  return '<div class="page"><section class="hero"><div class="hero-copy"><div class="eyebrow">12 шагов · личный темп</div><h1 tabindex="-1">С того места,<br>где вы сейчас.</h1><p>Немного чтения, одно упражнение, время для себя. Можно остановиться в любой момент.</p>' +
-    link(state.lastStep ? 'Продолжить · шаг ' + next : 'Начать знакомство · 5 минут', '#step/' + next, 'button button-primary') + '<p class="tiny">Сейчас: ' + h(s.activityTitle) + '</p></div>' +
-    '<div class="hero-art" aria-hidden="true"><span class="orbit orbit-one"></span><span class="orbit orbit-two"></span><span class="orbit orbit-three"></span><i class="orbit-dot a"></i><i class="orbit-dot b"></i><i class="orbit-dot c"></i></div></section>' +
-    '<div class="section-heading"><h2>Карта шагов</h2><span class="muted">Открывайте любой</span></div><div class="step-grid">' + steps.map(stepCard).join('') + '</div>' +
-    '<div class="home-foot-grid"><article class="soft-card"><span class="micro-icon" aria-hidden="true">✳</span><h3>На сегодня</h3><p>Какая поддержка доступна мне сейчас?</p>' + link('Собрать компас надежды →','#step/2','text-link') + '</article>' +
-    '<article class="soft-card"><span class="micro-icon" aria-hidden="true">▤</span><h3>Личное пространство</h3><p>' + (store.hasPin() ? 'Записи защищены вашим PIN.' : 'Черновики сохраняются в этом браузере. PIN можно настроить в любое время.') + '</p>' + link('Мои заметки →','#notes','text-link') + '</article></div></div>';
-}
+const journeyView = createJourneyRenderer({ steps, getState: () => state, esc: h, link, action, draftFor, field, options, exercise, questionBlock, sourceQuote, calendar });
 function questionBlock(question, index) {
   const d = draftFor(currentStep), skipped = !!d.skipped[index];
   return '<div class="question' + (skipped ? ' skipped' : '') + '"><div class="question-head"><label for="q-' + index + '">' + h(question) + '</label><button class="skip-button" data-skip="' + index + '" aria-pressed="' + skipped + '">' + (skipped ? 'Вернуться к вопросу' : 'Пропустить') + '</button></div><textarea id="q-' + index + '" data-answer="' + index + '" placeholder="Только если хочется записать" ' + (skipped ? 'disabled' : '') + '>' + h(d.answers[index] || '') + '</textarea></div>';
@@ -139,9 +129,9 @@ function calendar() {
   }
   return '<section class="content-card"><h2>Календарь записей · ' + h(now.toLocaleDateString('ru-RU',{month:'long',year:'numeric'})) + '</h2><p class="tiny">Только факт сохранения. Пропуски не создают долга.</p><div class="calendar-grid">' + grid + '</div></section>';
 }
-function stepPage(id) {
+function fullStepPage(id) {
   const s = stepBy(id), d = draftFor(id);
-  return '<div class="page step-layout"><div class="step-main"><div class="step-title-row"><div><div class="eyebrow">Шаг ' + id + ' · ' + h(s.verb) + '</div><h1 tabindex="-1">' + h(s.name) + '</h1><p class="step-kicker">' + h(s.short) + '</p></div><span class="step-number-big" aria-hidden="true">' + String(id).padStart(2,'0') + '</span></div>' +
+  return '<div class="page step-layout"><div class="step-main">' + action('← Вернуться к короткой сессии','journey-guided','button button-quiet') + '<div class="step-title-row"><div><div class="eyebrow">Шаг ' + id + ' · ' + h(s.verb) + '</div><h1 tabindex="-1">' + h(s.name) + '</h1><p class="step-kicker">' + h(s.short) + '</p></div><span class="step-number-big" aria-hidden="true">' + String(id).padStart(2,'0') + '</span></div>' +
     '<nav class="section-nav" aria-label="Разделы шага"><button data-section="intro"><span class="section-nav-index">01</span><span>Знакомство</span></button><button data-section="exercise"><span class="section-nav-index">02</span><span>Практика</span></button><button data-section="reflection"><span class="section-nav-index">03</span><span>Размышление</span></button><button data-section="source"><span class="section-nav-index">04</span><span>Источники</span></button></nav>' +
     '<section class="content-card" id="intro"><div class="eyebrow">01 / Знакомство</div><div class="intro-grid"><div><h2>Смысл шага</h2><p class="intro-copy">' + h(s.intro) + '</p></div><div class="story-box"><h3>Небольшая ситуация</h3><p>' + h(s.story) + '</p><span class="tiny">Вымышленный пример для размышления</span></div></div>' +
     '<div class="reading-controls">' + action('▶ Слушать введение','speak','button button-quiet button-small') + action('Пауза / продолжить','speech-pause','button button-quiet button-small') + action('Остановить','speech-stop','button button-quiet button-small') + '</div><p class="tiny" id="audio-status" aria-live="polite">Читается только введение локальным голосом браузера.</p></section>' +
@@ -159,7 +149,7 @@ function stepPage(id) {
     '<div class="aside-card"><h3>Поддержка рядом</h3><p>Сложные темы можно обсудить с человеком, которому вы доверяете.</p>' + action('Мои контакты поддержки','support','text-link') + '</div><div class="aside-card">' + link(id===12 ? 'К карте шагов →' : 'Следующий шаг →',id===12 ? '#steps' : '#step/' + (id+1),'text-link') + '</div></aside></div>';
 }
 function hasContent(d) {
-  return !!d && (d.savedAt || Object.values(d.fields || {}).some(Boolean) || Object.values(d.answers || {}).some(Boolean) || d.entries?.length || Object.keys(d.selections || {}).length);
+  return !!d && (getJourney(d).takeaway.trim() || d.savedAt || Object.values(d.fields || {}).some(Boolean) || Object.values(d.answers || {}).some(Boolean) || d.entries?.length || Object.keys(d.selections || {}).length);
 }
 function notesPage() {
   const q = noteSearch.toLocaleLowerCase('ru');
@@ -169,7 +159,7 @@ function notesPage() {
     '<div class="privacy-banner">' + (store.hasPin() ? 'Записи зашифрованы. При уходе приложения в фон оно блокируется.' : 'Записи локальные. Включите PIN, если хотите зашифровать их в браузере.') + ' Очищение данных браузера удалит их; сохраните копию при необходимости.</div>' +
     '<div class="note-list">' + (list.length ? list.map(s => {
       const d = state.drafts[s.id];
-      return '<article class="note-item"><div><h3>Шаг ' + s.id + ' · ' + h(s.name) + '</h3><p>' + h(d.savedAt ? new Date(d.savedAt).toLocaleString('ru-RU') : 'Автосохранённый черновик') + '</p></div><div class="note-actions">' + link('Открыть','#step/'+s.id,'button button-quiet button-small') + action('Удалить','delete-note','button button-danger button-small','data-id="' + s.id + '"') + '</div></article>';
+      return '<article class="note-item"><div><h3>Шаг ' + s.id + ' · ' + h(s.name) + '</h3><p>' + h(d.savedAt ? new Date(d.savedAt).toLocaleString('ru-RU') : 'Автосохранённый черновик') + '</p>' + (getJourney(d).takeaway.trim() ? '<blockquote class="note-takeaway">' + h(getJourney(d).takeaway) + '</blockquote>' : '') + '</div><div class="note-actions">' + link('Открыть','#step/'+s.id,'button button-quiet button-small') + action('Удалить','delete-note','button button-danger button-small','data-id="' + s.id + '"') + '</div></article>';
     }).join('') : '<div class="empty-state"><strong>Заметок пока нет</strong>Можно пройти любой шаг без записей.</div>') + '</div>' + calendar() + '</div>';
 }
 function libraryPage() {
@@ -207,7 +197,7 @@ function render({focus=false, restore=false}={}) {
   });
   $('#lock-button').hidden = !store.hasPin();
   document.body.classList.remove('vault-locked');
-  app.innerHTML = view==='home' ? home() : view==='steps' ? '<div class="page">' + heading('Все двенадцать шагов','Свободный маршрут. Выберите то, с чем хотите познакомиться сейчас.') + '<div class="step-grid">' + steps.map(stepCard).join('') + '</div></div>' : view==='step' ? stepPage(currentStep) : view==='summary' ? summaryPage(summaryId) : view==='notes' ? notesPage() : view==='library' ? libraryPage() : settingsPage();
+  app.innerHTML = view==='home' ? journeyView.home() : view==='steps' ? journeyView.stepsPage(heading) : view==='step' ? (fullStep ? fullStepPage(currentStep) : journeyView.session(currentStep)) : view==='summary' ? summaryPage(summaryId) : view==='notes' ? notesPage() : view==='library' ? libraryPage() : settingsPage();
   document.title = currentStep ? 'Шаг ' + currentStep + ' — Свой путь' : view==='summary' ? 'Конспект шага ' + summaryId + ' — Свой путь' : 'Свой путь — 12 шагов';
   applyPrefs();
   if (focus) app.querySelector('h1')?.focus({preventScroll:true});
@@ -226,11 +216,16 @@ function rerender(target) {
 async function routeChanged() {
   if (!state || store.isLocked()) return;
   clearTimeout(scrollTimer);
+  fullStep = false;
   stopSpeech(); stopTimer(); await flush();
+  if (!state || store.isLocked() || maintenance) return;
   const id = Number(location.hash.split('/')[1]);
   if (location.hash.startsWith('#step/') && stepBy(id)) {
     const d = draftFor(id);
     state.lastStep=id; state.visitCount[id]=(state.visitCount[id]||0)+1; d.opened ||= new Date().toISOString();
+    if (!d.journey) d.readPosition = 0;
+    d.journey = getJourney(d);
+    if (!d.journey.visited.includes(d.journey.phase)) d.journey.visited.push(d.journey.phase);
     await flush();
   }
   render({focus:true,restore:true});
@@ -341,7 +336,23 @@ document.addEventListener('click', async event => {
       return;
     }
     if(!state || store.isLocked()) return;
+    if(target.dataset.journeyStage){
+      const stage=target.dataset.journeyStage;
+      document.querySelectorAll('[data-stage]').forEach(el=>{el.hidden=stage!=='all'&&el.dataset.stage!==stage;});
+      document.querySelectorAll('[data-journey-stage]').forEach(el=>el.setAttribute('aria-pressed',String(el.dataset.journeyStage===stage)));
+      return;
+    }
     const d=currentStep?draftFor(currentStep):null;
+    if(target.dataset.phase && d && sessionPhases.includes(target.dataset.phase)){
+      stopSpeech();stopTimer();clearTimeout(scrollTimer);
+      d.journey=getJourney(d);d.journey.phase=target.dataset.phase;
+      if(!d.journey.visited.includes(d.journey.phase))d.journey.visited.push(d.journey.phase);
+      d.readPosition=0;
+      await flush();
+      if(!state||store.isLocked()||maintenance)return;
+      render();window.scrollTo({top:0,behavior:'instant'});$('#session-heading')?.focus({preventScroll:true});
+      return;
+    }
     if(target.dataset.option){
       const key=target.dataset.option,value=target.dataset.value,chosen=d.selections[key];
       d.selections[key]=target.dataset.multiple==='1' ? (Array.isArray(chosen)&&chosen.includes(value)?chosen.filter(x=>x!==value):[...(Array.isArray(chosen)?chosen:[]),value]) : value;
@@ -361,6 +372,17 @@ document.addEventListener('click', async event => {
     if(target.dataset.timerStop!==undefined){stopTimer();if($('#timer-display'))$('#timer-display').textContent='00:00';if($('#timer-label'))$('#timer-label').textContent='Практика остановлена. Можно вернуться позже.';return;}
     if(target.dataset.daily){const entry=state.daily[target.dataset.daily];if(entry)openDialog('Запись за ' + target.dataset.daily,'<div class="source-text">' + Object.entries(entry.fields||{}).filter(([,v])=>v).map(([k,v])=>'<p><strong>'+h(({dayImportant:'Важное',dayRepair:'Что исправить',dayGratitude:'Благодарность',dayNext:'Следующий шаг'})[k]||'Наблюдение')+'</strong><br>'+h(v)+'</p>').join('')+'</div>'+action('Удалить эту запись','delete-daily','button button-danger','data-date="'+target.dataset.daily+'"'));return;}
     switch(target.dataset.action){
+      case 'journey-full':
+      case 'journey-guided':
+        stopSpeech();stopTimer();clearTimeout(scrollTimer);fullStep=target.dataset.action==='journey-full';
+        render({focus:true});break;
+      case 'journey-complete':
+        if(!d)break;
+        d.journey=getJourney(d);d.journey.completedAt=new Date().toISOString();d.savedAt=d.journey.completedAt;
+        if(currentStep===10){state.daily[today()]=JSON.parse(JSON.stringify(d));d.checkinDates=[...new Set([...(d.checkinDates||[]),today()])];}
+        await flush();
+        if(!state||store.isLocked()||maintenance)return;
+        rerender();$('.completion-note')?.focus({preventScroll:true});toast('Сессия сохранена. Можно отдохнуть или продолжить путь.');break;
       case 'save':
         d.savedAt=new Date().toISOString();
         if(currentStep===10){state.daily[today()]=JSON.parse(JSON.stringify(d));d.checkinDates=[...new Set([...(d.checkinDates||[]),today()])];}
@@ -395,6 +417,7 @@ document.addEventListener('click', async event => {
 });
 document.addEventListener('input',event=>{
   const el=event.target;if(!state||store.isLocked()||maintenance)return;
+  if(el.hasAttribute('data-journey-takeaway')&&currentStep){const d=draftFor(currentStep);d.journey=getJourney(d);d.journey.takeaway=el.value;scheduleSave();}
   if(el.dataset.field!==undefined){draftFor(currentStep).fields[el.dataset.field]=el.value;scheduleSave();}
   if(el.dataset.answer!==undefined){draftFor(currentStep).answers[el.dataset.answer]=el.value;scheduleSave();}
   if(el.dataset.pref==='font'){prefs.font=Number(el.value);applyPrefs();savePreferences(prefs);$('#font-value').textContent=prefs.font+'%';}
