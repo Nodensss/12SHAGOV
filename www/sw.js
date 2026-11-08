@@ -1,11 +1,17 @@
 /* Офлайн-кэш для установки как веб-приложения (PWA). В APK не используется. */
-var CACHE = 'shagi-v1';
+var CACHE = 'shagi-v2';
 var FILES = [
   './',
   'index.html',
   'research.html',
   'css/app.css',
+  'css/intro.css',
   'js/content.js',
+  'js/intro.js',
+  'fonts/cormorant-garamond-cyrillic-600-italic.woff2',
+  'fonts/cormorant-garamond-latin-600-italic.woff2',
+  'fonts/cormorant-sc-cyrillic-700-normal.woff2',
+  'fonts/cormorant-sc-latin-700-normal.woff2',
   'js/app.js',
   'manifest.webmanifest',
   'icons/icon-192.png',

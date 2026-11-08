@@ -796,8 +796,24 @@
         h('li', null, h('a', { href: '#/sources' }, 'Источники', h('span', { class: 's' }, C.sources.length + ' ссылок: документы, исследования, пресса, форумы'))),
         h('li', null, h('a', { href: '#/data' }, 'Мои данные', h('span', { class: 's' }, 'Резервная копия, восстановление, удаление'))),
         h('li', null, h('a', { href: '#/about' }, 'О приложении'))),
+      introCard(),
       sosLink()
     ];
+  }
+
+  function introCard() {
+    if (!window.Intro) return null;
+    var cfg = window.Intro.settings();
+    function toggle(key, label) {
+      return h('label', { class: 'check-line' },
+        h('input', { type: 'checkbox', checked: cfg[key], onchange: function (ev) { window.Intro.set(key, ev.target.checked); } }),
+        h('span', null, label));
+    }
+    return h('section', { class: 'card stack', style: 'margin-top:20px' },
+      h('h3', null, 'Вступление'),
+      h('button', { class: 'btn block', type: 'button', onclick: function () { window.Intro.play(); } }, 'Посмотреть вступление'),
+      toggle('auto', 'Показывать при запуске приложения'),
+      toggle('sound', 'Со звуком'));
   }
 
   function viewInfo(item) {
@@ -961,4 +977,5 @@
   }
 
   route();
+  if (window.Intro && window.Intro.settings().auto) window.Intro.play();
 })();
