@@ -7,8 +7,11 @@
     "serve": "npx --yes http-server www -p 8080 -c-1",
     "research": "node scripts/build-research.mjs",
     "icons": "python3 scripts/make_icons.py",
-    "sync": "npm run research && cap sync android",
-    "apk": "npm run sync && cd android && ./gradlew assembleDebug"
+    "sync": "npm run content:steps && npm run research && cap sync android",
+    "apk": "npm run sync && cd android && ./gradlew assembleDebug",
+    "content:steps": "node scripts/build-step-content.cjs",
+    "preserve": "npm run content:steps",
+    "test:step": "node --test tests/step-core.test.cjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.6.0",

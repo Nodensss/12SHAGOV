@@ -1,0 +1,56 @@
+{
+  "id": "step01",
+  "title": "Первый шаг",
+  "topics": [
+    {
+      "id": "addiction",
+      "title": "Болезнь зависимости"
+    },
+    {
+      "id": "denial",
+      "title": "Отрицание"
+    },
+    {
+      "id": "bottom",
+      "title": "Дно, отчаяние, изоляция"
+    },
+    {
+      "id": "powerlessness",
+      "title": "Бессилие"
+    },
+    {
+      "id": "unmanageability",
+      "title": "Неуправляемость"
+    },
+    {
+      "id": "reservations",
+      "title": "Оговорки"
+    },
+    {
+      "id": "surrender",
+      "title": "Капитуляция и духовные принципы"
+    }
+  ],
+  "sections": [
+    {
+      "id": "sources",
+      "title": "Источники",
+      "description": "Прочитать, что говорит программа"
+    },
+    {
+      "id": "explain",
+      "title": "Разбор",
+      "description": "Понять смысл и способы работы"
+    },
+    {
+      "id": "practice",
+      "title": "Практика",
+      "description": "Примерить темы на свою жизнь"
+    },
+    {
+      "id": "journal",
+      "title": "Тетрадь",
+      "description": "Написать шаг и подготовить разговор"
+    }
+  ]
+}

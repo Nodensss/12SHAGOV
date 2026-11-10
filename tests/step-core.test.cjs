@@ -1,0 +1,7 @@
+const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),os=require('node:os'),path=require('node:path');
+const core=require('../www/js/step-core.js'),{build}=require('../scripts/build-step-content.cjs');
+test('frontmatter, topic markers and stable paragraph locators',()=>{const s=core.parseSource('---\nid: basic-text\ntitle: "Моя книга"\norder: 2\ntopics: [denial]\n---\n\nПервый.\n\n<!-- topic: powerlessness -->\n\nВторой.');assert.equal(s.title,'Моя книга');assert.deepEqual(s.paragraphs.map(p=>p.topics),[['denial'],['powerlessness']]);assert.equal(s.paragraphs[1].id,'basic-text-p2');});
+test('invalid metadata fails closed',()=>{for(const s of ['---\nid: ../../escape\n---\na','---\ntopics: [missing]\n---\na','---\nunknown: true\n---\na','---\nid: x'])assert.throws(()=>core.parseSource(s));});
+test('source HTML stays text',()=>{assert.equal(core.parseSource('<script>alert(1)</script>','safe').paragraphs[0].text,'<script>alert(1)</script>');});
+test('empty pack leaves step usable',()=>{const dir=fs.mkdtempSync(path.join(os.tmpdir(),'step-pack-'));try{const p=build(dir).step01;assert.equal(p.sources.length,0);assert.equal(p.wording,'');assert.equal(p.step.sections.length,4);}finally{fs.rmSync(dir,{recursive:true});}});
+test('step contract rejects duplicate sections',()=>{const s=JSON.parse(fs.readFileSync(path.join(__dirname,'../www/assets/steps/step01/step.json')));assert.equal(core.validateStep(s),s);s.sections[0].id='journal';assert.throws(()=>core.validateStep(s));});

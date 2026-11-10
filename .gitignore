@@ -3,3 +3,6 @@ dist/
 .DS_Store
 *.keystore
 *.jks
+
+content-pack/
+www/js/step-content.js

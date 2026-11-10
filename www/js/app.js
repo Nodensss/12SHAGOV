@@ -204,7 +204,7 @@
     step: function (p) {
       var n = parseInt(p[1], 10);
       if (!(n >= 1 && n <= 12)) return null;
-      return { tab: 'steps', title: 'Шаг ' + n, back: '#/steps', render: function () { return viewStep(n); } };
+      return { tab: 'steps', title: 'Шаг ' + n, back: '#/steps', render: function () { return n === 1 && window.StepEngine ? StepEngine.render("step01", p) : viewStep(n); } };
     },
     journal: function () { return { tab: 'journal', title: 'Дневник', render: viewJournal }; },
     more: function () { return { tab: 'more', title: 'Ещё', render: viewMore }; },
