@@ -944,10 +944,11 @@
   }
 
   function wipe() {
-    ask({ title: 'Удалить все записи?', body: 'Ответы, списки, дневник, счётчик и отметки будут удалены с этого устройства. Отменить это нельзя.', ok: 'Удалить всё', danger: true }).then(function (ok) {
+    ask({ title: 'Удалить все записи?', body: 'Ответы, списки, дневник, счётчик, отметки, зашифрованная тетрадь Шага 1 и сохранённые в ней источники будут удалены с этого устройства. Отменить это нельзя.', ok: 'Удалить всё', danger: true }).then(function (ok) {
       if (!ok) return;
       state = blank();
       try { localStorage.removeItem(KEY); } catch (e) { /* ignore */ }
+      if (window.StepEngine && StepEngine.vault) StepEngine.vault.destroy().catch(function () { /* ignore */ });
       journalDate = null;
       tell('Удалено', 'Все записи удалены.').then(function () { location.hash = '#/'; route(); });
     });
