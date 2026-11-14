@@ -74,9 +74,26 @@ jobs:
           fi
 
       - uses: actions/upload-artifact@v4
+        id: apk_artifact
+        continue-on-error: true
         with:
           name: 12-shagov-apk
           path: dist/12-shagov.apk
+
+      - name: Ссылка на APK, если хранилище артефактов недоступно
+        if: steps.apk_artifact.outcome == 'failure' && github.ref == 'refs/heads/ccr-904d7ed7-auu10m'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-${{ github.sha }}
+          target_commitish: ${{ github.sha }}
+          name: Тестовая APK — сборка ${{ github.run_number }}
+          prerelease: true
+          body: |
+            Тестовая сборка Android из ветки ccr-904d7ed7-auu10m.
+            Материалы добавляются после установки: Шаг 1 → Загрузить материалы в шаг.
+            Файл размещён здесь, потому что хранилище артефактов GitHub Actions недоступно.
+          files: dist/12-shagov.apk
+          fail_on_unmatched_files: true
 
       - name: Релиз с APK (для тегов v*)
         if: startsWith(github.ref, 'refs/tags/v')
