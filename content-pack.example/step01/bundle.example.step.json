@@ -1,0 +1,20 @@
+{
+  "format": "12shagov-step-pack",
+  "version": 1,
+  "id": "step01-example",
+  "stepId": "step01",
+  "title": "Пример личного пакета",
+  "subtitle": "Точка отсчёта",
+  "introduction": [
+    "Это пример формата. Замени заглушки своими материалами."
+  ],
+  "wording": "Здесь формулировка из твоего экземпляра.",
+  "questions": "# denial\n\n1. Здесь твой вопрос.\n\n# powerlessness\n\n1. Здесь следующий вопрос.",
+  "sources": [
+    {
+      "id": "example-book",
+      "editionStatus": "owner-provided",
+      "markdown": "---\nid: example-book\ntitle: \"Название книги\"\ntopics: [denial]\n---\n\nЗдесь твой оригинальный текст."
+    }
+  ]
+}

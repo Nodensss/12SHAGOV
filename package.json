@@ -12,7 +12,8 @@
     "content:steps": "npm run vendor:imports && node scripts/build-step-content.cjs",
     "preserve": "npm run content:steps",
     "test:step": "node --test tests/*.test.cjs",
-    "vendor:imports": "node scripts/vendor-importers.cjs"
+    "vendor:imports": "node scripts/vendor-importers.cjs",
+    "bundle:step01": "node scripts/build-personal-step-bundle.cjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.6.0",

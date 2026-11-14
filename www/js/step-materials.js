@@ -9,7 +9,7 @@ function record(id){return cache[id]||core.record(null);}
 async function load(vault,id){var version=epoch;var raw=await vault.get('materials:'+id);if(version===epoch&&vault.isOpen())cache[id]=core.record(raw);}
 function forget(){epoch++;cache={};}
 function questions(id,archive){var r=record(id);return archive?r.questions.concat(r.history.filter(function(q){return !r.questions.some(function(c){return c.id===q.id;});})):r.questions;}
-function effective(id,pack){var r=record(id);return Object.assign({},pack,{wording:r.wording||pack.wording});}
+function effective(id,pack){var r=record(id);var byId=new Map();pack.sources.concat(r.bundleSources||[]).forEach(function(s){byId.set(s.id,s);});return Object.assign({},pack,{wording:r.wording||pack.wording,sources:Array.from(byId.values()),ownerBundle:r.bundle?Object.assign({},r.bundle,{questionCount:r.questions.length}):null});}
 function confirm(root,message){return new Promise(function(resolve){var d=el('dialog');d.className='dialog';d.append(el('p',message));function finish(v){d.close();d.remove();resolve(v);}d.append(button('Отмена',function(){finish(false);}),button('Удалить',function(){finish(true);}));d.addEventListener('cancel',function(e){e.preventDefault();finish(false);});root.append(d);d.showModal();});}
 async function put(ctx,next){var version=epoch;if(!ctx.vault||!ctx.vault.isOpen())throw Error('Тетрадь закрыта. Открой её и повтори сохранение.');await ctx.vault.put('materials:'+ctx.id,next);if(version!==epoch||!ctx.vault.isOpen())throw Error('Тетрадь закрылась. Материалы будут видны после разблокировки.');cache[ctx.id]=next;}
 function render(root,ctx){
@@ -18,17 +18,23 @@ function render(root,ctx){
   root.append(el('p','Сначала создай или открой защищённую Тетрадь. После этого материалы будут сохраняться между запусками.'));
   if(window.StepJournal)StepJournal.render(root,Object.assign({},ctx,{item:''}));return;
  }
+ if(window.StepBundle)StepBundle.renderImporter(root,Object.assign({},ctx,{install:async function(bundle){
+  var r=record(ctx.id),next=Object.assign({},r),history=r.history.concat(r.questions);
+  next.history=history.filter(function(q,i){return history.findIndex(function(v){return v.id===q.id;})===i;});if(next.history.length>10000)throw Error('История вопросов слишком велика');
+  next.wording=bundle.wording;next.questionsText=bundle.questionsText;next.questions=bundle.questions;next.bundleSources=bundle.sources;next.bundle=bundle.meta;
+  await put(ctx,next);
+ }}));
  var status=el('p');status.setAttribute('role','status');root.append(status);
  var slots=[{id:'sources',name:'Оригиналы книг',place:'Источники',detail:'Добавь нужный раздел книги. Можно загрузить несколько источников.',save:'Сохранить книгу в Источниках'},{id:'wording',name:'Формулировка шага',place:'Главный экран шага',detail:'Один короткий фрагмент. Например, готовый файл step.md.',save:'Сохранить формулировку'},{id:'questions',name:'Вопросы из литературы',place:'Тетрадь',detail:'Нумерованный список. Для группировки добавь заголовки тем, например «# Отрицание».',save:'Сохранить вопросы в Тетради'}];
  var countLabels={};
  var editor=el('div');editor.className='material-editor';
- slots.forEach(function(slot,index){var card=el('section');card.className='card material-slot';var r=record(ctx.id),count=slot.id==='sources'?ctx.pack.sources.length+ctx.imports.length:slot.id==='wording'?(r.wording||ctx.pack.wording?1:0):questions(ctx.id,false).length;
+ slots.forEach(function(slot,index){var card=el('section');card.className='card material-slot';var r=record(ctx.id),count=slot.id==='sources'?new Set(ctx.pack.sources.concat(ctx.imports).map(function(s){return s.id;})).size:slot.id==='wording'?(r.wording||ctx.pack.wording?1:0):questions(ctx.id,false).length;
   var countLabel=el('p',count?'Добавлено: '+count:'Пока пусто');countLabels[slot.id]=countLabel;
   card.append(el('small','0'+(index+1)+' · '+slot.place),el('h4',slot.name),el('p',slot.detail),countLabel,button('Добавить '+(slot.id==='sources'?'книгу':slot.id==='wording'?'формулировку':'вопросы'),function(){showEditor(slot);}));root.append(card);
  });
  root.append(editor);
  var list=el('section');list.className='material-list';function refreshList(){list.replaceChildren();list.append(el('h4','Добавленные книги'));
- ctx.pack.sources.concat(ctx.imports).forEach(function(s){var row=el('div');row.append(link(s.title,ctx.path(ctx.id,'sources',s.id)));if(s.persisted)row.append(button('Удалить книгу',async function(){if(!await confirm(root,'Удалить «'+s.title+'»? Записи Тетради не удаляются.'))return;try{await ctx.vault.remove('source:'+s.id);ctx.imports.splice(ctx.imports.indexOf(s),1);window.dispatchEvent(new Event('hashchange'));}catch(e){status.textContent=e.message;}}));list.append(row);});}refreshList();root.append(list);var destination=el('div');root.append(destination);
+ Array.from(new Map(ctx.pack.sources.concat(ctx.imports).map(function(s){return [s.id,s];})).values()).forEach(function(s){var row=el('div');row.append(link(s.title,ctx.path(ctx.id,'sources',s.id)));if(s.persisted)row.append(button('Удалить книгу',async function(){if(!await confirm(root,'Удалить «'+s.title+'»? Записи Тетради не удаляются.'))return;try{await ctx.vault.remove('source:'+s.id);ctx.imports.splice(ctx.imports.indexOf(s),1);window.dispatchEvent(new Event('hashchange'));}catch(e){status.textContent=e.message;}}));list.append(row);});}refreshList();root.append(list);var destination=el('div');root.append(destination);
  function showEditor(slot){
   editor.replaceChildren();var version=epoch,job=0,busy=false,origin=null;
   var heading=el('h4',slot.name+' → '+slot.place),note=el('p',slot.detail),input=el('input');input.type='file';input.accept='.pdf,.epub,.md,.txt,application/pdf,application/epub+zip,text/plain,text/markdown';input.setAttribute('aria-label','Файл для '+slot.name);if(slot.id==='questions')input.accept='.md,.txt,text/plain,text/markdown';
@@ -57,7 +63,7 @@ function render(root,ctx){
     }else{
      next.questions=core.questions(text);next.questionsText=text;var archived=r.history.concat(r.questions);next.history=archived.filter(function(q,i){return archived.findIndex(function(x){return x.id===q.id;})===i;});if(next.history.length>10000)throw Error('История вопросов слишком велика');await put(ctx,next);
     }
-    if(version!==epoch||!root.isConnected)return;countLabels[slot.id].textContent='Добавлено: '+(slot.id==='sources'?ctx.pack.sources.length+ctx.imports.length:slot.id==='wording'?1:record(ctx.id).questions.length);status.textContent='Сохранено: '+slot.name+' → '+slot.place+'.';area.value='';input.value='';feedback.textContent='Материал добавлен. Он будет доступен после перезапуска и разблокировки Тетради.';refreshList();destination.replaceChildren(link('Открыть '+slot.place,ctx.path(ctx.id,slot.id==='wording'?'':slot.id==='questions'?'journal':'sources')));
+    if(version!==epoch||!root.isConnected)return;countLabels[slot.id].textContent='Добавлено: '+(slot.id==='sources'?new Set(ctx.pack.sources.concat(ctx.imports).map(function(s){return s.id;})).size:slot.id==='wording'?1:record(ctx.id).questions.length);status.textContent='Сохранено: '+slot.name+' → '+slot.place+'.';area.value='';input.value='';feedback.textContent='Материал добавлен. Он будет доступен после перезапуска и разблокировки Тетради.';refreshList();destination.replaceChildren(link('Открыть '+slot.place,ctx.path(ctx.id,slot.id==='wording'?'':slot.id==='questions'?'journal':'sources')));
    }catch(e){if(root.isConnected)feedback.textContent=e.message;}finally{busy=false;submit.disabled=false;}
   });
   editor.append(heading,note,field('Выбрать файл с телефона',input),ranges,read,el('p','Или вставь текст вручную. Сохранение начнётся только после нажатия кнопки ниже.'));
