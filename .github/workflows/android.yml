@@ -38,6 +38,9 @@ jobs:
       - name: Зависимости
         run: npm ci
 
+      - name: Проверка парсеров и хранилища
+        run: npm run test:step
+
       - name: Веб-часть → Android-проект
         run: npm run sync
 

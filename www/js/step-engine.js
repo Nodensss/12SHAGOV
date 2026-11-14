@@ -2,6 +2,7 @@
 var C=window.StepCore,KEY='steps:reader:v1',prefs={};try{prefs=JSON.parse(localStorage.getItem(KEY))||{};}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(prefs));}catch(e){}}
 /* Зашифрованное хранилище: тетрадь и импортированные источники. Блокируется после простоя и долгого фона. */
+var vaultEpoch=0;
 var vault=null,imports=[],IDLE=5*60e3,HIDDEN=60e3,idleTimer=0,hiddenAt=0;
 try{if(window.StepVault&&window.indexedDB)vault=StepVault.create(StepVault.idbBackend('steps-vault'));}catch(e){}
 function rerender(){if(/^#\/step\//.test(location.hash))window.dispatchEvent(new Event('hashchange'));}
@@ -9,10 +10,11 @@ function lockNow(){if(!vault||!vault.isOpen())return;var done=function(){vault.l
 function arm(){clearTimeout(idleTimer);if(vault&&vault.isOpen())idleTimer=setTimeout(lockNow,IDLE);}
 if(vault){
  vault.onchange(async function(state){
-  imports=imports.filter(function(s){return !s.persisted;});
-  if(state==='open'){arm();try{var names=await vault.names('source:');for(var i=0;i<names.length;i++){var s=await vault.get(names[i]);if(s&&Array.isArray(s.paragraphs)&&!imports.some(function(x){return x.id===s.id;})){s.persisted=true;imports.push(s);}}}catch(e){}}
-  else{clearTimeout(idleTimer);if(window.StepJournal)StepJournal.forget();}
-  rerender();
+  var token=++vaultEpoch;imports=imports.filter(function(s){return !s.persisted;});
+  if(state==='open'){
+   arm();try{var names=await vault.names('source:');for(var i=0;i<names.length;i++){var source=await vault.get(names[i]);if(token!==vaultEpoch||!vault.isOpen())return;if(source&&Array.isArray(source.paragraphs)&&!imports.some(function(x){return x.id===source.id;})){source.persisted=true;imports.push(source);}}if(window.StepMaterials)for(var id of Object.keys(window.STEP_PACKS||{}))await StepMaterials.load(vault,id);}catch(e){/* The notebook remains available if an imported record is damaged. */}
+  }else{clearTimeout(idleTimer);if(window.StepJournal)StepJournal.forget();if(window.StepMaterials)StepMaterials.forget();}
+  if(token===vaultEpoch)rerender();
  });
  ['pointerdown','keydown','input'].forEach(function(name){document.addEventListener(name,arm,true);});
  document.addEventListener('visibilitychange',function(){
@@ -26,22 +28,23 @@ function button(text,fn){var b=el('button',text);b.type='button';b.className='bt
 function path(id,section,item){return '#/step/'+Number(id.slice(4))+'/'+section+(item?'/'+encodeURIComponent(item):'');}
 function render(id,parts){
  var pack=window.STEP_PACKS&&window.STEP_PACKS[id],root=el('section');root.className='step-engine';
- if(!pack){root.append(el('p','Контент шага пока не установлен.'));return root;}C.validateStep(pack.step);
+ if(!pack){root.append(el('p','Контент шага пока не установлен.'));return root;}C.validateStep(pack.step);if(window.StepMaterials)pack=StepMaterials.effective(id,pack);
  var section=parts[2]||'',item=parts[3]||'',state=prefs[id]||(prefs[id]={visited:{},positions:{}});
  if(section){state.last=location.hash;state.visited[section]=true;save();}
  root.append(link('← Первый шаг','#/step/'+Number(id.slice(4))),el('h2',pack.step.title));
  var support=button('Мне сейчас тяжело',function(){var d=el('dialog');d.className='dialog';d.append(el('h2','Мне сейчас тяжело'),el('p','Тяга может меняться и ослабевать. Попробуй связаться с человеком, которому доверяешь, или дойти до своего собрания. Можно попросить кого-то побыть рядом.'),el('p','Свои контакты и собрания можно будет добавить на этапе настроек.'),button('Вернуться',function(){d.close();d.remove();}));root.append(d);d.addEventListener('cancel',function(){d.remove();});d.showModal();});support.className+=' step-support';root.append(support);
- if(!section){root.append(el('p',pack.wording||'Формулировка появится после добавления твоего контент-пака.'));if(state.last)root.append(link('Продолжить с того места',state.last));pack.step.sections.forEach(function(s){var card=el('article');card.className='card';card.append(el('h3',s.title),el('p',s.description),el('small',state.visited[s.id]?'Начато':'Можно открыть'),link('Открыть',path(id,s.id)));root.append(card);});return root;}
+ if(!section){root.append(link('Загрузить материалы в шаг',path(id,'materials')));root.append(el('p',pack.wording||'Формулировка появится после добавления твоего контент-пака.'));if(state.last)root.append(link('Продолжить с того места',state.last));pack.step.sections.forEach(function(s){var card=el('article');card.className='card';card.append(el('h3',s.title),el('p',s.description),el('small',state.visited[s.id]?'Начато':'Можно открыть'),link('Открыть',path(id,s.id)));root.append(card);});return root;}
+ if(section==='materials'&&window.StepMaterials){StepMaterials.render(root,{id:id,pack:pack,vault:vault,imports:imports,path:path});return root;}
  if(section==='sources'){
   root.append(el('h3','Источники'));var sources=pack.sources.concat(imports),source=sources.find(function(s){return s.id===item;});
   if(source){reader(root,source.paragraphs,source.title,state,source.id,pack.step);return root;}
-  if(!sources.length)root.append(el('p','Пока нет добавленных источников. Остальной шаг работает без них.'),el('p','Добавь свой Markdown или TXT ниже. Для сборки владелец может положить файлы в content-pack/'+id+'/sources/ и выполнить npm run content:steps.'));
+  if(!sources.length)root.append(el('p','Пока нет добавленных источников. Остальной шаг работает без них.'),el('p','Можно добавить PDF, EPUB, TXT или Markdown. Книги добавляются в разделе «Загрузить материалы в шаг» и сохраняются на устройстве.'));
   if(!vault||!vault.isOpen())root.append(el('p','Добавленные с устройства тексты сохраняются между запусками только в открытой зашифрованной тетради.'),link('Открыть тетрадь',path(id,'journal')));
   var filter=el('select');filter.setAttribute('aria-label','Тема источников');filter.append(new Option('Все темы',''));pack.step.topics.forEach(function(t){filter.append(new Option(t.title,t.id));});root.append(filter);var list=el('div');root.append(list);
+  var status=el('p');status.setAttribute('role','status');
   function paint(){list.replaceChildren();sources.filter(function(s){return !filter.value||s.topics.includes(filter.value)||s.paragraphs.some(function(p){return p.topics.includes(filter.value);});}).forEach(function(s){list.append(link(s.title,path(id,'sources',s.id)),el('p',s.section));
    if(imports.includes(s))list.append(button('Убрать «'+s.title+'»',async function(){try{if(s.persisted)await vault.remove('source:'+s.id);imports.splice(imports.indexOf(s),1);sources.splice(sources.indexOf(s),1);paint();status.textContent='Источник убран.';}catch(e){status.textContent=e.message;}}));});}filter.onchange=paint;paint();
-  var input=el('input');input.type='file';input.accept='.md,.txt,text/plain,text/markdown';input.setAttribute('aria-label','Добавить свой источник');var status=el('p');status.setAttribute('role','status');
-  input.onchange=async function(){try{var f=input.files[0];if(!f)return;if(f.size>2000000)throw Error('Файл должен быть не больше 2 МБ');var parsed=C.parseSource(await f.text(),'import-'+Date.now());if(sources.some(function(s){return s.id===parsed.id;}))throw Error('Источник с таким id уже добавлен');var kept=false;if(vault&&vault.isOpen()){await vault.put('source:'+parsed.id,parsed);kept=true;}parsed.persisted=kept;imports.push(parsed);sources.push(parsed);input.value='';paint();status.textContent=kept?'Текст сохранён в зашифрованной тетради.':'Текст доступен до перезапуска. Открой тетрадь перед добавлением, чтобы он сохранился.';}catch(e){status.textContent=e.message;}};root.append(input,status);return root;
+  root.append(link('Добавить книгу или текст',path(id,'materials')),status);return root;
  }
  if(section==='explain'){
   root.append(el('p','Объяснение автора приложения, не литература АН'));var chapter=pack.chapters.find(function(c){return c.id===item;});

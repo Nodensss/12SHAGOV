@@ -223,6 +223,7 @@
   function route() {
     if (cleanup) { cleanup(); cleanup = null; }
     var parts = parseHash();
+    document.body.classList.toggle('step-one-active', parts[0] === 'step' && Number(parts[1]) === 1);
     var make = routes[parts[0] || ''];
     var r = make && make(parts);
     if (!r) { location.replace('#/'); return; }

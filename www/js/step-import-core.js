@@ -1,0 +1,16 @@
+/* Pure material contracts. Originals remain data, never HTML or instructions. */
+(function(root,factory){var api=factory();if(typeof module==='object')module.exports=api;else root.StepImportCore=api;})(typeof globalThis!=='undefined'?globalThis:this,function(){
+'use strict';
+var LIMIT=2000000;
+var aliases={addiction:['болезнь зависимости','болезнь зависимость'],denial:['отрицание'],bottom:['дно, отчаяние, изоляция','дно','достигая дна: отчаяние и изоляция'],powerlessness:['бессилие'],unmanageability:['неуправляемость'],reservations:['оговорки'],surrender:['капитуляция','духовные принципы','капитуляция и духовные принципы','капитуляция и духовные принципы шага']};
+function text(value){if(typeof value!=='string'||value.length>LIMIT)throw Error('Текст должен быть не больше 2 миллионов знаков');value=value.replace(/^\uFEFF/,'').replace(/\r\n?/g,'\n');if(!value.trim())throw Error('В файле нет текста');if(value.includes('\u0000'))throw Error('Это не текстовый файл');return value;}
+function topicFor(title){var key=title.trim().toLowerCase().replace(/ё/g,'е').replace(/^тема\s*\d+[.:\s-]*/,'').replace(/^\d+[.)]\s*/,'');return Object.keys(aliases).find(function(id){return key===id||aliases[id].includes(key);})||'';}
+function fingerprint(s){var h=2166136261,g=5381;for(var i=0;i<s.length;i++){h=Math.imul(h^s.charCodeAt(i),16777619);g=Math.imul(g,33)^s.charCodeAt(i);}return (h>>>0).toString(36)+(g>>>0).toString(36);}
+function questions(value){value=text(value);var out=[],topic='',current=null;
+ function finish(){if(!current)return;current.text=current.lines.join('\n').trim();delete current.lines;current.id='ownerq-'+fingerprint(current.topic+'\n'+current.text);if(!out.some(function(q){return q.id===current.id&&q.text===current.text;}))out.push(current);current=null;}
+ value.split('\n').forEach(function(line){var heading=line.match(/^\s*#{1,6}\s+(.+)$/);if(heading){if(/^PDF-страница\s+\d+|^EPUB\s*[—-]/.test(heading[1]))return;finish();topic=topicFor(heading[1]);return;}if(/^\s*<!--.*-->\s*$/.test(line))return;if(topicFor(line)){finish();topic=topicFor(line);return;}if(!line.trim()){finish();return;}var m=line.match(/^\s*(?:\d+[.)]|[-*•])\s+(.+)$/);if(m){finish();current={topic:topic,lines:[m[1]]};}else if(current&&line.trim())current.lines.push(line.trim());else if(!current&&line.trim()&&topicFor(line)){topic=topicFor(line);}});finish();
+ if(!out.length)throw Error('Нужен список вопросов: каждый начинай с «1.» или «•». Темы обозначай заголовком «# denial» или «# Отрицание».');if(out.length>2000)throw Error('Слишком много вопросов. Добавь вопросы только этого шага.');return out;
+}
+function materialRecord(raw){if(!raw||raw.v!==1)return {v:1,wording:'',questionsText:'',questions:[],history:[]};var record={v:1,wording:typeof raw.wording==='string'?raw.wording:'',questionsText:typeof raw.questionsText==='string'?raw.questionsText:'',questions:Array.isArray(raw.questions)?raw.questions:[],history:Array.isArray(raw.history)?raw.history:[]};return record;}
+return {text:text,questions:questions,topicFor:topicFor,fingerprint:fingerprint,record:materialRecord,limit:LIMIT};
+});

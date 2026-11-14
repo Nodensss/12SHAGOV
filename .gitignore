@@ -6,3 +6,7 @@ dist/
 
 content-pack/
 www/js/step-content.js
+
+www/vendor/
+
+__pycache__/

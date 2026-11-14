@@ -1,0 +1,8 @@
+const {test}=require('node:test'),assert=require('node:assert/strict');
+const core=require('../www/js/step-import-core.js');
+test('questions use Russian or stable topic headers and multiline items',()=>{const q=core.questions('# Отрицание\n\n1. Что произошло?\n   Приведи пример.\n2. Когда?\n\n# powerlessness\n\n• Что я пробовал?');assert.equal(q.length,3);assert.equal(q[0].topic,'denial');assert.equal(q[2].topic,'powerlessness');assert.equal(q[0].text,'Что произошло?\nПриведи пример.');});
+test('question references survive reordering and repeated import',()=>{const a=core.questions('# denial\n1. Первый?\n2. Второй?');const b=core.questions('# denial\n1. Второй?\n2. Первый?');assert.equal(a[0].id,b[1].id);assert.equal(a[1].id,b[0].id);assert.equal(core.questions('1. Вопрос?\n2. Вопрос?').length,1);});
+test('empty, binary, oversized and unstructured inputs are rejected',()=>{for(const v of ['',null,'\u0000binary','x'.repeat(2000001)])assert.throws(()=>core.text(v));assert.throws(()=>core.questions('Текст без списка'));});
+test('source provenance comments stay out of the questions',()=>{const q=core.questions('# surrender\n<!-- source: owner; pdf-page: 8 -->\n1. Мой вопрос?\n\n<!-- source: owner; pdf-page: 9 -->\n2. Ещё вопрос?');assert.equal(q[0].text,'Мой вопрос?');assert.equal(q[1].topic,'surrender');});
+test('PDF page labels do not change an existing topic',()=>{const q=core.questions('# denial\n1. Пример?\n\n## PDF-страница 8\n\n2. Другой?');assert.equal(q[1].topic,'denial');});
+test('saved HTML remains plain question text',()=>{assert.equal(core.questions('1. <img src=x onerror=alert(1)>')[0].text,'<img src=x onerror=alert(1)>');});

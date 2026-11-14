@@ -9,16 +9,19 @@
     "icons": "python3 scripts/make_icons.py",
     "sync": "npm run content:steps && npm run research && cap sync android",
     "apk": "npm run sync && cd android && ./gradlew assembleDebug",
-    "content:steps": "node scripts/build-step-content.cjs",
+    "content:steps": "npm run vendor:imports && node scripts/build-step-content.cjs",
     "preserve": "npm run content:steps",
-    "test:step": "node --test tests/step-core.test.cjs"
+    "test:step": "node --test tests/*.test.cjs",
+    "vendor:imports": "node scripts/vendor-importers.cjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.6.0",
     "@capacitor/app": "^8.1.2",
     "@capacitor/core": "^8.6.0",
     "@capacitor/filesystem": "^8.1.5",
-    "@capacitor/share": "^8.0.3"
+    "@capacitor/share": "^8.0.3",
+    "fflate": "0.8.3",
+    "pdfjs-dist": "4.10.38"
   },
   "devDependencies": {
     "@capacitor/cli": "^8.6.0",

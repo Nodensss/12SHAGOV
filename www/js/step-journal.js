@@ -93,15 +93,16 @@
       return found || { title: 'К абзацу', missing: 'Текст абзаца сейчас недоступен: источник удалён или не загружен.' };
     }
     if (target.startsWith('lit-')) {
-      var lq = questions(ctx.pack).find(function (q) { return 'lit-' + q.id === target; });
+      var lq = questions(ctx.pack, true).find(function (q) { return 'lit-' + q.id === target; });
       return lq ? { title: 'Вопрос из моего пака', quote: lq.text } : null;
     }
     var own = data.questions.find(function (q) { return q.id === target; });
     return own ? { title: 'Мой вопрос', quote: own.text } : null;
   }
-  function questions(pack) {
-    if (!pack.literatureQuestions) return [];
-    try { return C.parseSource(pack.literatureQuestions, 'questions').paragraphs; } catch (e) { return []; }
+  function questions(pack, archive) {
+    var bundled=[];
+    if(pack.literatureQuestions)try{bundled=C.parseSource(pack.literatureQuestions,'questions').paragraphs;}catch(e){}
+    return bundled.concat(window.StepMaterials?StepMaterials.questions(pack.step.id,archive):[]);
   }
 
   function render(root, ctx) {
@@ -177,9 +178,15 @@
     var lit = questions(ctx.pack);
     if (lit.length) {
       box.append(el('h4', 'Вопросы из моего пака'));
-      lit.forEach(function (q) { box.append(item(snippet(q.text), 'lit-' + q.id)); });
+      ctx.pack.step.topics.concat([{id:'',title:'Без темы'}]).forEach(function(topic){
+        var group=lit.filter(function(q){return (q.topic||'')===topic.id;});
+        if(group.length){box.append(el('h5',topic.title));group.forEach(function(q){box.append(item(snippet(q.text),'lit-'+q.id));});}
+      });
     }
 
+    var older=Object.keys(counts).filter(function(target){return target.startsWith('lit-')&&!lit.some(function(q){return target==='lit-'+q.id;});});
+    if(older.length){box.append(el('h4','Ответы к прежним вопросам'));older.forEach(function(target){var info=describe(target,ctx,data);box.append(item(info?snippet(info.quote):'Сохранённый ответ',target));});}
+    box.append(link('Загрузить вопросы из своего файла',ctx.path(ctx.id,'materials')));
     box.append(el('h4', 'Свои вопросы'));
     data.questions.forEach(function (q) {
       var row = el('div', undefined, 'journal-row');

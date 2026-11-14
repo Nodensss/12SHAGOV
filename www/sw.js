@@ -1,5 +1,5 @@
 /* Офлайн-кэш для установки как веб-приложения (PWA). В APK не используется. */
-var CACHE = 'shagi-v5-step-journal';
+var CACHE = 'shagi-v6-material-slots';
 var FILES = [
   './',
   'index.html',
@@ -17,6 +17,12 @@ var FILES = [
   'js/step-content.js',
   'js/step-vault.js',
   'js/step-engine.js',
+  'js/step-import-core.js',
+  'js/step-file-reader.js',
+  'js/step-materials.js',
+  'vendor/fflate.js',
+  'vendor/pdfjs/pdf.mjs',
+  'vendor/pdfjs/pdf.worker.mjs',
   'js/step-journal.js',
   'css/step-engine.css',
   'manifest.webmanifest',
