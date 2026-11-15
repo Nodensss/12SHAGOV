@@ -6,12 +6,18 @@ def releaseKeystore = System.getenv('SHAGI_KEYSTORE_FILE')
 def hasReleaseKey = releaseKeystore && file(releaseKeystore).exists()
 // В GitHub Actions номер запуска увеличивает versionCode, чтобы обновление ставилось поверх.
 def ciBuild = (System.getenv('GITHUB_RUN_NUMBER') ?: '0').toInteger()
+// Preview installs beside the existing workbook, with its own Android data directory.
+def parallelInstall = System.getenv('SHAGI_PARALLEL_INSTALL') == 'true'
 
 android {
     namespace = "io.github.nodensss.shagi"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "io.github.nodensss.shagi"
+        applicationId(parallelInstall ? "io.github.nodensss.shagi.preview" : "io.github.nodensss.shagi")
+        manifestPlaceholders = [
+            shagiApplicationLabel: parallelInstall ? "12 шагов · новая" : "@string/app_name",
+            shagiActivityLabel: parallelInstall ? "12 шагов · новая" : "@string/title_activity_main"
+        ]
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1 + ciBuild

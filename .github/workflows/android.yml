@@ -9,6 +9,7 @@ on:
       - 'android/**'
       - 'docs/**'
       - 'scripts/**'
+      - 'tests/**'
       - 'package*.json'
       - 'capacitor.config.json'
       - '.github/workflows/android.yml'
@@ -53,7 +54,7 @@ jobs:
             echo "SHAGI_KEYSTORE_FILE=$RUNNER_TEMP/shagi.keystore" >> "$GITHUB_ENV"
             echo "Подпись постоянным ключом из секретов"
           else
-            echo "::warning::Секрет SHAGI_KEYSTORE_BASE64 не задан — APK подписан временным debug-ключом. Обновление поверх ранее установленной версии может не встать (см. README)."
+            echo "::warning::Секрет SHAGI_KEYSTORE_BASE64 не задан — APK подписан временным debug-ключом. Для установки рядом со старым приложением есть 12-shagov-new.apk. Не удаляйте приложение с записями."
           fi
 
       - name: Сборка APK
@@ -73,10 +74,36 @@ jobs:
             cp app/build/outputs/apk/debug/app-debug.apk ../dist/12-shagov.apk
           fi
 
-      - name: Проверка заставки внутри собранного APK
+      - name: Отдельный APK для установки рядом со старой версией
+        working-directory: android
+        env:
+          SHAGI_PARALLEL_INSTALL: 'true'
+          SHAGI_KEYSTORE_PASSWORD: ${{ secrets.SHAGI_KEYSTORE_PASSWORD }}
+          SHAGI_KEY_ALIAS: ${{ secrets.SHAGI_KEY_ALIAS }}
+          SHAGI_KEY_PASSWORD: ${{ secrets.SHAGI_KEY_PASSWORD }}
+        run: |
+          if [ -n "$SHAGI_KEYSTORE_FILE" ]; then
+            ./gradlew assembleRelease --no-daemon
+            cp app/build/outputs/apk/release/app-release.apk ../dist/12-shagov-new.apk
+          else
+            ./gradlew assembleDebug --no-daemon
+            cp app/build/outputs/apk/debug/app-debug.apk ../dist/12-shagov-new.apk
+          fi
+
+      - name: Проверка подписи и отдельного идентификатора
+        run: |
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose dist/12-shagov.apk
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose dist/12-shagov-new.apk
+          "$ANDROID_HOME/build-tools/36.0.0/aapt2" dump badging dist/12-shagov-new.apk > "$RUNNER_TEMP/parallel-package.txt"
+          grep -F "package: name='io.github.nodensss.shagi.preview'" "$RUNNER_TEMP/parallel-package.txt"
+          grep -F "application-label:'12 шагов · новая'" "$RUNNER_TEMP/parallel-package.txt"
+          grep -F "launchable-activity: name='io.github.nodensss.shagi.MainActivity'" "$RUNNER_TEMP/parallel-package.txt"
+
+      - name: Проверка заставки внутри собранных APK
         run: |
           python3 scripts/check-apk-entry.py dist/12-shagov.apk
-          python3 -m zipfile -e dist/12-shagov.apk "$RUNNER_TEMP/intro-apk"
+          python3 scripts/check-apk-entry.py dist/12-shagov-new.apk
+          python3 -m zipfile -e dist/12-shagov-new.apk "$RUNNER_TEMP/intro-apk"
 
       - name: Проверка запуска из файлов собранного APK
         run: |
@@ -92,7 +119,7 @@ jobs:
         continue-on-error: ${{ github.ref == 'refs/heads/ccr-904d7ed7-auu10m' || startsWith(github.ref, 'refs/tags/v') }}
         with:
           name: 12-shagov-apk
-          path: dist/12-shagov.apk
+          path: dist/*.apk
 
       - name: Ссылка на APK, если хранилище артефактов недоступно
         if: steps.apk_artifact.outcome == 'failure' && github.ref == 'refs/heads/ccr-904d7ed7-auu10m'
@@ -104,13 +131,15 @@ jobs:
           prerelease: true
           body: |
             Тестовая сборка Android из ветки ccr-904d7ed7-auu10m.
+            12-shagov-new.apk устанавливается рядом со старым приложением как «12 шагов · новая».
+            Записи старого приложения остаются в нём и автоматически в отдельную версию не переносятся.
             Материалы добавляются после установки: Шаг 1 → Загрузить материалы в шаг.
             Файл размещён здесь, потому что хранилище артефактов GitHub Actions недоступно.
-          files: dist/12-shagov.apk
+          files: dist/*.apk
           fail_on_unmatched_files: true
 
       - name: Релиз с APK (для тегов v*)
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/12-shagov.apk
+          files: dist/*.apk
