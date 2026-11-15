@@ -1,5 +1,5 @@
 /* Офлайн-кэш для установки как веб-приложения (PWA). В APK не используется. */
-var CACHE = 'shagi-v7-one-file-bundle';
+var CACHE = 'shagi-v8-dark-first-step';
 var FILES = [
   './',
   'index.html',
@@ -27,6 +27,8 @@ var FILES = [
   'vendor/pdfjs/pdf.worker.mjs',
   'js/step-journal.js',
   'css/step-engine.css',
+  'css/step-one-cinematic.css',
+  'images/step01-abyss.png',
   'manifest.webmanifest',
   'icons/icon-192.png',
   'icons/icon-512.png',

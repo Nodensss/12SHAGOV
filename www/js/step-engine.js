@@ -29,11 +29,26 @@ function path(id,section,item){return '#/step/'+Number(id.slice(4))+'/'+section+
 function render(id,parts){
  var pack=window.STEP_PACKS&&window.STEP_PACKS[id],root=el('section');root.className='step-engine';
  if(!pack){root.append(el('p','Контент шага пока не установлен.'));return root;}C.validateStep(pack.step);if(window.StepMaterials)pack=StepMaterials.effective(id,pack);
- var section=parts[2]||'',item=parts[3]||'',state=prefs[id]||(prefs[id]={visited:{},positions:{}});
+ var section=parts[2]||'',item=parts[3]||'';root.dataset.section=section||'home';var state=prefs[id]||(prefs[id]={visited:{},positions:{}});
  if(section){state.last=location.hash;state.visited[section]=true;save();}
- root.append(link('← Первый шаг','#/step/'+Number(id.slice(4))),el('h2',pack.step.title));
+ if(section)root.append(link('← Первый шаг','#/step/'+Number(id.slice(4))),el('h2',pack.step.title));
  var support=button('Мне сейчас тяжело',function(){var d=el('dialog');d.className='dialog';d.append(el('h2','Мне сейчас тяжело'),el('p','Тяга может меняться и ослабевать. Попробуй связаться с человеком, которому доверяешь, или дойти до своего собрания. Можно попросить кого-то побыть рядом.'),el('p','Свои контакты и собрания можно будет добавить на этапе настроек.'),button('Вернуться',function(){d.close();d.remove();}));root.append(d);d.addEventListener('cancel',function(){d.remove();});d.showModal();});support.className+=' step-support';root.append(support);
- if(!section){if(window.StepBundle)StepBundle.renderOverview(root,{id:id,pack:pack,path:path});root.append(link('Загрузить материалы в шаг',path(id,'materials')));root.append(el('p',pack.wording||'Формулировка появится после добавления твоего контент-пака.'));if(state.last)root.append(link('Продолжить с того места',state.last));pack.step.sections.forEach(function(s){var card=el('article');card.className='card';card.append(el('h3',s.title),el('p',s.description),el('small',state.visited[s.id]?'Начато':'Можно открыть'),link('Открыть',path(id,s.id)));root.append(card);});return root;}
+ if(!section){
+  var context={id:id,pack:pack,path:path};
+  if(window.StepBundle)StepBundle.renderOverview(root,context);
+  if(state.last)root.append(link('Продолжить с того места',state.last));
+  var nav=el('nav');nav.className='step-section-grid';nav.setAttribute('aria-label','Разделы Первого шага');
+  pack.step.sections.forEach(function(section,index){
+   var card=link('',path(id,section.id));card.className='step-section-card';
+   var number=el('span',String(index+1).padStart(2,'0'));number.className='step-section-number';
+   card.append(number,el('h3',section.title),el('p',section.description),el('small',state.visited[section.id]?'Начато':'Можно открыть'));
+   nav.append(card);
+  });root.append(nav);
+  if(pack.wording){var wording=el('blockquote');wording.className='step-wording';wording.append(el('small','ФОРМУЛИРОВКА ИЗ ТВОЕГО ПАКЕТА'),el('p',pack.wording));root.append(wording);}
+  var manage=link('Загрузить материалы в шаг',path(id,'materials'));manage.classList.add('step-manage-materials');root.append(manage);
+  if(window.StepBundle&&StepBundle.renderLibrary)StepBundle.renderLibrary(root,context);
+  return root;
+ }
  if(section==='materials'&&window.StepMaterials){StepMaterials.render(root,{id:id,pack:pack,vault:vault,imports:imports,path:path});return root;}
  if(section==='sources'){
   root.append(el('h3','Источники'));var sources=pack.sources.concat(imports.filter(function(s){return !pack.sources.some(function(b){return b.id===s.id;});})),source=sources.find(function(s){return s.id===item;});

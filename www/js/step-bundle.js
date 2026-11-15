@@ -14,15 +14,24 @@ function renderImporter(root,ctx){
  box.append(input,preview,status,submit);root.append(box);
 }
 function renderOverview(root,ctx){
+ var pack=ctx.pack,loaded=!!pack.ownerBundle,b=pack.ownerBundle||{subtitle:'Точка отсчёта'};
+ var hero=el('section',undefined,'bundle-hero cinematic-hero'+(loaded?'':' cinematic-empty'));
+ ['cinematic-scene','cinematic-mist','cinematic-grain'].forEach(function(cls){var layer=el('div',undefined,cls);layer.setAttribute('aria-hidden','true');hero.append(layer);});
+ var emblem=el('span','I','cinematic-emblem');emblem.setAttribute('aria-hidden','true');hero.append(emblem);
+ var heading=el('div',undefined,'cinematic-heading');heading.append(el('div','ГЛАВА I · ПЕРВЫЙ ШАГ','bundle-kicker'),el('h2',b.subtitle));hero.append(heading);
+ hero.append(el('p','Увидеть, где ты сейчас.\nНачать с одной честной страницы.','bundle-lead'));
+ if(loaded){var facts=el('div',undefined,'bundle-facts');[[pack.sources.length,'источника'],[b.questionCount,'вопросов'],[pack.step.topics.length,'тем']].forEach(function(pair){var fact=el('span');fact.append(el('strong',String(pair[0])),el('small',pair[1]));facts.append(fact);});hero.append(facts);}
+ var actions=el('div',undefined,'bundle-actions');
+ var primary=link(loaded?'Открыть оригиналы':'Открыть тетрадь',ctx.path(ctx.id,loaded?'sources':'journal'));
+ var arrow=el('span',undefined,'cinematic-arrow');arrow.setAttribute('aria-hidden','true');arrow.innerHTML='<svg viewBox="0 0 24 24" fill="none"><path d="M4 12h15m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.3"/></svg>';primary.append(arrow);
+ actions.append(primary,link(loaded?'Перейти к вопросам':'Загрузить материалы',ctx.path(ctx.id,loaded?'journal':'materials')));hero.append(actions);root.append(hero);
+}
+function renderLibrary(root,ctx){
  var pack=ctx.pack,b=pack.ownerBundle;if(!b)return;
- var hero=el('section',undefined,'bundle-hero');hero.append(el('div','I / ТОЧКА ОТСЧЁТА','bundle-kicker'));
- var art=el('div',undefined,'bundle-book-art');art.setAttribute('aria-hidden','true');art.innerHTML='<svg viewBox="0 0 180 140" fill="none"><path d="M90 115C70 98 43 101 20 105V26C46 20 69 25 90 42c21-17 44-22 70-16v79c-23-4-50-7-70 10Z" stroke="currentColor" stroke-width="1.4"/><path d="M90 43v71M29 114c23-5 42-2 61 10 19-12 38-15 61-10M34 45c15-1 30 3 42 11M34 58c15-1 30 3 42 11M34 71c15-1 30 3 42 11M104 56c12-8 27-12 42-11M104 69c12-8 27-12 42-11M104 82c12-8 27-12 42-11" stroke="currentColor" opacity=".45"/><circle cx="90" cy="15" r="2" fill="currentColor"/><path d="M90 20v13" stroke="currentColor" opacity=".4"/></svg>';
- hero.append(art,el('h2',b.subtitle),el('p','Посмотреть на свой опыт. Найти опору. Начать писать.','bundle-lead'));
- var stats=el('div',undefined,'bundle-facts');[[pack.sources.length,'источника'],[b.questionCount,'вопросов'],[pack.step.topics.length,'тем']].forEach(function(pair){var fact=el('span');fact.append(el('strong',String(pair[0])),el('small',pair[1]));stats.append(fact);});hero.append(stats);
- var actions=el('div',undefined,'bundle-actions');actions.append(link('Открыть оригиналы',ctx.path(ctx.id,'sources')),link('Перейти к вопросам',ctx.path(ctx.id,'journal')));hero.append(actions);root.append(hero);
  if(b.introduction&&b.introduction.length){var intro=el('section',undefined,'bundle-introduction');intro.append(el('small','ПУТЕВОДИТЕЛЬ ПО МАТЕРИАЛАМ · ТЕКСТ ПРИЛОЖЕНИЯ'));b.introduction.forEach(function(t){intro.append(el('p',t));});root.append(intro);}
  var shelf=el('section',undefined,'bundle-shelf');shelf.append(el('h3','Твоя библиотека Первого шага'));pack.sources.forEach(function(source,i){var a=link('',ctx.path(ctx.id,'sources',source.id));a.className='bundle-book-card';a.append(el('span',String(i+1).padStart(2,'0'),'bundle-book-index'),el('strong',source.title),el('small',source.section));if(source.editionStatus==='draft')a.append(el('span','Черновой источник','bundle-edition'));shelf.append(a);});root.append(shelf);
  var topics=el('section',undefined,'bundle-topics');topics.append(el('h3','Семь тем для твоих записей'));pack.step.topics.forEach(function(t,i){var a=link('',ctx.path(ctx.id,'journal',t.id));a.append(el('small','0'+(i+1)),el('strong',t.title));if(b.topicNotes&&b.topicNotes[t.id])a.append(el('span',b.topicNotes[t.id]));topics.append(a);});root.append(topics);
 }
-window.StepBundle={renderImporter:renderImporter,renderOverview:renderOverview};
+
+window.StepBundle={renderImporter:renderImporter,renderOverview:renderOverview,renderLibrary:renderLibrary};
 })();
