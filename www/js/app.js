@@ -978,6 +978,10 @@
     navigator.serviceWorker.register('sw.js').catch(function () { /* офлайн-режим необязателен */ });
   }
 
+  // A cold launch opens the current workbook; explicit deep links are preserved.
+  if (!location.hash || location.hash === '#' || location.hash === '#/') {
+    history.replaceState(null, '', '#/step/1');
+  }
   route();
   if (window.Intro && window.Intro.settings().auto) window.Intro.play();
 })();

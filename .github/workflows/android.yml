@@ -73,6 +73,20 @@ jobs:
             cp app/build/outputs/apk/debug/app-debug.apk ../dist/12-shagov.apk
           fi
 
+      - name: Проверка заставки внутри собранного APK
+        run: |
+          python3 scripts/check-apk-entry.py dist/12-shagov.apk
+          python3 -m zipfile -e dist/12-shagov.apk "$RUNNER_TEMP/intro-apk"
+
+      - name: Проверка запуска из файлов собранного APK
+        run: |
+          python3 -m venv "$RUNNER_TEMP/intro-check-env"
+          "$RUNNER_TEMP/intro-check-env/bin/pip" install playwright==1.58.0
+          INTRO_WEB_ROOT="$RUNNER_TEMP/intro-apk/assets/public" \
+          INTRO_REVIEW_DIR="$RUNNER_TEMP/intro-review" \
+          CHROMIUM_PATH="$(command -v google-chrome)" \
+          "$RUNNER_TEMP/intro-check-env/bin/python" tests/intro-flow.py
+
       - uses: actions/upload-artifact@v4
         id: apk_artifact
         continue-on-error: ${{ github.ref == 'refs/heads/ccr-904d7ed7-auu10m' || startsWith(github.ref, 'refs/tags/v') }}
