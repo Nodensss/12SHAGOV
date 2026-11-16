@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 import {
   advance, answerLater, choose, fill, freshGame, leaveJournal, normalizeGame, progressOf,
   saveEntry, setDraft, stage, validateChapter, validateVocab,
@@ -18,6 +18,13 @@ test('словарь и все главы игры проходят провер
     assert.equal(chapter.id, index.chapters[i].id);
     assert.deepEqual(validateChapter(chapter, vocab), []);
   });
+});
+
+test('у каждого героя есть название, описание и картинка', async () => {
+  for (const variant of vocab.variants) {
+    for (const key of ['label', 'epithet', 'quote', 'lore', 'art']) assert.ok(variant[key], variant.id + ': нет ' + key);
+    await access(new URL('../' + variant.art, data));
+  }
 });
 
 test('подстановка слов работает для каждого варианта', () => {

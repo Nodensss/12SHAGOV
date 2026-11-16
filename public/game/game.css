@@ -66,10 +66,24 @@ p { margin: 0 0 .8rem; }
 .g-text { white-space: pre-wrap; margin: .5rem 0 0; }
 .g-diary h2 { margin-top: 1.6rem; }
 
-.g-options { display: grid; gap: .55rem; margin-top: 1.2rem; }
-.g-option { min-height: 3.25rem; padding: .7rem 1rem; border-radius: 1rem; background: var(--panel); border: 1px solid var(--line); text-align: left; font-weight: 500; }
-.g-option.is-on { border-color: var(--sage); background: var(--panel-2); }
-.g-option.is-on::after { content: "✓"; float: right; color: var(--sage); }
+.g-heroes { padding-top: .9rem; padding-left: 0; padding-right: 0; padding-bottom: .5rem; display: flex; flex-direction: column; }
+.g-heroes > h1, .g-heroes > .g-lead { padding: 0 1rem; }
+.g-heroes > h1 { font-size: 1.6rem; margin-bottom: .3rem; }
+.g-heroes > .g-lead { font-size: .88rem; margin-bottom: .6rem; }
+.g-carousel { display: flex; padding-top: 6px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; }
+.g-carousel::-webkit-scrollbar { display: none; }
+.g-hero { flex: 0 0 100%; scroll-snap-align: center; scroll-snap-stop: always; padding: 0 1rem; text-align: center; }
+.g-portrait { width: min(58%, 26vh); aspect-ratio: 2 / 3; margin: 0 auto .8rem; border-radius: 1rem; overflow: hidden; border: 1px solid var(--warm); box-shadow: 0 0 0 4px #121915, 0 0 0 5px var(--line), 0 1rem 2.5rem rgba(0, 0, 0, .5); background: #0b100d; }
+.g-portrait img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.g-hero h2 { font-size: 1.6rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .3rem; }
+.g-hero .g-step { margin-bottom: .2rem; }
+.g-quote { font-family: Georgia, "Times New Roman", serif; font-style: italic; color: var(--warm); margin-bottom: .35rem; }
+.g-lore { color: var(--muted); font-size: .9rem; max-width: 22rem; margin: 0 auto; }
+.g-dots { display: flex; justify-content: center; gap: .4rem; padding: .8rem 0 0; }
+.g-dots i { width: .45rem; height: .45rem; border-radius: 50%; background: var(--line); transition: background .2s, transform .2s; }
+.g-dots i.is-on { background: var(--warm); transform: scale(1.35); }
+.g-foot-hero { grid-template-columns: 3.25rem 1fr 3.25rem; }
+.g-arrow { background: var(--panel-2); border-color: var(--line); font-size: 1.6rem; padding: 0; line-height: 1; }
 
 .g-log { display: flex; flex-direction: column; justify-content: flex-end; gap: .85rem; padding-bottom: 1rem; cursor: pointer; }
 .g-line { max-width: 100%; scroll-margin-bottom: 7rem; }

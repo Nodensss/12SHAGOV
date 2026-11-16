@@ -52,15 +52,36 @@ function menu() {
         (started ? '<button class="g-btn g-quiet" data-act="restart" data-id="' + h(item.id) + '">Сначала</button>' : '') + '</div></article>';
     }).join('') + '<div class="g-card g-card-off"><span class="g-step">Дальше</span><strong>Новые главы</strong><small>Появятся здесь по мере того, как их напишут.</small></div></div>' +
     '<div class="g-row g-wrap"><button class="g-btn g-secondary" data-act="diary">Дневник' + (saved || later ? ' · ' + [saved ? saved + ' зап.' : '', later ? later + ' отложено' : ''].filter(Boolean).join(', ') : '') + '</button>' +
-    '<button class="g-btn g-quiet" data-act="variant">О чём история: ' + h(variant ? variant.label : 'выбрать') + '</button></div>' +
+    '<button class="g-btn g-quiet" data-act="variant">Герой: ' + h(variant ? variant.label : 'выбрать') + '</button></div>' +
     (storageOk ? '' : '<p class="g-warn" role="alert">Браузер не разрешает сохранять данные. Прогресс и записи пропадут после закрытия вкладки.</p>') +
     '<p class="g-note">Игра — способ подумать, а не лечение. Если сейчас тяжело, свяжитесь с человеком, которому доверяете, с группой или со специалистом. <a href="../#home">Раздел поддержки — в приложении.</a></p></main>';
 }
 
 function variantScreen() {
-  return '<header class="g-top"><button class="g-back" data-act="menu">← Главы</button></header>' +
-    '<main class="g-main"><h1 tabindex="-1">О чём будет история?</h1><p class="g-lead">Герой борется с привычкой, которая сильнее его планов. Выберите, с какой именно — от этого поменяется несколько слов в репликах. Сюжет останется тем же. Ответ можно изменить в любой момент.</p>' +
-    '<div class="g-options">' + vocab.variants.map(v => '<button class="g-option' + (v.id === (game.variant || vocab.default) && game.variant ? ' is-on' : '') + '" data-act="set-variant" data-id="' + h(v.id) + '">' + h(v.label) + '</button>').join('') + '</div></main>';
+  const current = Math.max(0, vocab.variants.findIndex(v => v.id === game.variant));
+  return '<header class="g-top"><button class="g-back" data-act="menu">← Главы</button><span class="g-scene">Выбор героя</span></header>' +
+    '<main class="g-main g-heroes"><h1 tabindex="-1">Выбери героя</h1>' +
+    '<div class="g-carousel" data-start="' + current + '">' + vocab.variants.map((v, i) => '<article class="g-hero" data-id="' + h(v.id) + '" aria-label="' + h(v.label) + '">' +
+      '<div class="g-portrait">' + (v.art ? '<img src="' + h(v.art) + '" alt="" width="240" height="360"' + (Math.abs(i - current) > 1 ? ' loading="lazy"' : '') + '>' : '') + '</div>' +
+      '<span class="g-step">' + h(v.epithet || '') + '</span><h2>' + h(v.label) + '</h2>' + (v.quote ? '<p class="g-quote">«' + h(v.quote) + '»</p>' : '') + '<p class="g-lore">' + h(v.lore || '') + '</p></article>').join('') + '</div>' +
+    '<div class="g-dots" aria-hidden="true">' + vocab.variants.map((v, i) => '<i' + (i === current ? ' class="is-on"' : '') + '></i>').join('') + '</div></main>' +
+    '<footer class="g-foot g-foot-hero"><button class="g-btn g-arrow" data-act="hero-prev" aria-label="Предыдущий герой">‹</button>' +
+    '<button class="g-btn g-primary" data-act="set-variant" data-id="' + h(vocab.variants[current].id) + '" id="g-pick">Играть: ' + h(vocab.variants[current].label) + '</button>' +
+    '<button class="g-btn g-arrow" data-act="hero-next" aria-label="Следующий герой">›</button></footer>';
+}
+
+// Карусель героев: следим, какая карточка в центре, и обновляем кнопку и точки.
+function heroIndex(carousel) { return Math.round(carousel.scrollLeft / carousel.clientWidth); }
+function syncHero(carousel) {
+  const i = Math.min(vocab.variants.length - 1, Math.max(0, heroIndex(carousel))), variant = vocab.variants[i], pick = root.querySelector('#g-pick');
+  if (!pick || pick.dataset.id === variant.id) return;
+  pick.dataset.id = variant.id; pick.textContent = 'Играть: ' + variant.label;
+  root.querySelectorAll('.g-dots i').forEach((dot, n) => dot.classList.toggle('is-on', n === i));
+}
+function slideHero(step) {
+  const carousel = root.querySelector('.g-carousel'), n = vocab.variants.length;
+  const i = (heroIndex(carousel) + step + n) % n;
+  carousel.scrollTo({ left: i * carousel.clientWidth, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
 }
 
 function lineHtml(chapter, line, fresh) {
@@ -123,6 +144,11 @@ function diary() {
 function render() {
   root.innerHTML = view.name === 'play' ? play() : view.name === 'diary' ? diary() : view.name === 'variant' ? variantScreen() : menu();
   root.dataset.view = view.name;
+  const carousel = root.querySelector('.g-carousel');
+  if (carousel) {
+    carousel.scrollLeft = Number(carousel.dataset.start) * carousel.clientWidth;
+    carousel.addEventListener('scroll', () => syncHero(carousel), { passive: true });
+  }
   const log = root.querySelector('.g-log');
   if (log) requestAnimationFrame(() => log.lastElementChild?.scrollIntoView({ block: 'end', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }));
 }
@@ -145,6 +171,8 @@ const actions = {
   diary: () => go({ name: 'diary' }),
   variant: () => go({ name: 'variant' }),
   'set-variant': id => { game.variant = id; persist(); view.then ? go({ name: 'play', id: view.then }) : go({ name: 'menu' }); },
+  'hero-prev': () => slideHero(-1),
+  'hero-next': () => slideHero(1),
   play: id => startChapter(id),
   restart: id => { restartChapter(game, chapterOf(id)); persist(); startChapter(id); },
   next: () => { const chapter = chapterOf(view.id); advance(progressOf(game, chapter), chapter); persist(); render(); },
