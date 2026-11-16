@@ -518,3 +518,4 @@ textarea::placeholder { color: #8a958a; }
 .g-depth i.is-on { background: var(--warm); opacity: 1; }
 .g-page small { margin-top: .35rem; }
 .g-page .g-page-skill { color: var(--warm); font-size: .8rem; }
+@media (prefers-reduced-motion: reduce) { .g-load-row i { transition: none; } }

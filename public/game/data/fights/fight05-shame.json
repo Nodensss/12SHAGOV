@@ -2,8 +2,9 @@
   "id": "fight05-shame",
   "version": 1,
   "name": "Стыд",
+  "victoryTitle": "Стыд отступил",
   "tier": "Не тяга. Тише",
-  "art": "art/foe-shame.svg",
+  "art": "art/foe-shame.webp",
   "hp": 44,
   "playerHp": 26,
   "skills": [

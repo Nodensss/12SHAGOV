@@ -62,6 +62,20 @@ test('портреты из данных существуют, укладыва�
   assert.ok(total <= 3_000_000, 'вся графика игры, включая прежние SVG, — до 3 МБ');
 });
 
+test('графика четвёртого шага использует собственные иконки и портрет Стыда', () => {
+  const shame = fights.find(fight => fight.id === 'fight05-shame');
+  assert.equal(shame.art, 'art/foe-shame.webp');
+  const pageSkills = skills.filter(skill => skill.page);
+  const fourthItems = items.filter(item => item.step === 4);
+  assert.equal(pageSkills.length, 5);
+  assert.equal(fourthItems.length, 6);
+  assert.equal(new Set(pageSkills.map(skill => skill.icon)).size, 5);
+  assert.equal(new Set(fourthItems.map(item => item.icon)).size, 6);
+  const previousIcons = new Set(skills.filter(skill => !skill.page).map(skill => skill.icon));
+  assert.ok(pageSkills.every(skill => !previousIcons.has(skill.icon)));
+  assert.ok(fourthItems.every(item => item.icon !== 'art/icons/item-blank-page.webp'));
+});
+
 test('подстановка слов работает для каждого варианта', () => {
   for (const variant of vocab.variants) for (const chapter of chapters) for (const scene of Object.values(chapter.scenes)) {
     for (const line of scene.lines || []) assert.doesNotMatch(fill(line.text, vocab, variant.id), /[{}]/);

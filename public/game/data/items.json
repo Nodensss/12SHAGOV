@@ -161,7 +161,7 @@
     },
     {
       "id": "item.rods",
-      "icon": "art/icons/item-blank-page.webp",
+      "icon": "art/icons/item-rods.webp",
       "step": 4,
       "name": "Удочки у двери",
       "text": "Мальчик ждал у окна до темноты. Потом другой мальчик ждал у торта.",
@@ -169,7 +169,7 @@
     },
     {
       "id": "item.empty-line",
-      "icon": "art/icons/item-blank-page.webp",
+      "icon": "art/icons/item-empty-line.webp",
       "step": 4,
       "name": "Пустая строка",
       "text": "В неё вписан страх, который ручка обходила, как лужу.",
@@ -177,7 +177,7 @@
     },
     {
       "id": "item.tin-box",
-      "icon": "art/icons/item-blank-page.webp",
+      "icon": "art/icons/item-tin-box.webp",
       "step": 4,
       "name": "Шкатулка из-под печенья",
       "text": "«На чёрный день». Слово «взял» заменено точным.",
@@ -185,7 +185,7 @@
     },
     {
       "id": "item.unread",
-      "icon": "art/icons/item-blank-page.webp",
+      "icon": "art/icons/item-unread.webp",
       "step": 4,
       "name": "Сообщение двухлетней давности",
       "text": "«Я не злюсь. Я устала».",
@@ -193,7 +193,7 @@
     },
     {
       "id": "item.cover",
-      "icon": "art/icons/item-blank-page.webp",
+      "icon": "art/icons/item-cover.webp",
       "step": 4,
       "name": "Обложка с названием",
       "text": "Не приговор и не оправдание. То, что есть.",
@@ -201,7 +201,7 @@
     },
     {
       "id": "item.notebook",
-      "icon": "art/icons/item-blank-page.webp",
+      "icon": "art/icons/item-notebook.webp",
       "step": 4,
       "name": "Тетрадь в клетку",
       "text": "Сорок восемь листов. В ней договорились не врать.",

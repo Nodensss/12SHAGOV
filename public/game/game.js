@@ -199,7 +199,7 @@ function fightScreen() {
   }
   if (battle.over) {
     const won = battle.over === 'win', reward = fight.reward;
-    return top + '<main class="g-main g-ending"><div class="g-foe' + (won ? ' is-down' : '') + '"><img src="' + h(fight.art) + '" alt="" width="240" height="240"></div><h2 tabindex="-1">' + (won ? 'Тяга отступила' : 'Срыв') + '</h2>' +
+    return top + '<main class="g-main g-ending"><div class="g-foe' + (won ? ' is-down' : '') + '"><img src="' + h(fight.art) + '" alt="" width="240" height="240"></div><h2 tabindex="-1">' + (won ? h(fight.victoryTitle || 'Тяга отступила') : 'Срыв') + '</h2>' +
       (won ? fight.win : fight.lose).map(t => '<p>' + h(t) + '</p>').join('') +
       (won && view.levelUp && reward ? '<p class="g-levelup">Уровень ' + h(reward.level) + ' · ' + h(reward.title) + '</p>' : '') + '</main>' +
       '<footer class="g-foot">' + (won ? '<button class="g-btn g-primary" data-act="menu">Дальше</button>' : '<button class="g-btn g-primary g-fight-btn" data-act="fight-start">Попробовать иначе</button><button class="g-btn g-quiet" data-act="menu">К главам</button>') + '</footer>';

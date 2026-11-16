@@ -199,7 +199,8 @@ async def main():
         await page.locator('[data-act=menu]').first.click()
         await page.locator('[data-act=bag]').click()
         await page.wait_for_function('() => [...document.images].every(image => image.complete && image.naturalWidth)')
-        assert await page.locator('.g-find-icon').count() == 19
+        expected_items = json.loads((ROOT / 'public/game/data/items.json').read_text())['items']
+        assert await page.locator('.g-find-icon').count() == len(expected_items)
         assert await page.locator('.g-find.is-unknown .g-find-icon').count() > 0
         assert await page.locator('.g-find.is-unknown .g-find-icon').first.evaluate(
             "node => getComputedStyle(node).filter.includes('brightness(0)')")

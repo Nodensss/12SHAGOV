@@ -59,7 +59,7 @@
     },
     {
       "id": "name-resentment",
-      "icon": "art/icons/skill-truth.webp",
+      "icon": "art/icons/skill-name-resentment.webp",
       "name": "Назвать обиду",
       "hint": "6 урона за каждый слой страницы",
       "say": "Я обижен на отца. Вот, я это сказал.",
@@ -73,7 +73,7 @@
     },
     {
       "id": "name-fear",
-      "icon": "art/icons/skill-pause.webp",
+      "icon": "art/icons/skill-name-fear.webp",
       "name": "Назвать страх",
       "hint": "6 урона за каждый слой страницы",
       "say": "Я боюсь, что на работе узнают.",
@@ -87,7 +87,7 @@
     },
     {
       "id": "name-deed",
-      "icon": "art/icons/skill-admit.webp",
+      "icon": "art/icons/skill-name-deed.webp",
       "name": "Назвать поступок",
       "hint": "6 урона за каждый слой страницы",
       "say": "Я брал чужое и врал.",
@@ -101,7 +101,7 @@
     },
     {
       "id": "name-bond",
-      "icon": "art/icons/skill-call.webp",
+      "icon": "art/icons/skill-name-bond.webp",
       "name": "Назвать, кого оттолкнул",
       "hint": "6 урона за каждый слой страницы",
       "say": "От меня ушли люди.",
@@ -115,7 +115,7 @@
     },
     {
       "id": "worth",
-      "icon": "art/icons/skill-group.webp",
+      "icon": "art/icons/skill-worth.webp",
       "name": "Вспомнить, что во мне есть",
       "hint": "Снимает броню стыда. Один раз за бой",
       "say": "Я чиню вещи. Это правда.",

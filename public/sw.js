@@ -1,6 +1,19 @@
-const CACHE = '12shagov-shell-v17';
+const CACHE = '12shagov-shell-v18';
 // Каждый файл на своей строке: так правки разных авторов не сталкиваются при слиянии.
 const ASSETS = [
+  './game/art/foe-shame.webp',
+  './game/art/icons/item-rods.webp',
+  './game/art/icons/item-empty-line.webp',
+  './game/art/icons/item-tin-box.webp',
+  './game/art/icons/item-unread.webp',
+  './game/art/icons/item-cover.webp',
+  './game/art/icons/item-notebook.webp',
+  './game/art/icons/skill-name-resentment.webp',
+  './game/art/icons/skill-name-fear.webp',
+  './game/art/icons/skill-name-deed.webp',
+  './game/art/icons/skill-name-bond.webp',
+  './game/art/icons/skill-worth.webp',
+
   './favicon.ico',
   './game/art/scene-yard.webp',
   './game/art/scene-kitchen.webp',
