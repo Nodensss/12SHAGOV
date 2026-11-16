@@ -63,6 +63,7 @@ function normalizeBattle(raw) {
         who: ['you', 'foe', 'note'].includes(line.who) ? line.who : 'note',
         text: text(line.text, 500),
         ...(line.hit === 'you' || line.hit === 'foe' ? { hit: line.hit } : {}),
+        ...(line.heal === true ? { heal: true } : {}),
       })) : [],
       over: null,
     },

@@ -41,7 +41,7 @@ export function playTurn(state, fight, skill) {
   next.foe = Math.max(0, next.foe - dealt);
   if (dealt) say('note', '−' + dealt + ' тяге', { hit: 'foe' });
   if (skill.cost) { next.hp = Math.max(0, next.hp - skill.cost); say('note', '−' + skill.cost + ' стойкости: держаться на зубах выматывает', { hit: 'you' }); }
-  if (skill.heal) { const before = next.hp; next.hp = Math.min(next.maxHp, next.hp + skill.heal); if (next.hp > before) say('note', '+' + (next.hp - before) + ' стойкости'); }
+  if (skill.heal) { const before = next.hp; next.hp = Math.min(next.maxHp, next.hp + skill.heal); if (next.hp > before) say('note', '+' + (next.hp - before) + ' стойкости', { heal: true }); }
   if (skill.guard) next.guard = true;
   for (const id of Object.keys(next.cooldowns)) if (next.cooldowns[id] > 0) next.cooldowns[id] -= 1;
   if (skill.cooldown) next.cooldowns[skill.id] = skill.cooldown;

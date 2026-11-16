@@ -24,11 +24,12 @@ jobs:
           python-version: '3.12'
       - run: pip install playwright==1.63.0
       - run: python -m playwright install --with-deps chromium
-      - name: Экраны, герои и бой
+      - name: Экраны, герои, бой и звук
         run: |
           node scripts/serve.mjs --port 4173 &
           sleep 2
           python tests/game-art-flow.py
+          python tests/game-sound-flow.py
       - name: Третий шаг
         run: python tests/game-step03-flow.py
         env:

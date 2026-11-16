@@ -5,6 +5,7 @@ import {
   assignSteering, canLeaveSteering, leaveSteering, steeringOf,
 } from './engine.js';
 import { canUse, playTurn, restoreBattle, skillsOf, startBattle, validateFight } from './battle.js';
+import { createSound } from './sound.js';
 
 const root = document.querySelector('#game');
 if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
@@ -19,6 +20,8 @@ const json = async path => {
 
 let game = loadGame(), index = { chapters: [] }, vocab = { variants: [] }, chapters = new Map(), fights = new Map(), trials = new Map(), skills = [], items = [];
 let battle = null;
+const sound = createSound();
+let soundMap = {};
 let view = { name: 'menu' }, journalIndex = null, draftTimer, storageOk = true;
 
 function persist() { storageOk = saveGame(game); }
@@ -102,7 +105,8 @@ function menu() {
     '<button class="g-btn g-secondary" data-act="diary">Дневник' + (saved || later ? ' · ' + [saved ? saved + ' зап.' : '', later ? later + ' отл.' : ''].filter(Boolean).join(', ') : '') + '</button></div>' +
     steps.map(stepSection).join('') +
     (index.nextStep ? '<div class="g-card g-card-off g-next-step"><span class="g-step">Дальше</span><strong>' + h(index.nextStep.title) + '</strong><small>' + h(index.nextStep.teaser) + '</small></div>' : '') +
-    '<div class="g-row g-wrap"><button class="g-btn g-quiet" data-act="variant">Герой: ' + h(variant ? variant.label : 'выбрать') + '</button></div>' +
+    '<div class="g-row g-wrap"><button class="g-btn g-quiet" data-act="variant">Герой: ' + h(variant ? variant.label : 'выбрать') + '</button>' +
+    '<button class="g-btn g-quiet" data-act="sound" data-sound-label>' + soundLabel() + '</button></div>' +
     (storageOk ? '' : '<p class="g-warn" role="alert">Браузер не разрешает сохранять данные. Прогресс и записи пропадут после закрытия вкладки.</p>') +
     '<p class="g-note">Игра — способ подумать, а не лечение. Если сейчас тяжело, свяжитесь с человеком, которому доверяете, с группой или со специалистом. <a href="../#home">Раздел поддержки — в приложении.</a></p></main>';
 }
@@ -296,6 +300,9 @@ function render() {
     carousel.scrollLeft = Number(carousel.dataset.start) * carousel.clientWidth;
     carousel.addEventListener('scroll', () => syncHero(carousel), { passive: true });
   }
+  // Кнопка звука добавляется в шапку каждого экрана здесь, а не в разметке экранов.
+  root.querySelector('.g-top')?.insertAdjacentHTML('beforeend', soundButton());
+  sound.ambience(ambienceFor());
   // Журнал боя прокручивается внутри себя: после хода показываем его конец — ответ тяги.
   const battleLog = root.querySelector('.g-battle-log');
   if (battleLog) {
@@ -319,6 +326,54 @@ function startChapter(id) {
   go({ name: 'play', id });
 }
 
+/* ---------- Звук ---------- */
+
+const soundLabel = () => 'Звук: ' + (sound.enabled ? 'включён' : 'выключен');
+function soundButton() {
+  return '<button class="g-sound" type="button" data-act="sound" aria-pressed="' + sound.enabled + '" aria-label="' + (sound.enabled ? 'Выключить звук' : 'Включить звук') + '">' +
+    '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="g-sound-on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="g-sound-off" d="M17 9.5l4.5 5M21.5 9.5l-4.5 5"/></svg></button>';
+}
+
+// Фон зависит от того, где сейчас игрок: сцена эпизода, бой или тишина меню.
+function ambienceFor() {
+  const map = soundMap.ambience || {};
+  if (view.name === 'fight') return battle && !battle.over ? map.fight : null;
+  if (view.name !== 'play') return null;
+  const scene = game.chapters[view.id]?.scene;
+  return map.scenes?.[view.id]?.[scene] ?? map.chapters?.[view.id] ?? null;
+}
+
+function soundSnapshot() {
+  return { view: view.name, id: view.id, scene: view.name === 'play' ? game.chapters[view.id]?.scene : null, battle, card: view.card };
+}
+
+// Звук события подбирается по тому, что изменилось после нажатия.
+function soundAfter(act, id, before) {
+  if (act === 'sound') return;
+  const now = soundSnapshot();
+  if (act === 'skill') { if (now.battle && now.battle !== before.battle) battleSounds(id, before.battle, now.battle); return; }
+  if (['choose', 'steering-assign', 'trial-answer', 'set-variant'].includes(act)) return void sound.play('choice');
+  if (act === 'journal-save') { if (now.scene !== before.scene) sound.play('write'); return; }
+  if (act === 'trial-next' && now.view === 'trial' && now.card >= (trials.get(now.id)?.cards.length ?? Infinity)) return void sound.play('unlock');
+  if (now.view !== before.view || now.id !== before.id || now.scene !== before.scene || now.card !== before.card || (now.battle && !before.battle)) sound.play('scene');
+}
+
+function battleSounds(skillId, was, now) {
+  const fight = fights.get(view.id), armored = fight.armor && !was.open, struck = now.log.some(line => line.hit === 'foe');
+  sound.play(armored && skillId === fight.armor.opener ? 'release' : armored && !struck ? 'blocked' : 'skill');
+  if (struck) sound.play('hitFoe', 0.12);
+  if (now.log.some(line => line.heal)) sound.play('heal', 0.25);
+  if (now.over === 'win') {
+    const quiet = (soundMap.silenceAfter || []).includes(fight.id);
+    sound.play(quiet ? 'silence' : 'win', 0.5);
+    if (view.levelUp && !quiet) sound.play('unlock', 1.9);
+    return;
+  }
+  if (now.log.some(line => line.who === 'foe') || now.over === 'lose') sound.play('hitYou', 0.55);
+  if (now.over === 'lose') sound.play('lose', 1);
+}
+
 // Незаконченный бой хранится в сохранении, чтобы пережить перезагрузку страницы.
 // Законченный бой и выход в меню его стирают.
 function keepBattle() {
@@ -331,6 +386,12 @@ function dropBattle() {
 }
 
 const actions = {
+  sound: () => {
+    sound.setEnabled(!sound.enabled);
+    if (sound.enabled) sound.play('choice');
+    for (const button of root.querySelectorAll('.g-sound')) { button.setAttribute('aria-pressed', sound.enabled); button.setAttribute('aria-label', sound.enabled ? 'Выключить звук' : 'Включить звук'); }
+    for (const label of root.querySelectorAll('[data-sound-label]')) label.textContent = soundLabel();
+  },
   menu: () => { dropBattle(); go({ name: 'menu' }); },
   bag: () => go({ name: 'bag' }),
   trial: id => go({ name: 'trial', id, card: null, answer: null }),
@@ -417,8 +478,13 @@ root.addEventListener('click', event => {
   const target = event.target.closest('[data-act]');
   if (!target || !root.contains(target) || !target.dataset.act) return;
   if (target.matches('.g-log') && getSelection()?.toString()) return;
+  const before = soundSnapshot();
   actions[target.dataset.act]?.(target.dataset.id, target);
+  soundAfter(target.dataset.act, target.dataset.id, before);
 });
+// Браузер разрешает звук только после действия игрока; скрытая вкладка молчит.
+addEventListener('pointerdown', () => sound.wake(), { capture: true });
+document.addEventListener('visibilitychange', () => { if (document.hidden) sound.pause(); else sound.wake(); });
 root.addEventListener('input', event => {
   const area = event.target.closest('textarea[data-question]');
   if (!area) return;
@@ -435,6 +501,9 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) flush
 async function boot() {
   try {
     [index, vocab, { skills }, { items }] = await Promise.all([json('./data/episodes.json'), json('./data/vocab.json'), json('./data/skills.json'), json('./data/items.json')]);
+    // Без файла настроек звука игра остаётся рабочей: просто без фонов.
+    soundMap = await json('./data/sounds.json').catch(() => ({}));
+    sound.configure(soundMap);
     const problems = validateVocab(vocab);
     await Promise.all(index.chapters.map(async item => {
       try {

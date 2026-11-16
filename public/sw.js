@@ -1,4 +1,4 @@
-const CACHE = '12shagov-shell-v13';
+const CACHE = '12shagov-shell-v14';
 // Каждый файл на своей строке: так правки разных авторов не сталкиваются при слиянии.
 const ASSETS = [
   './game/art/icons/item-blank-page.webp',
@@ -59,6 +59,8 @@ const ASSETS = [
   './game/game.css',
   './game/game.js',
   './game/engine.js',
+  './game/sound.js',
+  './game/data/sounds.json',
   './game/battle.js',
   './game/data/skills.json',
   './game/data/items.json',

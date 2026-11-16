@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "_comment": "Звук игры. volume — общая громкость от 0 до 1, ambienceVolume — громкость фонов мест от 0 до 1 (0 — без фонов). ambience — какой фон звучит где: fight — в любом бою, chapters — фон эпизода по его id, scenes — фон отдельной сцены внутри эпизода (важнее, чем фон эпизода). Доступные фоны: yard (двор), kitchen (кухня), room (комната группы), river (набережная), rain (дождь), night (ночь), battle (бой). silenceAfter — бои, после победы в которых остаётся тишина. Сами звуки описаны в sound.js; послушать их можно на странице /game/sounds.html.",
+  "volume": 0.8,
+  "ambienceVolume": 1,
+  "ambience": {
+    "fight": "battle",
+    "chapters": {
+      "step01-only-once": "yard",
+      "step01-stash": "kitchen",
+      "step01-sister": "kitchen",
+      "step01-door": "yard",
+      "step02-group": "room",
+      "step02-bench": "yard",
+      "step02-lena": "kitchen",
+      "step02-river": "river",
+      "step02-morning": "kitchen",
+      "step02-night": "night",
+      "step03-message": "kitchen",
+      "step03-shift": "kitchen",
+      "step03-key": "room",
+      "step03-family": "yard",
+      "step03-rain": "rain",
+      "step03-decision": "night"
+    },
+    "scenes": {
+      "step01-only-once": { "s1-morning": "kitchen", "s4a-home": "kitchen", "s4b-evening": "night" },
+      "step01-stash": { "s4-number": "night" },
+      "step01-door": { "s3a-inside": "room" },
+      "step03-rain": { "s3-rain-group": "room" }
+    }
+  },
+  "silenceAfter": ["fight04-craving"]
+}

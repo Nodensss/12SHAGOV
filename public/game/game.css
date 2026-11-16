@@ -479,3 +479,11 @@ textarea::placeholder { color: #8a958a; }
   scrollbar-width: thin;
 }
 .game:has(> .g-battle) .g-battle-log.is-clipped { mask-image: linear-gradient(to bottom, transparent, #000 1.2rem); }
+
+/* Кнопка звука в шапке: всегда справа, не меняет высоту шапки. */
+.g-sound { flex: none; margin-left: auto; width: 2.75rem; height: 2.75rem; min-height: 0; padding: 0; display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 50%; background: none; color: var(--muted); }
+.g-scene + .g-sound { margin-left: 0; }
+.g-top { gap: .5rem; }
+.g-sound[aria-pressed="true"] { color: var(--warm); }
+.g-sound[aria-pressed="true"] .g-sound-off, .g-sound[aria-pressed="false"] .g-sound-on { display: none; }
+.g-sound:active { background: var(--panel-2); }
