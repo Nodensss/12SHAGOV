@@ -4,17 +4,20 @@ import { access, readFile } from 'node:fs/promises';
 import {
   advance, answerLater, choose, fill, freshGame, isLocked, leaveJournal, linesOf, normalizeGame, progressOf,
   saveEntry, setDraft, stage, validateChapter, validateVocab,
-  levelOf, recordFight,
+  itemsOf, levelOf, markDone, recordFight,
 } from '../public/game/engine.js';
 import { canUse, playTurn, skillsOf, startBattle, validateFight } from '../public/game/battle.js';
 
 const data = new URL('../public/game/data/', import.meta.url);
 const load = async file => JSON.parse(await readFile(new URL(file, data), 'utf8'));
 const index = await load('episodes.json'), vocab = await load('vocab.json');
-const episodes = index.chapters.filter(item => item.type !== 'fight'), bouts = index.chapters.filter(item => item.type === 'fight');
+const episodes = index.chapters.filter(item => !item.type), bouts = index.chapters.filter(item => item.type === 'fight');
 const chapters = await Promise.all(episodes.map(item => load(item.file)));
 const fights = await Promise.all(bouts.map(item => load(item.file)));
 const { skills } = await load('skills.json');
+const { items } = await load('items.json');
+const trialItems = index.chapters.filter(item => item.type === 'trial');
+const trials = await Promise.all(trialItems.map(item => load(item.file)));
 
 test('словарь и все главы игры проходят проверку', () => {
   assert.deepEqual(validateVocab(vocab), []);
@@ -45,7 +48,8 @@ function playThrough(game, chapter, pick) {
   const progress = progressOf(game, chapter), visited = [];
   for (let guard = 0; guard < 500; guard += 1) {
     const now = stage(progress, chapter, game);
-    if (visited.at(-1) !== progress.scene) visited.push(progress.scene);
+    const seen = progress.scene + ':' + linesOf(chapter.scenes[progress.scene], game).map(l => l.id).join(',');
+    if (visited.at(-1) !== seen) visited.push(seen);
     if (now === 'ending') return { progress, visited };
     if (now === 'choice') choose(progress, chapter, chapter.scenes[progress.scene].choice.options[pick].id, game);
     else if (now === 'journal') {
@@ -74,6 +78,9 @@ test('эпизоды открываются по порядку, а услови
   const options = [];
   for (const chapter of chapters) for (const scene of Object.values(chapter.scenes)) for (const o of scene.choice?.options || []) options.push(o.id);
   assert.equal(new Set(options).size, options.length, 'id вариантов выбора уникальны во всей игре');
+  options.push(...index.chapters.map(item => item.id));
+  assert.equal(new Set(options).size, options.length, 'id эпизодов не совпадают с id вариантов');
+  for (const item of items) assert.ok(options.includes(item.when), item.id + ': ' + item.when);
   for (const chapter of chapters) for (const scene of Object.values(chapter.scenes)) {
     const conditional = [...(scene.lines || []), ...(Array.isArray(scene.next) ? scene.next : [])];
     for (const item of conditional) for (const key of ['if', 'ifNot']) if (item[key]) assert.ok(options.includes(item[key]), chapter.id + ': ' + item[key]);
@@ -84,9 +91,12 @@ test('эпизоды открываются по порядку, а услови
     assert.equal(isLocked(item, freshGame()), i > 0);
     assert.equal(isLocked(item, game), false);
     if (item.type === 'fight') recordFight(game, item.id, true);
+    else if (item.type === 'trial') markDone(game, item.id);
     else playThrough(game, chapters[episodes.indexOf(item)], i % 2);
   });
   assert.equal(levelOf(game), bouts.length + 1);
+  for (const item of index.chapters.filter(c => c.needs)) for (const id of item.needs.of) assert.ok(index.chapters.some(c => c.id === id), id);
+  for (const step of index.steps) assert.ok(index.chapters.some(c => c.step === step.id), 'шаг ' + step.id);
 });
 
 test('реплики зависят от решений из прошлых эпизодов', () => {
@@ -147,4 +157,40 @@ test('броня босса снимается только признанием
   state = playTurn(state, boss, by('truth'));
   assert.ok(state.foe < before);
   assert.equal(canUse(state, by('truth')), false);
+});
+
+test('финал второго шага открывается после трёх мест из пяти в любом порядке', () => {
+  const night = index.chapters.find(item => item.needs), game = freshGame();
+  markDone(game, night.after);
+  const order = [...night.needs.of].reverse();
+  order.slice(0, night.needs.count).forEach((id, i) => {
+    assert.equal(isLocked(night, game), true, 'после ' + i + ' мест');
+    assert.equal(isLocked(index.chapters.find(c => c.id === id), game), false);
+    markDone(game, id);
+  });
+  assert.equal(isLocked(night, game), false);
+  const chapter = chapters[episodes.indexOf(night)], supports = Object.values(chapter.scenes).find(sc => (sc.lines || []).filter(l => night.needs.of.includes(l.if)).length === night.needs.of.length);
+  assert.equal(linesOf(supports, game).filter(l => night.needs.of.includes(l.if)).length, night.needs.count);
+});
+
+test('рюкзак: находки зависят от решений, опор столько же, сколько мест', () => {
+  assert.equal(new Set(items.map(i => i.id)).size, items.length);
+  assert.equal(itemsOf(items, freshGame()).filter(i => i.found).length, 0);
+  const honest = freshGame(), joke = freshGame();
+  playThrough(honest, chapters[0], 0); playThrough(joke, chapters[0], 1);
+  const a = itemsOf(items, honest).filter(i => i.found).map(i => i.id), b = itemsOf(items, joke).filter(i => i.found).map(i => i.id);
+  assert.equal(a.length, 1);
+  assert.notDeepEqual(a, b);
+  const night = index.chapters.find(item => item.needs);
+  assert.deepEqual(items.filter(i => i.kind === 'support').map(i => i.when).sort(), [...night.needs.of].sort());
+});
+
+test('испытания: в каждом есть и ловушки, и правда, у каждой фразы есть объяснение', () => {
+  trials.forEach((trial, i) => {
+    assert.equal(trial.id, trialItems[i].id);
+    assert.ok(trial.cards.some(c => c.trap) && trial.cards.some(c => !c.trap));
+    assert.equal(new Set(trial.cards.map(c => c.id)).size, trial.cards.length);
+    for (const card of trial.cards) assert.ok(card.text && card.why && typeof card.trap === 'boolean', card.id);
+    assert.ok(trial.intro.length && trial.outro.length);
+  });
 });

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "_comment": "Список глав. Чтобы добавить главу: положите файл в chapters/ и добавьте строку сюда. Идентификаторы (id) не меняйте после публикации: к ним привязаны прогресс и записи дневника игроков. Поле after — id эпизода, после которого открывается этот. Запись с \"type\": \"fight\" — бой из папки fights/. Победа в бою повышает уровень героя.",
+  "_comment": "Список глав. Чтобы добавить главу: положите файл в chapters/ и добавьте строку сюда. Идентификаторы (id) не меняйте после публикации: к ним привязаны прогресс и записи дневника игроков. Поле after — id эпизода, после которого открывается этот. Запись с \"type\": \"fight\" — бой из папки fights/. Победа в бою повышает уровень героя. steps — разделы меню: layout \"path\" — список по порядку, \"map\" — плитки мест. Запись с \"type\": \"trial\" — испытание из папки trials/. needs: { count, of } — открыть, когда пройдено хотя бы count из списка.",
   "chapters": [
     {
       "id": "step01-only-once",
@@ -76,6 +76,98 @@
       "minutes": "бой",
       "file": "fights/fight04-craving.json",
       "after": "step01-door"
+    },
+    {
+      "id": "trial01-trap",
+      "type": "trial",
+      "step": 1,
+      "title": "Испытание: Капкан иллюзий",
+      "teaser": "Восемь фраз. Где ловушка, а где правда?",
+      "minutes": "2 минуты",
+      "file": "trials/trial01-trap.json",
+      "after": "fight04-craving"
+    },
+    {
+      "id": "step02-group",
+      "step": 2,
+      "title": "Группа",
+      "teaser": "Те же стулья. Сегодня ты разглядываешь людей.",
+      "minutes": "2–3 минуты",
+      "file": "chapters/step02-group.json",
+      "after": "trial01-trap"
+    },
+    {
+      "id": "step02-bench",
+      "step": 2,
+      "title": "Скамейка",
+      "teaser": "Марат, термос и вопрос про здравомыслие.",
+      "minutes": "2–3 минуты",
+      "file": "chapters/step02-bench.json",
+      "after": "trial01-trap"
+    },
+    {
+      "id": "step02-lena",
+      "step": 2,
+      "title": "У Лены",
+      "teaser": "Чай в воскресенье. Тимка выглядывает из-за косяка.",
+      "minutes": "2–3 минуты",
+      "file": "chapters/step02-lena.json",
+      "after": "trial01-trap"
+    },
+    {
+      "id": "step02-river",
+      "step": 2,
+      "title": "Набережная",
+      "teaser": "Слово «Сила», от которого передёргивает.",
+      "minutes": "2–3 минуты",
+      "file": "chapters/step02-river.json",
+      "after": "trial01-trap"
+    },
+    {
+      "id": "step02-morning",
+      "step": 2,
+      "title": "Утро",
+      "teaser": "Шесть сорок. Пустая кухня и чистый листок.",
+      "minutes": "2–3 минуты",
+      "file": "chapters/step02-morning.json",
+      "after": "trial01-trap"
+    },
+    {
+      "id": "step02-night",
+      "step": 2,
+      "final": true,
+      "title": "Ночь без драки",
+      "teaser": "Три часа ночи. Пустота приходит в полный рост.",
+      "minutes": "3–4 минуты",
+      "file": "chapters/step02-night.json",
+      "after": "trial01-trap",
+      "needs": {
+        "count": 3,
+        "of": [
+          "step02-group",
+          "step02-bench",
+          "step02-lena",
+          "step02-river",
+          "step02-morning"
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "id": 1,
+      "title": "Шаг первый",
+      "name": "Признание",
+      "layout": "path",
+      "lead": "Эпизоды и бои идут по порядку."
+    },
+    {
+      "id": 2,
+      "title": "Шаг второй",
+      "name": "Надежда",
+      "layout": "map",
+      "after": "trial01-trap",
+      "lead": "Драк здесь нет. Иди куда хочешь, в любом порядке, и собирай опоры. Когда их будет три — наступит ночь."
     }
   ]
 }

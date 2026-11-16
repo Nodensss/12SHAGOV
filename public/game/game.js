@@ -1,5 +1,5 @@
 import {
-  advance, answerLater, choose, deleteEntry, fill, freshGame, GAME_KEY, isLocked, leaveJournal, linesOf, loadGame,
+  advance, answerLater, choose, deleteEntry, fill, freshGame, GAME_KEY, isLocked, itemsOf, leaveJournal, linesOf, loadGame, markDone, picked,
   progressOf, restartChapter, saveEntry, saveGame, setDraft, stage, validateChapter, validateVocab,
   levelOf, recordFight,
 } from './engine.js';
@@ -13,7 +13,7 @@ const json = async path => {
   return response.json();
 };
 
-let game = loadGame(), index = { chapters: [] }, vocab = { variants: [] }, chapters = new Map(), fights = new Map(), skills = [];
+let game = loadGame(), index = { chapters: [] }, vocab = { variants: [] }, chapters = new Map(), fights = new Map(), trials = new Map(), skills = [], items = [];
 let battle = null;
 let view = { name: 'menu' }, journalIndex = null, draftTimer, storageOk = true;
 
@@ -39,27 +39,91 @@ function go(next) {
 
 /* ---------- Экраны ---------- */
 
+function episodeCard(item) {
+  const chapter = chapterOf(item.id), saved = game.chapters[item.id], tag = 'Шаг ' + h(item.step);
+  if (!chapter) return '<div class="g-card g-card-off"><span class="g-step">' + tag + '</span><strong>' + h(item.title) + '</strong><small>Глава не загрузилась. Проверьте файл ' + h(item.file) + '.</small></div>';
+  if (isLocked(item, game)) return '<div class="g-card g-card-off"><span class="g-step">' + tag + ' · закрыто</span><strong>' + h(item.title) + '</strong><small>' + h(lockedText(item)) + '</small></div>';
+  const started = saved && (saved.scene !== chapter.start || saved.line > 0) && chapter.scenes[saved.scene]?.type !== 'ending';
+  return '<article class="g-card' + (item.final ? ' g-card-final' : '') + '"><span class="g-step">' + h(item.minutes) + (saved?.done ? ' · пройдено' : '') + '</span><strong>' + h(item.title) + '</strong><small>' + h(item.teaser) + '</small>' +
+    '<div class="g-row"><button class="g-btn ' + (saved?.done && !started ? 'g-secondary' : 'g-primary') + '" data-act="' + (!started && saved?.done ? 'restart' : 'play') + '" data-id="' + h(item.id) + '">' + (started ? 'Продолжить' : saved?.done ? 'Пройти ещё раз' : 'Начать') + '</button>' +
+    (started ? '<button class="g-btn g-quiet" data-act="restart" data-id="' + h(item.id) + '">Сначала</button>' : '') + '</div></article>';
+}
+
+function trialCard(item) {
+  const trial = trials.get(item.id), done = game.chapters[item.id]?.done;
+  if (!trial) return '<div class="g-card g-card-off"><span class="g-step">Испытание</span><strong>' + h(item.title) + '</strong><small>Испытание не загрузилось. Проверьте файл ' + h(item.file) + '.</small></div>';
+  if (isLocked(item, game)) return '<div class="g-card g-card-off"><span class="g-step">Испытание · закрыто</span><strong>' + h(item.title) + '</strong><small>' + h(lockedText(item)) + '</small></div>';
+  return '<article class="g-card g-card-final"><span class="g-step">Испытание · ' + h(item.minutes) + (done ? ' · пройдено' : '') + '</span><strong>' + h(item.title) + '</strong><small>' + h(item.teaser) + '</small>' +
+    '<div class="g-row"><button class="g-btn ' + (done ? 'g-secondary' : 'g-primary') + '" data-act="trial" data-id="' + h(item.id) + '">' + (done ? 'Пройти ещё раз' : 'Начать') + '</button></div></article>';
+}
+
+// Плитка места на карте второго шага.
+function placeTile(item) {
+  const chapter = chapterOf(item.id), saved = game.chapters[item.id], support = items.find(i => i.when === item.id);
+  if (!chapter) return '<div class="g-tile is-off"><strong>' + h(item.title) + '</strong><small>Не загрузилось</small></div>';
+  const started = saved && (saved.scene !== chapter.start || saved.line > 0) && chapter.scenes[saved.scene]?.type !== 'ending';
+  return '<button class="g-tile' + (saved?.done ? ' is-done' : '') + '" data-act="' + (!started && saved?.done ? 'restart' : 'play') + '" data-id="' + h(item.id) + '"><span class="g-tile-mark" aria-hidden="true">' + (saved?.done ? '✦' : '○') + '</span><strong>' + h(item.title) + '</strong>' +
+    '<small>' + h(saved?.done && support ? 'Опора: ' + support.name : started ? 'Продолжить' : item.teaser) + '</small></button>';
+}
+
+function stepSection(step) {
+  const list = index.chapters.filter(item => item.step === step.id), done = list.filter(item => picked(game).has(item.id)).length;
+  const head = '<div class="g-section-head"><div><span class="g-step">' + h(step.title) + '</span><h2>' + h(step.name) + '</h2></div><span class="g-count">' + done + ' / ' + list.length + '</span></div>';
+  if (step.after && !picked(game).has(step.after)) {
+    return '<section class="g-section is-locked">' + head + '<div class="g-card g-card-off"><strong>Закрыто</strong><small>Откроется, когда первый шаг будет пройден целиком — вместе с боссом и последним испытанием.</small></div></section>';
+  }
+  // Пройденный шаг сворачивается, когда открыт следующий, чтобы не листать его каждый раз.
+  const folded = done === list.length && (index.steps || []).some(next => next.id > step.id && next.after && picked(game).has(next.after));
+  const fresh = step.after && !done ? '<p class="g-unlocked">Открыт новый шаг</p>' : '';
+  if (step.layout !== 'map') return '<section class="g-section">' + head + (folded ? '<details class="g-fold"><summary>Шаг пройден. Показать эпизоды и бои</summary>' : '<p class="g-lead g-section-lead">' + h(step.lead || '') + '</p>') + '<div class="g-list">' + list.map(item => item.type === 'fight' ? fightCard(item) : item.type === 'trial' ? trialCard(item) : episodeCard(item)).join('') + '</div>' + (folded ? '</details>' : '') + '</section>';
+  const supports = itemsOf(items, game).filter(i => i.kind === 'support' && i.step === step.id), places = list.filter(item => !item.final), finals = list.filter(item => item.final);
+  return '<section class="g-section g-section-map">' + head + fresh + '<p class="g-lead g-section-lead">' + h(step.lead || '') + '</p>' +
+    '<div class="g-supports" role="img" aria-label="Опор найдено: ' + supports.filter(i => i.found).length + ' из ' + supports.length + '">' + supports.map(i => '<i' + (i.found ? ' class="is-on"' : '') + '></i>').join('') + '<span>Опоры: ' + supports.filter(i => i.found).length + ' из ' + supports.length + '</span></div>' +
+    '<div class="g-map">' + places.map(placeTile).join('') + '</div><div class="g-list">' + finals.map(item => {
+      if (!isLocked(item, game)) return episodeCard(item);
+      const have = item.needs ? item.needs.of.filter(id => picked(game).has(id)).length : 0;
+      return '<div class="g-card g-card-off"><span class="g-step">Закрыто</span><strong>' + h(item.title) + '</strong><small>' + (item.needs ? 'Нужно опор: ' + item.needs.count + '. Найдено: ' + have + '.' : h(lockedText(item))) + '</small></div>';
+    }).join('') + '</div></section>';
+}
+
 function menu() {
   const later = Object.values(game.journal).filter(e => e.later && !e.text).length;
   const saved = Object.values(game.journal).filter(e => e.text).length;
-  const variant = vocab.variants.find(v => v.id === game.variant);
+  const variant = vocab.variants.find(v => v.id === game.variant), found = itemsOf(items, game).filter(i => i.found).length;
+  const steps = index.steps || [{ id: 1, title: 'Шаг первый', name: '', layout: 'path' }];
   return '<header class="g-top"><a class="g-back" href="../">← Свой путь</a></header>' +
     '<main class="g-main g-menu"><div class="g-eyebrow">Сюжетная игра · 12 шагов</div><h1 tabindex="-1">Истории<br>одного двора</h1>' +
-    '<p class="g-lead">Сцены, где решаешь ты, и бои с тягой — от лёгкой к самой тяжёлой. В конце каждой сцены — страница личного дневника, которую можно оставить пустой.</p>' +
-    levelBar() + '<div class="g-list">' + index.chapters.map(item => {
-      if (item.type === 'fight') return fightCard(item);
-      const chapter = chapterOf(item.id), saved = game.chapters[item.id];
-      if (!chapter) return '<div class="g-card g-card-off"><span class="g-step">Шаг ' + h(item.step) + '</span><strong>' + h(item.title) + '</strong><small>Глава не загрузилась. Проверьте файл ' + h(item.file) + '.</small></div>';
-      if (isLocked(item, game)) return '<div class="g-card g-card-off"><span class="g-step">Шаг ' + h(item.step) + ' · закрыто</span><strong>' + h(item.title) + '</strong><small>' + h(lockedText(item)) + '</small></div>';
-      const started = saved && (saved.scene !== chapter.start || saved.line > 0) && chapter.scenes[saved.scene]?.type !== 'ending';
-      return '<article class="g-card"><span class="g-step">Шаг ' + h(item.step) + ' · ' + h(item.minutes) + (saved?.done ? ' · пройдено' : '') + '</span><strong>' + h(item.title) + '</strong><small>' + h(item.teaser) + '</small>' +
-        '<div class="g-row"><button class="g-btn g-primary" data-act="' + (!started && saved?.done ? 'restart' : 'play') + '" data-id="' + h(item.id) + '">' + (started ? 'Продолжить' : saved?.done ? 'Пройти ещё раз' : 'Начать') + '</button>' +
-        (started ? '<button class="g-btn g-quiet" data-act="restart" data-id="' + h(item.id) + '">Сначала</button>' : '') + '</div></article>';
-    }).join('') + '<div class="g-card g-card-off"><span class="g-step">Дальше</span><strong>Шаг второй</strong><small>В работе.</small></div></div>' +
-    '<div class="g-row g-wrap"><button class="g-btn g-secondary" data-act="diary">Дневник' + (saved || later ? ' · ' + [saved ? saved + ' зап.' : '', later ? later + ' отложено' : ''].filter(Boolean).join(', ') : '') + '</button>' +
-    '<button class="g-btn g-quiet" data-act="variant">Герой: ' + h(variant ? variant.label : 'выбрать') + '</button></div>' +
+    '<p class="g-lead">Сцены, где решаешь ты. У каждого шага свои правила. В конце сцены — страница личного дневника, которую можно оставить пустой.</p>' +
+    levelBar() + '<div class="g-row g-wrap g-tools"><button class="g-btn g-secondary" data-act="bag">Рюкзак · ' + found + ' из ' + items.length + '</button>' +
+    '<button class="g-btn g-secondary" data-act="diary">Дневник' + (saved || later ? ' · ' + [saved ? saved + ' зап.' : '', later ? later + ' отл.' : ''].filter(Boolean).join(', ') : '') + '</button></div>' +
+    steps.map(stepSection).join('') +
+    '<div class="g-card g-card-off g-next-step"><span class="g-step">Дальше</span><strong>Шаг третий</strong><small>В работе.</small></div>' +
+    '<div class="g-row g-wrap"><button class="g-btn g-quiet" data-act="variant">Герой: ' + h(variant ? variant.label : 'выбрать') + '</button></div>' +
     (storageOk ? '' : '<p class="g-warn" role="alert">Браузер не разрешает сохранять данные. Прогресс и записи пропадут после закрытия вкладки.</p>') +
     '<p class="g-note">Игра — способ подумать, а не лечение. Если сейчас тяжело, свяжитесь с человеком, которому доверяете, с группой или со специалистом. <a href="../#home">Раздел поддержки — в приложении.</a></p></main>';
+}
+
+function bagScreen() {
+  const all = itemsOf(items, game), steps = index.steps || [];
+  return '<header class="g-top"><button class="g-back" data-act="menu">← Главы</button><span class="g-scene">Рюкзак</span></header>' +
+    '<main class="g-main g-bag"><h1 tabindex="-1">Рюкзак</h1><p class="g-lead">То, что герой унёс из сцен. Часть находок зависит от твоих решений — все за одно прохождение не собрать.</p>' +
+    steps.map(step => { const list = all.filter(i => i.step === step.id); return list.length ? '<h2>' + h(step.title) + '</h2><div class="g-finds">' + list.map(i => i.found
+      ? '<div class="g-find' + (i.kind === 'support' ? ' is-support' : '') + '"><strong>' + h(i.name) + '</strong><small>' + h(i.text) + '</small></div>'
+      : '<div class="g-find is-unknown"><strong>???</strong><small>Ещё не найдено</small></div>').join('') + '</div>' : ''; }).join('') + '</main>';
+}
+
+function trialScreen() {
+  const trial = trials.get(view.id), top = '<header class="g-top"><button class="g-back" data-act="menu">← Главы</button><span class="g-scene">Испытание</span></header>';
+  if (view.card == null) return top + '<main class="g-main g-ending"><div class="g-trap" aria-hidden="true"><i></i><i></i></div><h2 tabindex="-1">' + h(trial.title) + '</h2>' + trial.intro.map(t => '<p>' + h(t) + '</p>').join('') + '</main>' +
+    '<footer class="g-foot"><button class="g-btn g-primary" data-act="trial-next">Начать</button></footer>';
+  if (view.card >= trial.cards.length) return top + '<main class="g-main g-ending"><div class="g-trap is-open" aria-hidden="true"><i></i><i></i></div><h2 tabindex="-1">Капкан разжат</h2>' + trial.outro.map(t => '<p>' + h(t) + '</p>').join('') + '</main>' +
+    '<footer class="g-foot"><button class="g-btn g-primary" data-act="menu">Дальше</button></footer>';
+  const card = trial.cards[view.card], answered = view.answer != null, right = answered && view.answer === card.trap;
+  return top + '<main class="g-main g-trial"><span class="g-step">Фраза ' + (view.card + 1) + ' из ' + trial.cards.length + '</span>' +
+    '<blockquote class="g-phrase" tabindex="-1">«' + h(card.text) + '»</blockquote>' +
+    (answered ? '<div class="g-why" role="status"><strong>' + (card.trap ? h(trial.trapLabel) : h(trial.truthLabel)) + (right ? '. Ты это услышал.' : '. Легко перепутать.') + '</strong><p>' + h(card.why) + '</p></div>' : '') + '</main>' +
+    '<footer class="g-foot' + (answered ? '' : ' g-foot-two') + '">' + (answered ? '<button class="g-btn g-primary" data-act="trial-next">Дальше</button>'
+      : '<button class="g-btn g-choice g-trap-btn" data-act="trial-answer" data-id="trap">' + h(trial.trapLabel) + '</button><button class="g-btn g-choice g-truth-btn" data-act="trial-answer" data-id="truth">' + h(trial.truthLabel) + '</button>') + '</footer>';
 }
 
 const lockedText = item => { const prev = index.chapters.find(c => c.id === item.after); return 'Откроется после: ' + (prev?.title || ''); };
@@ -189,7 +253,7 @@ function diary() {
 }
 
 function render() {
-  root.innerHTML = view.name === 'fight' ? fightScreen() : view.name === 'play' ? play() : view.name === 'diary' ? diary() : view.name === 'variant' ? variantScreen() : menu();
+  root.innerHTML = view.name === 'fight' ? fightScreen() : view.name === 'trial' ? trialScreen() : view.name === 'bag' ? bagScreen() : view.name === 'play' ? play() : view.name === 'diary' ? diary() : view.name === 'variant' ? variantScreen() : menu();
   root.dataset.view = view.name;
   const carousel = root.querySelector('.g-carousel');
   if (carousel) {
@@ -215,6 +279,15 @@ function startChapter(id) {
 
 const actions = {
   menu: () => { battle = null; go({ name: 'menu' }); },
+  bag: () => go({ name: 'bag' }),
+  trial: id => go({ name: 'trial', id, card: null, answer: null }),
+  'trial-answer': id => { view.answer = id === 'trap'; render(); },
+  'trial-next': () => {
+    const trial = trials.get(view.id);
+    view.card = view.card == null ? 0 : view.card + 1; view.answer = null;
+    if (view.card >= trial.cards.length) { markDone(game, trial.id); persist(); }
+    render(); window.scrollTo(0, 0);
+  },
   fight: id => { battle = null; go({ name: 'fight', id }); },
   'fight-start': () => { battle = startBattle(fights.get(view.id)); view.levelUp = false; render(); window.scrollTo(0, 0); },
   skill: id => {
@@ -285,10 +358,15 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) flush
 
 async function boot() {
   try {
-    [index, vocab, { skills }] = await Promise.all([json('./data/episodes.json'), json('./data/vocab.json'), json('./data/skills.json')]);
+    [index, vocab, { skills }, { items }] = await Promise.all([json('./data/episodes.json'), json('./data/vocab.json'), json('./data/skills.json'), json('./data/items.json')]);
     const problems = validateVocab(vocab);
     await Promise.all(index.chapters.map(async item => {
       try {
+        if (item.type === 'trial') {
+          const trial = await json('./data/' + item.file);
+          if (trial.id !== item.id || !trial.cards?.length) problems.push(item.id + ': испытание без карточек или с чужим id'); else trials.set(item.id, trial);
+          return;
+        }
         if (item.type === 'fight') {
           const fight = await json('./data/' + item.file), errors = validateFight(fight, skills);
           if (fight.id !== item.id) errors.push('id в файле не совпадает с episodes.json');

@@ -125,10 +125,15 @@ export function validateChapter(chapter, vocab) {
   return errors;
 }
 
-// Все варианты, которые игрок выбрал в любых главах: по ним ветвятся следующие эпизоды.
+// Всё, что игрок уже сделал: выбранные варианты, пройденные эпизоды и выигранные бои.
+// По этим id ветвятся реплики (if / ifNot), открываются эпизоды и находки.
 export function picked(game) {
   const set = new Set();
-  for (const chapter of Object.values(game?.chapters || {})) for (const id of Object.values(chapter.choices || {})) set.add(id);
+  for (const [chapterId, chapter] of Object.entries(game?.chapters || {})) {
+    if (chapter.done) set.add(chapterId);
+    for (const id of Object.values(chapter.choices || {})) set.add(id);
+  }
+  for (const [fightId, fight] of Object.entries(game?.fights || {})) if (fight.won) set.add(fightId);
   return set;
 }
 
@@ -148,7 +153,10 @@ export function resolveNext(next, game) {
 }
 
 export function isLocked(item, game) {
-  return !!item.after && game.chapters[item.after]?.done !== true && game.fights?.[item.after]?.won !== true;
+  const have = picked(game);
+  if (item.after && !have.has(item.after)) return true;
+  // needs: { count, of: [id, ...] } — открыть, когда пройдено хотя бы count из списка.
+  return !!item.needs && item.needs.of.filter(id => have.has(id)).length < item.needs.count;
 }
 
 export function progressOf(game, chapter) {
@@ -238,4 +246,15 @@ export function recordFight(game, fightId, won) {
   const item = game.fights[fightId] ||= { won: false, tries: 0 };
   item.tries += 1;
   if (won) item.won = true;
+}
+
+// Отмечает пройденным элемент без сцен (испытание).
+export function markDone(game, id) {
+  game.chapters[id] = { scene: null, line: 0, choices: game.chapters[id]?.choices || {}, done: true };
+}
+
+// Находки в рюкзаке: предмет найден, если его when есть среди сделанного игроком.
+export function itemsOf(items, game) {
+  const have = picked(game);
+  return items.map(item => ({ ...item, found: have.has(item.when) }));
 }
