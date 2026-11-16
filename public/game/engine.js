@@ -61,9 +61,10 @@ export function validateVocab(vocab) {
     if (!variant.id || seen.has(variant.id)) errors.push('vocab: повтор или пустой id ' + variant.id);
     seen.add(variant.id);
     if (!variant.label) errors.push('vocab: ' + variant.id + ' без label');
+    if (variant.locked) continue;
     for (const key of keys) if (!variant.words?.[key]) errors.push('vocab: ' + variant.id + ' без слова ' + key);
   }
-  if (!seen.has(vocab.default)) errors.push('vocab: default не найден среди вариантов');
+  if (!seen.has(vocab.default) || vocab.variants.find(v => v.id === vocab.default).locked) errors.push('vocab: default должен быть открытым героем');
   return errors;
 }
 
@@ -80,7 +81,11 @@ export function validateChapter(chapter, vocab) {
   for (const q of chapter?.questions || []) { unique(q.id, 'вопрос'); if (!q.text) errors.push('вопрос ' + q.id + ' без текста'); }
   if (!scenes[chapter?.start]) errors.push('start указывает на несуществующую сцену');
   const tokens = new Set(Object.keys(vocab?.tokens || {}));
-  const target = (id, where) => { if (!scenes[id]) errors.push(where + ': нет сцены ' + id); };
+  const routes = next => Array.isArray(next) ? next.map(route => route.to) : [next];
+  const target = (next, where) => {
+    if (Array.isArray(next) && (!next.length || next.at(-1).if || next.at(-1).ifNot)) errors.push(where + ': последний маршрут next должен быть без условия');
+    for (const id of routes(next)) if (!scenes[id]) errors.push(where + ': нет сцены ' + id);
+  };
   for (const [sceneId, scene] of Object.entries(scenes)) {
     unique(sceneId, 'сцена');
     if (!['story', 'journal', 'ending'].includes(scene.type)) errors.push(sceneId + ': неизвестный type');
@@ -110,17 +115,43 @@ export function validateChapter(chapter, vocab) {
       if (seen.has(id)) return false;
       const scene = scenes[id], next = new Set(seen).add(id);
       if (scene.type === 'ending') return true;
-      return scene.choice ? scene.choice.options.every(o => reaches(o.next, next)) : reaches(scene.next, next);
+      return scene.choice ? scene.choice.options.every(o => routes(o.next).every(id => reaches(id, next))) : routes(scene.next).every(id => reaches(id, next));
     };
     if (!reaches(chapter.start)) errors.push('не все ветки доходят до концовки');
   }
   return errors;
 }
 
+// Все варианты, которые игрок выбрал в любых главах: по ним ветвятся следующие эпизоды.
+export function picked(game) {
+  const set = new Set();
+  for (const chapter of Object.values(game?.chapters || {})) for (const id of Object.values(chapter.choices || {})) set.add(id);
+  return set;
+}
+
+const passes = (item, chosen) => (!item.if || chosen.has(item.if)) && (!item.ifNot || !chosen.has(item.ifNot));
+
+// Реплики сцены с учётом условий if / ifNot (id варианта выбора из любой главы).
+export function linesOf(scene, game) {
+  const chosen = picked(game);
+  return (scene.lines || []).filter(line => passes(line, chosen));
+}
+
+// next — id сцены или список маршрутов [{ if, ifNot, to }]; берётся первый подходящий.
+export function resolveNext(next, game) {
+  if (!Array.isArray(next)) return next;
+  const chosen = picked(game);
+  return (next.find(route => passes(route, chosen)) || next.at(-1)).to;
+}
+
+export function isLocked(item, game) {
+  return !!item.after && game.chapters[item.after]?.done !== true;
+}
+
 export function progressOf(game, chapter) {
   const saved = game.chapters[chapter.id];
   if (saved && chapter.scenes[saved.scene]) {
-    const max = Math.max(0, (chapter.scenes[saved.scene].lines?.length || 1) - 1);
+    const max = Math.max(0, (linesOf(chapter.scenes[saved.scene], game).length || 1) - 1);
     saved.line = Math.min(saved.line, max);
     return saved;
   }
@@ -138,33 +169,33 @@ function enter(progress, chapter, sceneId) {
 }
 
 // Что сейчас ждёт игрока: следующая реплика, выбор, дневник или конец.
-export function stage(progress, chapter) {
+export function stage(progress, chapter, game) {
   const scene = chapter.scenes[progress.scene];
   if (scene.type === 'journal') return 'journal';
   if (scene.type === 'ending') return 'ending';
-  if (progress.line < scene.lines.length - 1) return 'line';
+  if (progress.line < linesOf(scene, game).length - 1) return 'line';
   return scene.choice ? 'choice' : 'next';
 }
 
-export function advance(progress, chapter) {
-  const now = stage(progress, chapter), scene = chapter.scenes[progress.scene];
+export function advance(progress, chapter, game) {
+  const now = stage(progress, chapter, game), scene = chapter.scenes[progress.scene];
   if (now === 'line') progress.line += 1;
-  else if (now === 'next') enter(progress, chapter, scene.next);
+  else if (now === 'next') enter(progress, chapter, resolveNext(scene.next, game));
   return progress;
 }
 
-export function choose(progress, chapter, optionId) {
+export function choose(progress, chapter, optionId, game) {
   const scene = chapter.scenes[progress.scene];
   const option = scene.choice?.options.find(o => o.id === optionId);
-  if (!option || stage(progress, chapter) !== 'choice') return progress;
+  if (!option || stage(progress, chapter, game) !== 'choice') return progress;
   progress.choices[scene.choice.id] = option.id;
   enter(progress, chapter, option.next);
   return progress;
 }
 
-export function leaveJournal(progress, chapter) {
+export function leaveJournal(progress, chapter, game) {
   const scene = chapter.scenes[progress.scene];
-  if (scene.type === 'journal') enter(progress, chapter, scene.next);
+  if (scene.type === 'journal') enter(progress, chapter, resolveNext(scene.next, game));
   return progress;
 }
 

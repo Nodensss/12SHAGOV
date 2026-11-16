@@ -1,5 +1,5 @@
 import {
-  advance, answerLater, choose, deleteEntry, fill, freshGame, GAME_KEY, leaveJournal, loadGame,
+  advance, answerLater, choose, deleteEntry, fill, freshGame, GAME_KEY, isLocked, leaveJournal, linesOf, loadGame,
   progressOf, restartChapter, saveEntry, saveGame, setDraft, stage, validateChapter, validateVocab,
 } from './engine.js';
 
@@ -46,11 +46,12 @@ function menu() {
     '<div class="g-list">' + index.chapters.map(item => {
       const chapter = chapterOf(item.id), saved = game.chapters[item.id];
       if (!chapter) return '<div class="g-card g-card-off"><span class="g-step">Шаг ' + h(item.step) + '</span><strong>' + h(item.title) + '</strong><small>Глава не загрузилась. Проверьте файл ' + h(item.file) + '.</small></div>';
+      if (isLocked(item, game)) return '<div class="g-card g-card-off"><span class="g-step">Шаг ' + h(item.step) + ' · закрыто</span><strong>' + h(item.title) + '</strong><small>Откроется после эпизода «' + h(index.chapters.find(c => c.id === item.after)?.title || '') + '».</small></div>';
       const started = saved && (saved.scene !== chapter.start || saved.line > 0) && chapter.scenes[saved.scene]?.type !== 'ending';
       return '<article class="g-card"><span class="g-step">Шаг ' + h(item.step) + ' · ' + h(item.minutes) + (saved?.done ? ' · пройдено' : '') + '</span><strong>' + h(item.title) + '</strong><small>' + h(item.teaser) + '</small>' +
-        '<div class="g-row"><button class="g-btn g-primary" data-act="play" data-id="' + h(item.id) + '">' + (started ? 'Продолжить' : saved?.done ? 'Пройти ещё раз' : 'Начать') + '</button>' +
+        '<div class="g-row"><button class="g-btn g-primary" data-act="' + (!started && saved?.done ? 'restart' : 'play') + '" data-id="' + h(item.id) + '">' + (started ? 'Продолжить' : saved?.done ? 'Пройти ещё раз' : 'Начать') + '</button>' +
         (started ? '<button class="g-btn g-quiet" data-act="restart" data-id="' + h(item.id) + '">Сначала</button>' : '') + '</div></article>';
-    }).join('') + '<div class="g-card g-card-off"><span class="g-step">Дальше</span><strong>Новые главы</strong><small>Появятся здесь по мере того, как их напишут.</small></div></div>' +
+    }).join('') + '<div class="g-card g-card-off"><span class="g-step">Дальше</span><strong>Шаг второй</strong><small>В работе.</small></div></div>' +
     '<div class="g-row g-wrap"><button class="g-btn g-secondary" data-act="diary">Дневник' + (saved || later ? ' · ' + [saved ? saved + ' зап.' : '', later ? later + ' отложено' : ''].filter(Boolean).join(', ') : '') + '</button>' +
     '<button class="g-btn g-quiet" data-act="variant">Герой: ' + h(variant ? variant.label : 'выбрать') + '</button></div>' +
     (storageOk ? '' : '<p class="g-warn" role="alert">Браузер не разрешает сохранять данные. Прогресс и записи пропадут после закрытия вкладки.</p>') +
@@ -61,21 +62,22 @@ function variantScreen() {
   const current = Math.max(0, vocab.variants.findIndex(v => v.id === game.variant));
   return '<header class="g-top"><button class="g-back" data-act="menu">← Главы</button><span class="g-scene">Выбор героя</span></header>' +
     '<main class="g-main g-heroes"><h1 tabindex="-1">Выбери героя</h1>' +
-    '<div class="g-carousel" data-start="' + current + '">' + vocab.variants.map((v, i) => '<article class="g-hero" data-id="' + h(v.id) + '" aria-label="' + h(v.label) + '">' +
-      '<div class="g-portrait">' + (v.art ? '<img src="' + h(v.art) + '" alt="" width="240" height="360"' + (Math.abs(i - current) > 1 ? ' loading="lazy"' : '') + '>' : '') + '</div>' +
+    '<div class="g-carousel" data-start="' + current + '">' + vocab.variants.map((v, i) => '<article class="g-hero' + (v.locked ? ' is-locked' : '') + '" data-id="' + h(v.id) + '" aria-label="' + h(v.label) + (v.locked ? ', закрыт' : '') + '">' +
+      '<div class="g-portrait">' + (v.art ? '<img src="' + h(v.art) + '" alt="" width="240" height="360"' + (Math.abs(i - current) > 1 ? ' loading="lazy"' : '') + '>' : '') + (v.locked ? '<span class="g-lock">Закрыт</span>' : '') + '</div>' +
       '<span class="g-step">' + h(v.epithet || '') + '</span><h2>' + h(v.label) + '</h2>' + (v.quote ? '<p class="g-quote">«' + h(v.quote) + '»</p>' : '') + '<p class="g-lore">' + h(v.lore || '') + '</p></article>').join('') + '</div>' +
     '<div class="g-dots" aria-hidden="true">' + vocab.variants.map((v, i) => '<i' + (i === current ? ' class="is-on"' : '') + '></i>').join('') + '</div></main>' +
     '<footer class="g-foot g-foot-hero"><button class="g-btn g-arrow" data-act="hero-prev" aria-label="Предыдущий герой">‹</button>' +
-    '<button class="g-btn g-primary" data-act="set-variant" data-id="' + h(vocab.variants[current].id) + '" id="g-pick">Играть: ' + h(vocab.variants[current].label) + '</button>' +
+    '<button class="g-btn g-primary" data-act="set-variant" data-id="' + h(vocab.variants[current].id) + '" id="g-pick"' + (vocab.variants[current].locked ? ' disabled' : '') + '>' + h(pickLabel(vocab.variants[current])) + '</button>' +
     '<button class="g-btn g-arrow" data-act="hero-next" aria-label="Следующий герой">›</button></footer>';
 }
 
 // Карусель героев: следим, какая карточка в центре, и обновляем кнопку и точки.
+const pickLabel = variant => variant.locked ? 'Герой пока закрыт' : 'Играть: ' + variant.label;
 function heroIndex(carousel) { return Math.round(carousel.scrollLeft / carousel.clientWidth); }
 function syncHero(carousel) {
   const i = Math.min(vocab.variants.length - 1, Math.max(0, heroIndex(carousel))), variant = vocab.variants[i], pick = root.querySelector('#g-pick');
   if (!pick || pick.dataset.id === variant.id) return;
-  pick.dataset.id = variant.id; pick.textContent = 'Играть: ' + variant.label;
+  pick.dataset.id = variant.id; pick.textContent = pickLabel(variant); pick.disabled = !!variant.locked;
   root.querySelectorAll('.g-dots i').forEach((dot, n) => dot.classList.toggle('is-on', n === i));
 }
 function slideHero(step) {
@@ -91,15 +93,15 @@ function lineHtml(chapter, line, fresh) {
 }
 
 function play() {
-  const chapter = chapterOf(view.id), progress = progressOf(game, chapter), scene = chapter.scenes[progress.scene], now = stage(progress, chapter);
+  const chapter = chapterOf(view.id), progress = progressOf(game, chapter), scene = chapter.scenes[progress.scene], now = stage(progress, chapter, game);
   const top = '<header class="g-top"><button class="g-back" data-act="menu">← Главы</button><span class="g-scene">' + h(chapter.title) + ' · ' + h(scene.title || '') + '</span></header>';
   if (now === 'journal') return top + journal(chapter, scene);
   if (now === 'ending') {
     return top + '<main class="g-main g-ending"><div class="g-door" aria-hidden="true"><i></i></div><h2 tabindex="-1">' + h(scene.title) + '</h2>' +
-      scene.lines.map(line => '<p>' + say(line.text) + '</p>').join('') + '<p class="g-note">' + h(chapter.disclaimer || '') + '</p></main>' +
+      linesOf(scene, game).map(line => '<p>' + say(line.text) + '</p>').join('') + '<p class="g-note">' + h(chapter.disclaimer || '') + '</p></main>' +
       '<footer class="g-foot"><button class="g-btn g-primary" data-act="menu">К главам</button><button class="g-btn g-secondary" data-act="diary">Открыть дневник</button><button class="g-btn g-quiet" data-act="restart" data-id="' + h(chapter.id) + '">Пройти иначе</button></footer>';
   }
-  const shown = scene.lines.slice(0, progress.line + 1);
+  const shown = linesOf(scene, game).slice(0, progress.line + 1);
   const log = '<main class="g-main g-log" data-act="' + (now === 'choice' ? '' : 'next') + '" aria-live="polite">' + shown.map((line, i) => lineHtml(chapter, line, i === shown.length - 1)).join('') + '</main>';
   const foot = now === 'choice'
     ? '<footer class="g-foot"><p class="g-prompt">' + h(scene.choice.prompt || 'Что дальше?') + '</p>' + scene.choice.options.map(o => '<button class="g-btn g-choice" data-act="choose" data-id="' + h(o.id) + '">' + say(o.label) + '</button>').join('') + '</footer>'
@@ -170,13 +172,13 @@ const actions = {
   menu: () => go({ name: 'menu' }),
   diary: () => go({ name: 'diary' }),
   variant: () => go({ name: 'variant' }),
-  'set-variant': id => { game.variant = id; persist(); view.then ? go({ name: 'play', id: view.then }) : go({ name: 'menu' }); },
+  'set-variant': id => { if (vocab.variants.find(v => v.id === id)?.locked) return; game.variant = id; persist(); view.then ? go({ name: 'play', id: view.then }) : go({ name: 'menu' }); },
   'hero-prev': () => slideHero(-1),
   'hero-next': () => slideHero(1),
   play: id => startChapter(id),
   restart: id => { restartChapter(game, chapterOf(id)); persist(); startChapter(id); },
-  next: () => { const chapter = chapterOf(view.id); advance(progressOf(game, chapter), chapter); persist(); render(); },
-  choose: id => { const chapter = chapterOf(view.id); choose(progressOf(game, chapter), chapter, id); persist(); render(); window.scrollTo(0, 0); },
+  next: () => { const chapter = chapterOf(view.id); advance(progressOf(game, chapter), chapter, game); persist(); render(); },
+  choose: id => { const chapter = chapterOf(view.id); choose(progressOf(game, chapter), chapter, id, game); persist(); render(); window.scrollTo(0, 0); },
   'other-question': () => { flushDraft(); journalIndex += 1; render(); root.querySelector('#g-answer')?.focus(); },
   'journal-save': () => {
     const area = root.querySelector('#g-answer'), chapter = chapterOf(view.id);
@@ -185,13 +187,13 @@ const actions = {
       root.querySelector('#g-status').textContent = 'Здесь пока пусто. Напишите пару слов или нажмите «Ответить позже».';
       return area.focus();
     }
-    leaveJournal(progressOf(game, chapter), chapter); persist(); journalIndex = null; render(); window.scrollTo(0, 0);
+    leaveJournal(progressOf(game, chapter), chapter, game); persist(); journalIndex = null; render(); window.scrollTo(0, 0);
   },
   'journal-later': () => {
     const area = root.querySelector('#g-answer'), chapter = chapterOf(view.id);
     setDraft(game, area.dataset.question, area.value, chapter.id);
     answerLater(game, area.dataset.question, chapter.id);
-    leaveJournal(progressOf(game, chapter), chapter); persist(); journalIndex = null; render(); window.scrollTo(0, 0);
+    leaveJournal(progressOf(game, chapter), chapter, game); persist(); journalIndex = null; render(); window.scrollTo(0, 0);
   },
   'diary-edit': id => { flushDraft(); view.edit = id; render(); root.querySelector('textarea[data-question="' + CSS.escape(id) + '"]')?.focus(); },
   'diary-save': id => {
@@ -238,11 +240,11 @@ async function boot() {
       } catch (error) { problems.push(item.id + ': ' + error.message); }
     }));
     if (problems.length) console.warn('Ошибки в данных игры:\n' + problems.join('\n'));
-    if (game.variant && !vocab.variants.some(v => v.id === game.variant)) game.variant = null;
+    if (game.variant && !vocab.variants.some(v => v.id === game.variant && !v.locked)) game.variant = null;
     // После перезагрузки возвращаем игрока в незавершённую главу.
     const open = index.chapters.find(item => {
       const chapter = chapterOf(item.id), saved = game.chapters[item.id];
-      return chapter && saved && chapter.scenes[saved.scene] && chapter.scenes[saved.scene].type !== 'ending' && (saved.scene !== chapter.start || saved.line > 0);
+      return chapter && !isLocked(item, game) && saved && chapter.scenes[saved.scene] && chapter.scenes[saved.scene].type !== 'ending' && (saved.scene !== chapter.start || saved.line > 0);
     });
     view = open && game.variant ? { name: 'play', id: open.id } : { name: 'menu' };
     render();
