@@ -17,9 +17,19 @@ from playwright.async_api import async_playwright
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 WEB_ROOT = pathlib.Path(os.environ.get('GAME_WEB_ROOT', str(ROOT / 'public')))
 OUT = pathlib.Path(os.environ.get('GAME_REVIEW_DIR', str(ROOT.parent / 'scratch' / 'game-step03-review')))
-CHROMIUM = os.environ.get('CHROMIUM_PATH', '/usr/bin/chromium')
 OUT.mkdir(parents=True, exist_ok=True)
 KEY = '12shagov-game-v1'
+
+
+async def launch_chromium(playwright):
+    """CHROMIUM_PATH wins; otherwise Playwright's own browser, then the system Chromium."""
+    path = os.environ.get('CHROMIUM_PATH')
+    if path:
+        return await playwright.chromium.launch(executable_path=path, args=['--no-sandbox'])
+    try:
+        return await playwright.chromium.launch(args=['--no-sandbox'])
+    except Exception:
+        return await playwright.chromium.launch(executable_path='/usr/bin/chromium', args=['--no-sandbox'])
 
 
 async def seed_old_save(page):
@@ -226,7 +236,7 @@ async def main():
         else:
             raise AssertionError('Test HTTP server did not start')
         async with async_playwright() as p:
-            browser = await p.chromium.launch(executable_path=CHROMIUM, args=['--no-sandbox'])
+            browser = await launch_chromium(p)
             endings = []
             for branch in [0, 1]:
                 context = await browser.new_context(viewport={'width': 390, 'height': 844}, device_scale_factor=1, has_touch=True, is_mobile=True, reduced_motion='reduce')

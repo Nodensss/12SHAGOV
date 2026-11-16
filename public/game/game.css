@@ -463,3 +463,19 @@ textarea::placeholder { color: #8a958a; }
     padding-bottom: calc(.3rem + env(safe-area-inset-bottom));
   }
 }
+
+/* Противник не сжимается меньше минимума (96 px на коротком телефоне, 160 px на обычном):
+   место ему уступает журнал боя, который прокручивается внутри себя и показывает конец хода.
+   В альбомной ориентации (высота меньше 540 px) минимума нет — там страница прокручивается. */
+@media (min-height: 540px) {
+  .game:has(> .g-battle) .g-battle {
+    grid-template-rows: auto minmax(clamp(96px, 100dvh - 472px, 160px), 1fr) minmax(3.4rem, auto) auto;
+  }
+}
+.game:has(> .g-battle) .g-battle-log {
+  max-height: 7.5rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+.game:has(> .g-battle) .g-battle-log.is-clipped { mask-image: linear-gradient(to bottom, transparent, #000 1.2rem); }

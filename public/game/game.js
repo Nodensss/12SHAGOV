@@ -171,7 +171,7 @@ function fightScreen() {
   const hitFoe = battle.log.some(l => l.hit === 'foe'), hitYou = battle.log.some(l => l.hit === 'you');
   return top + '<main class="g-main g-battle">' + bar(h(fight.name), battle.foe, battle.foeMax, 'g-bar-foe') +
     '<div class="g-foe g-foe-small' + (hitFoe ? ' is-hit' : '') + (fight.armor && !battle.open ? ' is-armored' : '') + '"><img src="' + h(fight.art) + '" alt="" width="240" height="240"></div>' +
-    '<div class="g-battle-log' + (hitYou ? ' is-hit' : '') + '" aria-live="polite">' + (battle.log.length ? battle.log.map(l => '<p class="g-log-' + l.who + '">' + (l.who === 'you' ? '<b>Ты:</b> ' : l.who === 'foe' ? '<b>' + h(fight.name) + ':</b> ' : '') + h(l.text) + '</p>').join('') : '<p class="g-log-note">Твой ход. Выбери приём.</p>') + '</div>' +
+    '<div class="g-battle-log' + (hitYou ? ' is-hit' : '') + '" aria-live="polite" tabindex="0" aria-label="Журнал боя">' + (battle.log.length ? battle.log.map(l => '<p class="g-log-' + l.who + '">' + (l.who === 'you' ? '<b>Ты:</b> ' : l.who === 'foe' ? '<b>' + h(fight.name) + ':</b> ' : '') + h(l.text) + '</p>').join('') : '<p class="g-log-note">Твой ход. Выбери приём.</p>') + '</div>' +
     bar('Твоя стойкость', battle.hp, battle.maxHp, 'g-bar-you') + '</main>' +
     '<footer class="g-foot g-skills">' + skillsOf(fight, skills).map(s => { const wait = battle.cooldowns[s.id] > 0; return '<button class="g-skill" data-act="skill" data-id="' + h(s.id) + '"' + (canUse(battle, s) ? '' : ' disabled') + '><strong>' + iconHtml(s, 'g-skill-icon') + h(s.name) + '</strong><small>' + (wait ? (battle.cooldowns[s.id] > 9 ? 'Уже сказано' : 'Через ' + battle.cooldowns[s.id] + ' ход' + (battle.cooldowns[s.id] > 1 ? 'а' : '')) : h(s.hint)) + '</small></button>'; }).join('') + '</footer>';
 }
@@ -210,9 +210,15 @@ function lineHtml(chapter, line, fresh) {
   return '<div class="' + cls + '">' + (speaker.name ? '<span class="g-name">' + h(speaker.name) + '</span>' : '') + '<p>' + say(line.text) + '</p></div>';
 }
 
+// Заголовок в шапке: «Глава · Сцена», без повтора, если название сцены уже содержит название главы.
+function sceneHeading(chapter, scene) {
+  const title = scene.title || '';
+  return !title ? chapter.title : title.includes(chapter.title) ? title : chapter.title + ' · ' + title;
+}
+
 function play() {
   const chapter = chapterOf(view.id), progress = progressOf(game, chapter), scene = chapter.scenes[progress.scene], now = stage(progress, chapter, game);
-  const top = '<header class="g-top"><button class="g-back" data-act="menu">← Главы</button><span class="g-scene">' + h(chapter.title) + ' · ' + h(scene.title || '') + '</span></header>';
+  const top = '<header class="g-top"><button class="g-back" data-act="menu">← Главы</button><span class="g-scene">' + h(sceneHeading(chapter, scene)) + '</span></header>';
   if (now === 'journal') return top + journal(chapter, scene);
   if (now === 'steering') return top + steering(chapter, scene, progress);
   if (now === 'ending') {
@@ -289,6 +295,12 @@ function render() {
   if (carousel) {
     carousel.scrollLeft = Number(carousel.dataset.start) * carousel.clientWidth;
     carousel.addEventListener('scroll', () => syncHero(carousel), { passive: true });
+  }
+  // Журнал боя прокручивается внутри себя: после хода показываем его конец — ответ тяги.
+  const battleLog = root.querySelector('.g-battle-log');
+  if (battleLog) {
+    battleLog.scrollTop = battleLog.scrollHeight;
+    battleLog.classList.toggle('is-clipped', battleLog.scrollHeight > battleLog.clientHeight + 1);
   }
   const log = root.querySelector('.g-log');
   if (log) requestAnimationFrame(() => log.lastElementChild?.scrollIntoView({ block: 'end', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }));

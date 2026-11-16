@@ -10,6 +10,27 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 BASE = os.environ.get('GAME_TEST_URL', 'http://127.0.0.1:4173')
 VIEWPORTS = [(390, 844), (390, 664), (320, 568), (844, 390)]
 SHORT_PORTRAIT = {(390, 664), (320, 568)}
+# Противник не должен сжиматься ради журнала боя: минимальная сторона картинки в пикселях.
+MIN_FOE = {(390, 664): 150, (320, 568): 96}
+
+
+async def launch_chromium(playwright):
+    """CHROMIUM_PATH wins; otherwise Playwright's own browser, then the system Chromium."""
+    path = os.environ.get('CHROMIUM_PATH')
+    if path:
+        return await playwright.chromium.launch(executable_path=path, args=['--no-sandbox'])
+    try:
+        return await playwright.chromium.launch(args=['--no-sandbox'])
+    except Exception:
+        return await playwright.chromium.launch(executable_path='/usr/bin/chromium', args=['--no-sandbox'])
+
+
+async def check_foe_size(page, label, size):
+    box = await page.locator('.g-battle .g-foe').bounding_box()
+    least = MIN_FOE.get(size)
+    if least and min(box['width'], box['height']) < least:
+        return [f'{label}: foe is {round(box["width"])}x{round(box["height"])}, minimum {least}']
+    return []
 
 
 async def check_layout(page, label, selectors, *, strict, above_footer=()):
@@ -18,9 +39,10 @@ async def check_layout(page, label, selectors, *, strict, above_footer=()):
       const issues = [], footer = document.querySelector('.g-foot');
       const footerTop = footer?.getBoundingClientRect().top ?? innerHeight;
       const root = document.documentElement;
+      // Журнал боя может прокручиваться внутри себя, но после хода обязан показывать свой конец.
       const log = document.querySelector('.g-battle-log');
-      if (strict && log && log.scrollHeight > log.clientHeight + 1)
-        issues.push(`log content height ${log.scrollHeight} > visible ${log.clientHeight}`);
+      if (strict && log && log.scrollTop + log.clientHeight < log.scrollHeight - 1)
+        issues.push(`log is not scrolled to its end: ${log.scrollTop + log.clientHeight} of ${log.scrollHeight}`);
       if (root.scrollWidth > innerWidth + 1) issues.push(`page width ${root.scrollWidth} > ${innerWidth}`);
       if (strict && root.scrollHeight > innerHeight + 1) issues.push(`page height ${root.scrollHeight} > ${innerHeight}`);
       if (strict && (scrollX !== 0 || scrollY !== 0)) issues.push(`page scrolled ${scrollX},${scrollY}`);
@@ -92,8 +114,7 @@ async def start_boss(page, save):
 async def main():
     failures, errors = [], []
     async with async_playwright() as playwright:
-        browser = await playwright.chromium.launch(
-            executable_path='/usr/bin/chromium', args=['--no-sandbox'])
+        browser = await launch_chromium(playwright)
         context = await browser.new_context(
             viewport={'width': 390, 'height': 844}, reduced_motion='reduce')
         page = await context.new_page()
@@ -155,10 +176,11 @@ async def main():
                         'will', 'pause', 'call', 'truth', 'admit', 'group'}, label
                 failures += await check_layout(page, label, selectors, strict=strict,
                                                above_footer=['.g-bar-foe', '.g-foe', '.g-battle-log', '.g-bar-you'])
-                # Every log paragraph must also fit; a clipped log container is insufficient.
+                failures += await check_foe_size(page, label, (width, height))
+                # The end of the turn (the last log line) must be visible without scrolling the log.
                 if strict:
-                    failures += await check_layout(page, label + ' log text', ['.g-battle-log p'],
-                                                   strict=True, above_footer=['.g-battle-log p'])
+                    failures += await check_layout(page, label + ' log text', ['.g-battle-log p:last-of-type'],
+                                                   strict=True, above_footer=['.g-battle-log p:last-of-type'])
         # Armor responses differ: also test every available first move, including
         # the wordier blocked-will and blocked-pause turns, on both short phones.
         for width, height in sorted(SHORT_PORTRAIT):
@@ -169,10 +191,11 @@ async def main():
                 rect = await page.locator(f'[data-act=skill][data-id={first_skill}]').bounding_box()
                 await page.mouse.click(rect['x'] + rect['width'] / 2, rect['y'] + rect['height'] / 2)
                 await page.wait_for_timeout(80)
-                visible = ['.g-bar-foe', '.g-battle-log', '.g-battle-log p', '.g-bar-you', '.g-skill']
+                visible = ['.g-bar-foe', '.g-foe', '.g-battle-log', '.g-battle-log p:last-of-type', '.g-bar-you', '.g-skill']
                 failures += await check_layout(page, f'closed armor {width}x{height} {first_skill}',
                                                visible, strict=True,
                                                above_footer=visible[:-1])
+                failures += await check_foe_size(page, f'closed armor {width}x{height} {first_skill}', (width, height))
         await page.locator('[data-act=menu]').first.click()
         await page.locator('[data-act=bag]').click()
         await page.wait_for_function('() => [...document.images].every(image => image.complete && image.naturalWidth)')

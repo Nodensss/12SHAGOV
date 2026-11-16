@@ -11,3 +11,25 @@ jobs:
       - run: npm run check
       - run: npm test
       - run: npm run build
+  browser:
+    # Проход игры в настоящем браузере: размеры экранов телефона, бой с боссом, третий шаг, офлайн.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install playwright==1.63.0
+      - run: python -m playwright install --with-deps chromium
+      - name: Экраны, герои и бой
+        run: |
+          node scripts/serve.mjs --port 4173 &
+          sleep 2
+          python tests/game-art-flow.py
+      - name: Третий шаг
+        run: python tests/game-step03-flow.py
+        env:
+          GAME_REVIEW_DIR: ${{ runner.temp }}/game-step03-review
