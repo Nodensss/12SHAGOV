@@ -16,10 +16,10 @@
     { "id": "item.stone", "icon": "art/icons/item-stone.webp", "step": 2, "kind": "support", "name": "Камень с набережной", "text": "Река течёт, и ей не нужно твоё разрешение. Есть что-то больше тебя.", "when": "step02-river" },
     { "id": "item.schedule", "icon": "art/icons/item-schedule.webp", "step": 2, "kind": "support", "name": "Листок на холодильнике", "text": "Встать. Поесть. В семь — дверь. Жить так, как будто получится.", "when": "step02-morning" },
     { "id": "item.spark", "icon": "art/icons/item-spark.webp", "step": 2, "name": "Искра", "text": "Не уверенность. Просто больше не темно.", "when": "step02-night" },
-    {"id": "item.clear-message", "icon": "art/icons/item-clear-message.webp", "step": 3, "name": "Короткий черновик", "text": "Время и один понятный вопрос. Без требования ответить так, как тебе нужно.", "when": "s3-message.choice.clarify"},
-    {"id": "item.folded-receipt", "icon": "art/icons/item-folded-receipt.webp", "step": 3, "name": "Квитанция с адресами", "text": "На обороте — условия работы и место поддержки. Можно сверяться и менять план.", "when": "step03-shift"},
-    {"id": "item.key-tag", "icon": "art/icons/item-key-tag.webp", "step": 3, "name": "Бирка от ключа", "text": "Номер комнаты написан разборчиво. Открыть её помогли несколько человек.", "when": "step03-key"},
-    {"id": "item.paper-plane", "icon": "art/icons/item-paper-plane.webp", "step": 3, "name": "Самолёт на потом", "text": "Один край помят. Встреча переносится; забота не обязана превращаться в торг.", "when": "step03-family"},
-    {"id": "item.blank-page", "icon": "art/icons/item-blank-page.webp", "step": 3, "name": "Свободная страница", "text": "Здесь можно начать с одного случая. План и слова можно переписать.", "when": "step03-decision"}
+    {"id": "item.clear-message", "icon": "art/icons/item-clear-message.webp", "step": 3, "name": "Короткий черновик", "text": "Время и один вопрос. Без требования ответить так, как тебе нужно.", "when": "s3-message.choice.clarify"},
+    {"id": "item.folded-receipt", "icon": "art/icons/item-folded-receipt.webp", "step": 3, "name": "Исписанная квитанция", "text": "Утром — бумажка с долгом. Теперь на обороте завтрашний день, записанный твоей рукой.", "when": "step03-shift"},
+    {"id": "item.key-tag", "icon": "art/icons/item-key-tag.webp", "step": 3, "name": "Бирка от ключа", "text": "Подписана крупно, печатными. Дверь в тот вечер открывали вчетвером.", "when": "step03-key"},
+    {"id": "item.paper-plane", "icon": "art/icons/item-paper-plane.webp", "step": 3, "name": "Самолёт на потом", "text": "Одно крыло помято. Встречу перенесли. Полетит и так.", "when": "step03-family"},
+    {"id": "item.blank-page", "icon": "art/icons/item-blank-page.webp", "step": 3, "name": "Свободная страница", "text": "Начать можно с одного случая. Это черновик — его разрешено переписывать.", "when": "step03-decision"}
   ]
 }
