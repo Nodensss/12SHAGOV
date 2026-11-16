@@ -4,18 +4,23 @@ import { access, readFile } from 'node:fs/promises';
 import {
   advance, answerLater, choose, fill, freshGame, isLocked, leaveJournal, linesOf, normalizeGame, progressOf,
   saveEntry, setDraft, stage, validateChapter, validateVocab,
+  levelOf, recordFight,
 } from '../public/game/engine.js';
+import { canUse, playTurn, skillsOf, startBattle, validateFight } from '../public/game/battle.js';
 
 const data = new URL('../public/game/data/', import.meta.url);
 const load = async file => JSON.parse(await readFile(new URL(file, data), 'utf8'));
 const index = await load('episodes.json'), vocab = await load('vocab.json');
-const chapters = await Promise.all(index.chapters.map(item => load(item.file)));
+const episodes = index.chapters.filter(item => item.type !== 'fight'), bouts = index.chapters.filter(item => item.type === 'fight');
+const chapters = await Promise.all(episodes.map(item => load(item.file)));
+const fights = await Promise.all(bouts.map(item => load(item.file)));
+const { skills } = await load('skills.json');
 
 test('словарь и все главы игры проходят проверку', () => {
   assert.deepEqual(validateVocab(vocab), []);
   assert.equal(new Set(index.chapters.map(c => c.id)).size, index.chapters.length);
   chapters.forEach((chapter, i) => {
-    assert.equal(chapter.id, index.chapters[i].id);
+    assert.equal(chapter.id, episodes[i].id);
     assert.deepEqual(validateChapter(chapter, vocab), []);
   });
 });
@@ -78,8 +83,10 @@ test('эпизоды открываются по порядку, а услови
     if (item.after) assert.ok(index.chapters.slice(0, i).some(c => c.id === item.after), item.id);
     assert.equal(isLocked(item, freshGame()), i > 0);
     assert.equal(isLocked(item, game), false);
-    playThrough(game, chapters[i], i % 2);
+    if (item.type === 'fight') recordFight(game, item.id, true);
+    else playThrough(game, chapters[episodes.indexOf(item)], i % 2);
   });
+  assert.equal(levelOf(game), bouts.length + 1);
 });
 
 test('реплики зависят от решений из прошлых эпизодов', () => {
@@ -100,4 +107,44 @@ test('пустой ответ не сохраняется, а повреждён
   assert.deepEqual(restored.chapters.x, { scene: 's', line: 0, choices: {}, done: false });
   assert.deepEqual(restored.journal, { q: { draft: 'д', text: '', savedAt: null, later: false, chapter: null } });
   assert.equal(progressOf(restored, { id: 'x', start: 'a', scenes: { a: { type: 'story', lines: [{}] } } }).scene, 'a');
+});
+
+function fightWith(fight, choose) {
+  let state = startBattle(fight);
+  for (let turn = 0; turn < 40 && !state.over; turn += 1) state = playTurn(state, fight, choose(state, skillsOf(fight, skills).filter(s => canUse(state, s))));
+  return state;
+}
+
+test('бои: данные верны, сложность растёт, награды идут по порядку', () => {
+  fights.forEach((fight, i) => {
+    assert.equal(fight.id, bouts[i].id);
+    assert.deepEqual(validateFight(fight, skills), []);
+    assert.equal(fight.reward.level, i + 2);
+    if (i) assert.ok(fight.hp > fights[i - 1].hp, fight.id);
+  });
+});
+
+test('одной силой воли бой не выиграть, а приёмами из сюжета — можно', () => {
+  for (const fight of fights) {
+    const will = fightWith(fight, (state, usable) => usable.find(s => s.id === 'will'));
+    assert.equal(will.over, 'lose', fight.id + ': сила воли не должна побеждать');
+    const smart = fightWith(fight, (state, usable) => {
+      const opener = fight.armor && !state.open && usable.find(s => s.id === fight.armor.opener);
+      return opener || usable.filter(s => s.id !== 'will' && s.id !== 'admit').sort((a, b) => b.dmg - a.dmg)[0] || usable[0];
+    });
+    assert.equal(smart.over, 'win', fight.id + ': должен быть путь к победе');
+    assert.ok(smart.hp >= 3, fight.id + ': победа не должна висеть на волоске, осталось ' + smart.hp);
+  }
+});
+
+test('броня босса снимается только признанием', () => {
+  const boss = fights.at(-1), by = id => skills.find(s => s.id === id);
+  let state = playTurn(startBattle(boss), boss, by('group'));
+  assert.equal(state.foe, boss.hp);
+  state = playTurn(state, boss, by('admit'));
+  assert.equal(state.open, true);
+  const before = state.foe;
+  state = playTurn(state, boss, by('truth'));
+  assert.ok(state.foe < before);
+  assert.equal(canUse(state, by('truth')), false);
 });

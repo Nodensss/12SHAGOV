@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img">
+  <defs>
+    <radialGradient id="aura" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#b7e39b" stop-opacity=".5"/><stop offset=".6" stop-color="#b7e39b" stop-opacity=".08"/><stop offset="1" stop-color="#b7e39b" stop-opacity="0"/></radialGradient>
+    <filter id="glow" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+  </defs>
+  <rect width="240" height="240" fill="#0a100c"/><rect width="240" height="240" fill="url(#aura)"/>
+  <g filter="url(#soft)" fill="#b7e39b" opacity=".18"><circle cx="120" cy="120" r="70"/><circle cx="70" cy="170" r="40"/></g>
+    <path d="M120 222 q-56 -18 -40 -70 q10 -30 -8 -52 q-18 -30 12 -54 q30 -22 60 -6 q34 18 22 52 q-10 26 6 48 q18 34 -12 60 q-18 16 -40 22Z" fill="#101a13" stroke="#b7e39b" stroke-opacity=".7" stroke-width="1.5"/>
+    <g fill="none" stroke="#b7e39b" stroke-opacity=".35" stroke-width="2" stroke-linecap="round"><path d="M70 40 q-14 -14 0 -28"/><path d="M178 60 q16 -16 2 -34"/><path d="M52 120 q-18 4 -22 22"/><path d="M196 150 q18 0 24 16"/></g><g transform="rotate(12 98 96)"><ellipse cx="98" cy="96" rx="9" ry="6" fill="#050806"/><ellipse cx="98" cy="96" rx="4.800000000000001" ry="2.7" fill="#b7e39b" filter="url(#glow)"/></g><g transform="rotate(-12 142 96)"><ellipse cx="142" cy="96" rx="9" ry="6" fill="#050806"/><ellipse cx="142" cy="96" rx="4.800000000000001" ry="2.7" fill="#b7e39b" filter="url(#glow)"/></g><path d="M92 132 q28 22 56 0" fill="none" stroke="#b7e39b" stroke-width="2.5" stroke-linecap="round" filter="url(#glow)"/><path d="M150 128 q10 -2 14 -10" fill="none" stroke="#b7e39b" stroke-width="2" stroke-linecap="round"/>
+    <g font-family="Georgia,serif" font-style="italic" fill="#b7e39b" opacity=".5" font-size="12"><text x="22" y="72">тсс…</text><text x="150" y="212">не считается</text></g>
+</svg>

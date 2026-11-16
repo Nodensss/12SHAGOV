@@ -1,7 +1,9 @@
 import {
   advance, answerLater, choose, deleteEntry, fill, freshGame, GAME_KEY, isLocked, leaveJournal, linesOf, loadGame,
   progressOf, restartChapter, saveEntry, saveGame, setDraft, stage, validateChapter, validateVocab,
+  levelOf, recordFight,
 } from './engine.js';
+import { canUse, playTurn, skillsOf, startBattle, validateFight } from './battle.js';
 
 const root = document.querySelector('#game');
 const h = value => String(value == null ? '' : value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -11,7 +13,8 @@ const json = async path => {
   return response.json();
 };
 
-let game = loadGame(), index = { chapters: [] }, vocab = { variants: [] }, chapters = new Map();
+let game = loadGame(), index = { chapters: [] }, vocab = { variants: [] }, chapters = new Map(), fights = new Map(), skills = [];
+let battle = null;
 let view = { name: 'menu' }, journalIndex = null, draftTimer, storageOk = true;
 
 function persist() { storageOk = saveGame(game); }
@@ -42,11 +45,12 @@ function menu() {
   const variant = vocab.variants.find(v => v.id === game.variant);
   return '<header class="g-top"><a class="g-back" href="../">← Свой путь</a></header>' +
     '<main class="g-main g-menu"><div class="g-eyebrow">Сюжетная игра · 12 шагов</div><h1 tabindex="-1">Истории<br>одного двора</h1>' +
-    '<p class="g-lead">Короткие сцены, где решаешь ты. Без таймера, очков и оценок. В конце — страница личного дневника, которую можно оставить пустой.</p>' +
-    '<div class="g-list">' + index.chapters.map(item => {
+    '<p class="g-lead">Сцены, где решаешь ты, и бои с тягой — от лёгкой к самой тяжёлой. В конце каждой сцены — страница личного дневника, которую можно оставить пустой.</p>' +
+    levelBar() + '<div class="g-list">' + index.chapters.map(item => {
+      if (item.type === 'fight') return fightCard(item);
       const chapter = chapterOf(item.id), saved = game.chapters[item.id];
       if (!chapter) return '<div class="g-card g-card-off"><span class="g-step">Шаг ' + h(item.step) + '</span><strong>' + h(item.title) + '</strong><small>Глава не загрузилась. Проверьте файл ' + h(item.file) + '.</small></div>';
-      if (isLocked(item, game)) return '<div class="g-card g-card-off"><span class="g-step">Шаг ' + h(item.step) + ' · закрыто</span><strong>' + h(item.title) + '</strong><small>Откроется после эпизода «' + h(index.chapters.find(c => c.id === item.after)?.title || '') + '».</small></div>';
+      if (isLocked(item, game)) return '<div class="g-card g-card-off"><span class="g-step">Шаг ' + h(item.step) + ' · закрыто</span><strong>' + h(item.title) + '</strong><small>' + h(lockedText(item)) + '</small></div>';
       const started = saved && (saved.scene !== chapter.start || saved.line > 0) && chapter.scenes[saved.scene]?.type !== 'ending';
       return '<article class="g-card"><span class="g-step">Шаг ' + h(item.step) + ' · ' + h(item.minutes) + (saved?.done ? ' · пройдено' : '') + '</span><strong>' + h(item.title) + '</strong><small>' + h(item.teaser) + '</small>' +
         '<div class="g-row"><button class="g-btn g-primary" data-act="' + (!started && saved?.done ? 'restart' : 'play') + '" data-id="' + h(item.id) + '">' + (started ? 'Продолжить' : saved?.done ? 'Пройти ещё раз' : 'Начать') + '</button>' +
@@ -56,6 +60,47 @@ function menu() {
     '<button class="g-btn g-quiet" data-act="variant">Герой: ' + h(variant ? variant.label : 'выбрать') + '</button></div>' +
     (storageOk ? '' : '<p class="g-warn" role="alert">Браузер не разрешает сохранять данные. Прогресс и записи пропадут после закрытия вкладки.</p>') +
     '<p class="g-note">Игра — способ подумать, а не лечение. Если сейчас тяжело, свяжитесь с человеком, которому доверяете, с группой или со специалистом. <a href="../#home">Раздел поддержки — в приложении.</a></p></main>';
+}
+
+const lockedText = item => { const prev = index.chapters.find(c => c.id === item.after); return 'Откроется после: ' + (prev?.title || ''); };
+
+function levelBar() {
+  const all = index.chapters.filter(item => item.type === 'fight'), level = levelOf(game), max = all.length + 1;
+  const last = all.filter(item => game.fights[item.id]?.won).map(item => fights.get(item.id)?.reward?.title).filter(Boolean).at(-1);
+  return '<div class="g-level" role="img" aria-label="Уровень ' + level + ' из ' + max + '"><div class="g-level-top"><strong>Уровень ' + level + '</strong><span>' + h(last || 'В круге') + '</span></div>' +
+    '<div class="g-pips">' + Array.from({ length: max }, (_, i) => '<i' + (i < level ? ' class="is-on"' : '') + '></i>').join('') + '</div></div>';
+}
+
+function fightCard(item) {
+  const fight = fights.get(item.id), won = game.fights[item.id]?.won;
+  if (!fight) return '<div class="g-card g-card-off"><span class="g-step">Бой</span><strong>' + h(item.title) + '</strong><small>Бой не загрузился. Проверьте файл ' + h(item.file) + '.</small></div>';
+  if (isLocked(item, game)) return '<div class="g-card g-card-off"><span class="g-step">Бой · закрыто</span><strong>' + h(item.title) + '</strong><small>' + h(lockedText(item)) + '</small></div>';
+  return '<article class="g-card g-card-fight"><img class="g-foe-thumb" src="' + h(fight.art) + '" alt="" width="64" height="64"><span class="g-step">' + h(fight.tier) + (won ? ' · побеждено' : '') + '</span><strong>' + h(item.title) + '</strong><small>' + h(item.teaser) + '</small>' +
+    '<div class="g-row"><button class="g-btn ' + (won ? 'g-secondary' : 'g-primary g-fight-btn') + '" data-act="fight" data-id="' + h(item.id) + '">' + (won ? 'Сразиться ещё раз' : 'В бой') + '</button></div></article>';
+}
+
+const bar = (label, value, max, cls) => '<div class="g-bar ' + cls + '"><span>' + label + '</span><b>' + value + ' / ' + max + '</b><div><i style="width:' + Math.round(100 * value / max) + '%"></i></div></div>';
+
+function fightScreen() {
+  const fight = fights.get(view.id), top = '<header class="g-top"><button class="g-back" data-act="menu">← Главы</button><span class="g-scene">' + h(fight.tier) + '</span></header>';
+  if (!battle) {
+    return top + '<main class="g-main g-fight-intro"><div class="g-foe"><img src="' + h(fight.art) + '" alt="" width="240" height="240"></div><span class="g-step">' + h(fight.tier) + '</span><h2 tabindex="-1">' + h(fight.name) + '</h2>' +
+      fight.intro.map(t => '<p>' + h(t) + '</p>').join('') + '<p class="g-note">Твои приёмы: ' + skillsOf(fight, skills).map(s => h(s.name)).join(' · ') + '</p></main>' +
+      '<footer class="g-foot"><button class="g-btn g-primary g-fight-btn" data-act="fight-start">Начать бой</button></footer>';
+  }
+  if (battle.over) {
+    const won = battle.over === 'win', reward = fight.reward;
+    return top + '<main class="g-main g-ending"><div class="g-foe' + (won ? ' is-down' : '') + '"><img src="' + h(fight.art) + '" alt="" width="240" height="240"></div><h2 tabindex="-1">' + (won ? 'Тяга отступила' : 'Срыв') + '</h2>' +
+      (won ? fight.win : fight.lose).map(t => '<p>' + h(t) + '</p>').join('') +
+      (won && view.levelUp && reward ? '<p class="g-levelup">Уровень ' + h(reward.level) + ' · ' + h(reward.title) + '</p>' : '') + '</main>' +
+      '<footer class="g-foot">' + (won ? '<button class="g-btn g-primary" data-act="menu">Дальше</button>' : '<button class="g-btn g-primary g-fight-btn" data-act="fight-start">Попробовать иначе</button><button class="g-btn g-quiet" data-act="menu">К главам</button>') + '</footer>';
+  }
+  const hitFoe = battle.log.some(l => l.hit === 'foe'), hitYou = battle.log.some(l => l.hit === 'you');
+  return top + '<main class="g-main g-battle">' + bar(h(fight.name), battle.foe, battle.foeMax, 'g-bar-foe') +
+    '<div class="g-foe g-foe-small' + (hitFoe ? ' is-hit' : '') + (fight.armor && !battle.open ? ' is-armored' : '') + '"><img src="' + h(fight.art) + '" alt="" width="240" height="240"></div>' +
+    '<div class="g-battle-log' + (hitYou ? ' is-hit' : '') + '" aria-live="polite">' + (battle.log.length ? battle.log.map(l => '<p class="g-log-' + l.who + '">' + (l.who === 'you' ? '<b>Ты:</b> ' : l.who === 'foe' ? '<b>' + h(fight.name) + ':</b> ' : '') + h(l.text) + '</p>').join('') : '<p class="g-log-note">Твой ход. Выбери приём.</p>') + '</div>' +
+    bar('Твоя стойкость', battle.hp, battle.maxHp, 'g-bar-you') + '</main>' +
+    '<footer class="g-foot g-skills">' + skillsOf(fight, skills).map(s => { const wait = battle.cooldowns[s.id] > 0; return '<button class="g-skill" data-act="skill" data-id="' + h(s.id) + '"' + (canUse(battle, s) ? '' : ' disabled') + '><strong>' + h(s.name) + '</strong><small>' + (wait ? (battle.cooldowns[s.id] > 9 ? 'Уже сказано' : 'Через ' + battle.cooldowns[s.id] + ' ход' + (battle.cooldowns[s.id] > 1 ? 'а' : '')) : h(s.hint)) + '</small></button>'; }).join('') + '</footer>';
 }
 
 function variantScreen() {
@@ -144,7 +189,7 @@ function diary() {
 }
 
 function render() {
-  root.innerHTML = view.name === 'play' ? play() : view.name === 'diary' ? diary() : view.name === 'variant' ? variantScreen() : menu();
+  root.innerHTML = view.name === 'fight' ? fightScreen() : view.name === 'play' ? play() : view.name === 'diary' ? diary() : view.name === 'variant' ? variantScreen() : menu();
   root.dataset.view = view.name;
   const carousel = root.querySelector('.g-carousel');
   if (carousel) {
@@ -169,7 +214,17 @@ function startChapter(id) {
 }
 
 const actions = {
-  menu: () => go({ name: 'menu' }),
+  menu: () => { battle = null; go({ name: 'menu' }); },
+  fight: id => { battle = null; go({ name: 'fight', id }); },
+  'fight-start': () => { battle = startBattle(fights.get(view.id)); view.levelUp = false; render(); window.scrollTo(0, 0); },
+  skill: id => {
+    const fight = fights.get(view.id), skill = skills.find(s => s.id === id);
+    if (!battle || !skill || !canUse(battle, skill)) return;
+    battle = playTurn(battle, fight, skill);
+    if (battle.over) { view.levelUp = battle.over === 'win' && !game.fights[fight.id]?.won; recordFight(game, fight.id, battle.over === 'win'); persist(); }
+    render();
+    if (battle.over) window.scrollTo(0, 0);
+  },
   diary: () => go({ name: 'diary' }),
   variant: () => go({ name: 'variant' }),
   'set-variant': id => { if (vocab.variants.find(v => v.id === id)?.locked) return; game.variant = id; persist(); view.then ? go({ name: 'play', id: view.then }) : go({ name: 'menu' }); },
@@ -230,10 +285,16 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) flush
 
 async function boot() {
   try {
-    [index, vocab] = await Promise.all([json('./data/episodes.json'), json('./data/vocab.json')]);
+    [index, vocab, { skills }] = await Promise.all([json('./data/episodes.json'), json('./data/vocab.json'), json('./data/skills.json')]);
     const problems = validateVocab(vocab);
     await Promise.all(index.chapters.map(async item => {
       try {
+        if (item.type === 'fight') {
+          const fight = await json('./data/' + item.file), errors = validateFight(fight, skills);
+          if (fight.id !== item.id) errors.push('id в файле не совпадает с episodes.json');
+          if (errors.length) problems.push(...errors.map(e => item.id + ': ' + e)); else fights.set(item.id, fight);
+          return;
+        }
         const chapter = await json('./data/' + item.file), errors = validateChapter(chapter, vocab);
         if (chapter.id !== item.id) errors.push('id в файле не совпадает с episodes.json');
         if (errors.length) problems.push(...errors.map(e => item.id + ': ' + e)); else chapters.set(item.id, chapter);

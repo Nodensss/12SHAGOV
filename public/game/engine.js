@@ -5,7 +5,7 @@ export const GAME_KEY = '12shagov-game-v1';
 const MAX_ENTRY = 20000;
 
 export function freshGame() {
-  return { version: 1, variant: null, chapters: {}, journal: {} };
+  return { version: 1, variant: null, chapters: {}, journal: {}, fights: {} };
 }
 
 const text = (value, max = MAX_ENTRY) => typeof value === 'string' ? value.slice(0, max) : '';
@@ -23,6 +23,9 @@ export function normalizeGame(raw) {
       choices: plain(value.choices) ? Object.fromEntries(Object.entries(value.choices).filter(([, v]) => typeof v === 'string')) : {},
       done: value.done === true,
     };
+  }
+  if (plain(raw.fights)) for (const [id, value] of Object.entries(raw.fights)) {
+    if (plain(value)) game.fights[id] = { won: value.won === true, tries: Number.isInteger(value.tries) && value.tries > 0 ? value.tries : 0 };
   }
   if (plain(raw.journal)) for (const [id, value] of Object.entries(raw.journal)) {
     if (!plain(value)) continue;
@@ -145,7 +148,7 @@ export function resolveNext(next, game) {
 }
 
 export function isLocked(item, game) {
-  return !!item.after && game.chapters[item.after]?.done !== true;
+  return !!item.after && game.chapters[item.after]?.done !== true && game.fights?.[item.after]?.won !== true;
 }
 
 export function progressOf(game, chapter) {
@@ -224,4 +227,15 @@ export function answerLater(game, questionId, chapterId) {
 
 export function deleteEntry(game, questionId) {
   delete game.journal[questionId];
+}
+
+// Уровень героя: 1 в начале, +1 за каждый выигранный бой.
+export function levelOf(game) {
+  return 1 + Object.values(game.fights || {}).filter(f => f.won).length;
+}
+
+export function recordFight(game, fightId, won) {
+  const item = game.fights[fightId] ||= { won: false, tries: 0 };
+  item.tries += 1;
+  if (won) item.won = true;
 }

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "_comment": "Список глав. Чтобы добавить главу: положите файл в chapters/ и добавьте строку сюда. Идентификаторы (id) не меняйте после публикации: к ним привязаны прогресс и записи дневника игроков. Поле after — id эпизода, после которого открывается этот.",
+  "_comment": "Список глав. Чтобы добавить главу: положите файл в chapters/ и добавьте строку сюда. Идентификаторы (id) не меняйте после публикации: к ним привязаны прогресс и записи дневника игроков. Поле after — id эпизода, после которого открывается этот. Запись с \"type\": \"fight\" — бой из папки fights/. Победа в бою повышает уровень героя.",
   "chapters": [
     {
       "id": "step01-only-once",
@@ -11,13 +11,33 @@
       "file": "chapters/step01-only-once.json"
     },
     {
+      "id": "fight01-whisper",
+      "type": "fight",
+      "step": 1,
+      "title": "Бой: Шёпот",
+      "teaser": "Лёгкая тяга. «Это вообще не считается».",
+      "minutes": "бой",
+      "file": "fights/fight01-whisper.json",
+      "after": "step01-only-once"
+    },
+    {
       "id": "step01-stash",
       "step": 1,
       "title": "Заначка",
       "teaser": "Спичечный коробок за книгами и сообщение от старого знакомого.",
       "minutes": "3–4 минуты",
       "file": "chapters/step01-stash.json",
-      "after": "step01-only-once"
+      "after": "fight01-whisper"
+    },
+    {
+      "id": "fight02-stash",
+      "type": "fight",
+      "step": 1,
+      "title": "Бой: Заначка",
+      "teaser": "Тяга покрепче. Отрастает, пока ты один.",
+      "minutes": "бой",
+      "file": "fights/fight02-stash.json",
+      "after": "step01-stash"
     },
     {
       "id": "step01-sister",
@@ -26,7 +46,17 @@
       "teaser": "Лена приходит без приглашения. С детским рисунком.",
       "minutes": "3–4 минуты",
       "file": "chapters/step01-sister.json",
-      "after": "step01-stash"
+      "after": "fight02-stash"
+    },
+    {
+      "id": "fight03-company",
+      "type": "fight",
+      "step": 1,
+      "title": "Бой: Старая компания",
+      "teaser": "Тяжёлая тяга, прикрытая ложью.",
+      "minutes": "бой",
+      "file": "fights/fight03-company.json",
+      "after": "step01-sister"
     },
     {
       "id": "step01-door",
@@ -35,7 +65,17 @@
       "teaser": "Без десяти семь. Десять шагов до крыльца.",
       "minutes": "3–5 минут",
       "file": "chapters/step01-door.json",
-      "after": "step01-sister"
+      "after": "fight03-company"
+    },
+    {
+      "id": "fight04-craving",
+      "type": "fight",
+      "step": 1,
+      "title": "Босс: Тяга",
+      "teaser": "Самая тяжёлая. У неё твоё лицо.",
+      "minutes": "бой",
+      "file": "fights/fight04-craving.json",
+      "after": "step01-door"
     }
   ]
 }

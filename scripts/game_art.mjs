@@ -110,4 +110,55 @@ const arts = {
     bag(54, 244, 34, 44, '#2a1420') + bag(76, 250, 26, 34, '#1d1420') + bag(186, 244, 36, 46, '#2a1420') + bag(164, 252, 24, 32, '#1d1420') +
     `<g transform="translate(120 330) rotate(-8)"><rect x="-17" y="-10" width="34" height="21" rx="3" fill="#e9e3d2" stroke="${INK}"/><rect x="-17" y="-5" width="34" height="5" fill="${INK}"/><text x="0" y="8" text-anchor="middle" font-size="7" font-family="monospace" fill="${c}">0.00</text></g>`); },
 };
+// Противники: квадратные портреты тяги, от лёгкой к самой тяжёлой.
+function foe(c, bg, body) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img">
+  <defs>
+    <radialGradient id="aura" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="${c}" stop-opacity=".5"/><stop offset=".6" stop-color="${c}" stop-opacity=".08"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></radialGradient>
+    <filter id="glow" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+  </defs>
+  <rect width="240" height="240" fill="${bg}"/><rect width="240" height="240" fill="url(#aura)"/>
+  ${body}
+</svg>
+`;
+}
+const eye = (x, y, c, r = 7, tilt = 0) => `<g transform="rotate(${tilt} ${x} ${y})"><ellipse cx="${x}" cy="${y}" rx="${r * 1.5}" ry="${r}" fill="#050806"/><ellipse cx="${x}" cy="${y}" rx="${r * .8}" ry="${r * .45}" fill="${c}" filter="url(#glow)"/></g>`;
+const teeth = (x, y, w, n, c) => `<path d="M${x} ${y} ${Array.from({ length: n }, (_, i) => `l${w / n / 2} ${i % 2 ? 9 : 7} l${w / n / 2} ${i % 2 ? -9 : -7}`).join(' ')}" fill="#e9e3d2" stroke="${c}" stroke-opacity=".4"/>`;
+const foes = {
+  'foe-whisper': () => { const c = '#b7e39b'; return foe(c, '#0a100c',
+    `<g filter="url(#soft)" fill="${c}" opacity=".18"><circle cx="120" cy="120" r="70"/><circle cx="70" cy="170" r="40"/></g>
+    <path d="M120 222 q-56 -18 -40 -70 q10 -30 -8 -52 q-18 -30 12 -54 q30 -22 60 -6 q34 18 22 52 q-10 26 6 48 q18 34 -12 60 q-18 16 -40 22Z" fill="#101a13" stroke="${c}" stroke-opacity=".7" stroke-width="1.5"/>
+    <g fill="none" stroke="${c}" stroke-opacity=".35" stroke-width="2" stroke-linecap="round"><path d="M70 40 q-14 -14 0 -28"/><path d="M178 60 q16 -16 2 -34"/><path d="M52 120 q-18 4 -22 22"/><path d="M196 150 q18 0 24 16"/></g>` +
+    eye(98, 96, c, 6, 12) + eye(142, 96, c, 6, -12) +
+    `<path d="M92 132 q28 22 56 0" fill="none" stroke="${c}" stroke-width="2.5" stroke-linecap="round" filter="url(#glow)"/><path d="M150 128 q10 -2 14 -10" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round"/>
+    <g font-family="Georgia,serif" font-style="italic" fill="${c}" opacity=".5" font-size="12"><text x="22" y="72">тсс…</text><text x="150" y="212">не считается</text></g>`); },
+  'foe-stash': () => { const c = '#e9b04a'; return foe(c, '#120e07',
+    `<g stroke="#2a2114" stroke-width="10" stroke-linecap="round">${[[20,60],[52,40],[188,40],[220,60]].map(([x,y])=>`<path d="M${x} ${y} v170"/>`).join('')}</g>
+    <g stroke-linecap="round" fill="none" stroke="#1c150b" stroke-width="7"><path d="M78 170 q-22 14 -34 40 M96 176 q-8 22 -6 44 M144 176 q8 22 6 44 M162 170 q22 14 34 40"/></g>
+    <g stroke-linecap="round" fill="none" stroke="${c}" stroke-opacity=".6" stroke-width="1.5"><path d="M78 170 q-22 14 -34 40 M96 176 q-8 22 -6 44 M144 176 q8 22 6 44 M162 170 q22 14 34 40"/></g>
+    <path d="M62 62 l116 -14 l8 46 l-116 16Z" fill="#3a2a12" stroke="${c}" stroke-width="1.6"/>
+    <path d="M70 110 l116 -16 l6 76 q-58 22 -122 6Z" fill="#241a0c" stroke="${c}" stroke-width="1.6"/>
+    <path d="M70 110 l116 -16 l2 20 l-116 16Z" fill="#050806"/>` + teeth(74, 112, 112, 8, c).replace('M74 112', 'M72 111') +
+    eye(100, 76, c, 6, -8) + eye(146, 70, c, 6, -8) +
+    `<path d="M88 150 h64 M90 160 h44" stroke="${c}" stroke-opacity=".35" stroke-width="3" stroke-linecap="round"/>
+    <text x="120" y="232" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="12" fill="${c}" opacity=".55">на чёрный день</text>`); },
+  'foe-company': () => { const c = '#e5786a'; const head = (x, y, r, o) => `<g opacity="${o}"><path d="M${x - r * 1.6} 240 q0 -${r * 2.6} ${r * 1.6} -${r * 2.6} q${r * 1.6} 0 ${r * 1.6} ${r * 2.6}Z" fill="#170f0e" stroke="${c}" stroke-opacity=".5"/><circle cx="${x}" cy="${y}" r="${r}" fill="#170f0e" stroke="${c}" stroke-opacity=".6" stroke-width="1.4"/>${eye(x - r * .4, y - 2, c, r * .16, 10)}${eye(x + r * .4, y - 2, c, r * .16, -10)}<path d="M${x - r * .45} ${y + r * .45} q${r * .45} ${r * .3} ${r * .9} 0" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round"/></g>`;
+    return foe(c, '#120a09',
+    head(46, 112, 24, .6) + head(196, 108, 26, .6) + head(84, 96, 28, .8) + head(160, 92, 28, .8) + head(120, 104, 38, 1) +
+    `<g transform="translate(120 190)"><rect x="-46" y="-20" width="92" height="40" rx="12" fill="#22110f" stroke="${c}" stroke-width="1.5"/><text y="-3" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" fill="${c}">Заезжай. Свои все будут</text><text y="12" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="${c}" opacity=".6">Сиплый · 23:41</text></g>
+    <g fill="${c}" filter="url(#glow)"><circle cx="170" cy="168" r="8"/></g><text x="170" y="172" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="10" fill="#210c09">3</text>`); },
+  'foe-craving': () => { const c = '#c58cff'; const hand = (x, y, r) => `<g transform="translate(${x} ${y}) rotate(${r})" fill="none" stroke-linecap="round"><path d="M0 60 L0 0" stroke="#0b0710" stroke-width="12"/><path d="M0 60 L0 0" stroke="${c}" stroke-opacity=".5" stroke-width="1.4"/>${[-14, -7, 0, 7, 14].map(a => `<path d="M0 0 l${a} -20" stroke="#0b0710" stroke-width="5"/><path d="M0 0 l${a} -20" stroke="${c}" stroke-opacity=".6" stroke-width="1"/>`).join('')}</g>`;
+    return foe(c, '#0b0810',
+    hand(28, 150, -30) + hand(212, 150, 30) + hand(52, 90, -55) + hand(188, 90, 55) + hand(86, 196, -8) + hand(154, 196, 8) +
+    `<path d="M120 236 q-76 -10 -70 -96 q4 -80 70 -108 q66 28 70 108 q6 86 -70 96Z" fill="#0b0710" stroke="${c}" stroke-opacity=".7" stroke-width="1.6"/>
+    <ellipse cx="120" cy="104" rx="34" ry="42" fill="#8f8a99"/>
+    <path d="M88 116 q8 26 32 30 q24 -4 32 -30 q-4 38 -32 42 q-28 -4 -32 -42Z" fill="#5d586b"/>
+    <path d="M86 96 q-2 -44 34 -46 q36 2 34 46 q-10 -22 -22 -24 q-6 8 -16 2 q-10 8 -16 2 q-8 4 -14 20Z" fill="#0b0710"/>` +
+    eye(104, 106, c, 7) + eye(137, 106, c, 7) +
+    `<path d="M96 138 q24 -14 48 0 q-24 16 -48 0Z" fill="#050806"/>` + teeth(98, 136, 44, 6, c) +
+    `<path d="M120 114 l-4 14 h8" stroke="#5d586b" stroke-width="2" fill="none"/>
+    <g fill="none" stroke="${c}" stroke-opacity=".3" stroke-width="2"><circle cx="120" cy="120" r="108" stroke-dasharray="4 10"/></g>`); },
+};
+for (const [id, make] of Object.entries(foes)) await writeFile(`${out}/${id}.svg`, make());
 for (const [id, make] of Object.entries(arts)) await writeFile(`${out}/${id}.svg`, make());
