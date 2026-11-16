@@ -139,6 +139,7 @@ small { font-size: .875rem; }
 .status-dot { margin-right: .35rem; vertical-align: middle; }
 .home-foot-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: .875rem; margin-top: 1.4rem; }
 .soft-card { padding: 1.5rem; border-radius: 1.125rem; background: #eeeee4; }
+.game-card { margin-top: 1.4rem; }
 .soft-card h3 { font-size: 1.0625rem; }
 .soft-card p { font-size: .9375rem; color: var(--muted); margin-bottom: .2rem; }
 .micro-icon { width: 2.25rem; height: 2.25rem; display: inline-grid; place-items: center; border-radius: .75rem; background: var(--card); color: var(--sage-dark); margin-bottom: .8rem; }

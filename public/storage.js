@@ -1,6 +1,8 @@
 export const STORAGE_KEY = '12shagov-v2';
 export const PREFERENCES_KEY = '12shagov-prefs-v2';
 const LEGACY_KEY = 'svoy-put-12-mvp-v1';
+// Дневник и прогресс сюжетной игры (public/game). Удаляются вместе с личными данными.
+const GAME_KEY = '12shagov-game-v1';
 const ITERATIONS = 210000;
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
@@ -234,7 +236,7 @@ export function createStore(storage = globalThis.localStorage, crypto = globalTh
     clear() {
       return serialized(async () => {
         assertCurrent();
-        try { storage.removeItem(STORAGE_KEY); storage.removeItem(LEGACY_KEY); }
+        try { storage.removeItem(STORAGE_KEY); storage.removeItem(LEGACY_KEY); storage.removeItem(GAME_KEY); }
         catch (cause) { throw failure('STORAGE_UNAVAILABLE', 'Браузер не разрешил удалить локальные записи.', cause); }
         expectedRaw = null;
         key = null; snapshot = null; envelope = null;
