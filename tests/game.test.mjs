@@ -29,8 +29,8 @@ test('словарь и все главы игры проходят провер
 });
 
 test('у каждого героя есть название, описание и картинка', async () => {
+  assert.deepEqual(vocab.variants.filter(v => !v.locked).map(v => v.id), ['drugs']);
   for (const variant of vocab.variants) {
-    assert.equal(vocab.variants.filter(v => !v.locked).length >= 1, true);
     for (const key of ['label', 'epithet', 'quote', 'lore', 'art']) assert.ok(variant[key], variant.id + ': нет ' + key);
     await access(new URL('../' + variant.art, data));
   }
@@ -38,7 +38,9 @@ test('у каждого героя есть название, описание �
 
 test('портреты из данных существуют, укладываются в лимит и доступны офлайн', async () => {
   const sw = await readFile(new URL('../public/sw.js', import.meta.url), 'utf8');
-  const assetPaths = new Set([...vocab.variants, ...fights].map(item => item.art));
+  const css = await readFile(new URL('../public/game/game.css', import.meta.url), 'utf8');
+  const textures = [...css.matchAll(/url\(['"]?\.\/(art\/[\w.-]+)/g)].map(match => match[1]);
+  const assetPaths = new Set([...vocab.variants, ...fights].map(item => item.art).concat(textures));
   for (const art of assetPaths) {
     assert.match(art, /^art\/[\w-]+\.(svg|webp)$/);
     const info = await stat(new URL('../' + art, data));
