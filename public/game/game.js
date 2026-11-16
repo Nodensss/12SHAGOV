@@ -235,6 +235,12 @@ function play() {
   const foot = now === 'choice'
     ? '<footer class="g-foot"><p class="g-prompt">' + h(scene.choice.prompt || 'Что дальше?') + '</p>' + scene.choice.options.map(o => '<button class="g-btn g-choice" data-act="choose" data-id="' + h(o.id) + '">' + say(o.label) + '</button>').join('') + '</footer>'
     : '<footer class="g-foot"><button class="g-btn g-primary g-next" data-act="next">Дальше</button></footer>';
+  // Optional artwork is local data; chapters without it keep the original scene markup.
+  const background = scene.background ?? chapter.background;
+  if (typeof background === 'string' && /^art\/[a-z0-9-]+\.webp$/.test(background)) {
+    return top + '<section class="g-story-art"><img class="g-scene-art" src="' + h(background) + '" alt="" aria-hidden="true">' +
+      '<div class="g-scene-window" aria-hidden="true"></div>' + log + foot + '</section>';
+  }
   return top + log + foot;
 }
 

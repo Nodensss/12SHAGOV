@@ -35,6 +35,7 @@
       "next": "s2-yard"
     },
     "s2-yard": {
+      "background": "art/scene-yard.webp",
       "type": "story",
       "title": "Двор",
       "lines": [
@@ -57,6 +58,7 @@
       }
     },
     "s3a-honest": {
+      "background": "art/scene-yard.webp",
       "type": "story",
       "title": "Три кружка",
       "lines": [
@@ -95,6 +97,7 @@
       "next": "j-honest"
     },
     "s3b-control": {
+      "background": "art/scene-yard.webp",
       "type": "story",
       "title": "«Под контролем»",
       "lines": [

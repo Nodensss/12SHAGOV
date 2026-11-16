@@ -79,6 +79,7 @@
       "next": "s2-talk"
     },
     "s2-talk": {
+      "background": "art/scene-kitchen.webp",
       "type": "story",
       "title": "Кухня",
       "lines": [
@@ -126,6 +127,7 @@
       }
     },
     "s3a-truth": {
+      "background": "art/scene-kitchen.webp",
       "type": "story",
       "title": "Правда",
       "lines": [
@@ -193,6 +195,7 @@
       "next": "s4-list"
     },
     "s3b-part": {
+      "background": "art/scene-kitchen.webp",
       "type": "story",
       "title": "Почти правда",
       "lines": [
@@ -250,6 +253,7 @@
       "next": "s4-list"
     },
     "s4-list": {
+      "background": "art/scene-kitchen.webp",
       "type": "story",
       "title": "Рисунок",
       "lines": [

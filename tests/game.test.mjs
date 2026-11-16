@@ -40,7 +40,8 @@ test('портреты из данных существуют, укладыва�
   const sw = await readFile(new URL('../public/sw.js', import.meta.url), 'utf8');
   const css = await readFile(new URL('../public/game/game.css', import.meta.url), 'utf8');
   const textures = [...css.matchAll(/url\(['"]?\.\/(art\/[\w.-]+)/g)].map(match => match[1]);
-  const assetPaths = new Set([...vocab.variants, ...fights].map(item => item.art).concat(textures, skills.map(item => item.icon), items.map(item => item.icon)));
+  const backgrounds = chapters.flatMap(chapter => [chapter.background, ...Object.values(chapter.scenes).map(scene => scene.background)]).filter(Boolean);
+  const assetPaths = new Set([...vocab.variants, ...fights].map(item => item.art).concat(textures, skills.map(item => item.icon), items.map(item => item.icon), backgrounds));
   for (const art of assetPaths) {
     assert.match(art, /^art\/(?:icons\/)?[\w-]+\.(svg|webp)$/);
     const info = await stat(new URL('../' + art, data));

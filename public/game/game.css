@@ -487,3 +487,16 @@ textarea::placeholder { color: #8a958a; }
 .g-sound[aria-pressed="true"] { color: var(--warm); }
 .g-sound[aria-pressed="true"] .g-sound-off, .g-sound[aria-pressed="false"] .g-sound-on { display: none; }
 .g-sound:active { background: var(--panel-2); }
+
+/* Scene art: deliberately scoped away from battle, journal and unillustrated scenes. */
+.g-story-art { position: relative; isolation: isolate; display: flex; flex-direction: column; height: calc(100dvh - 3.5rem); min-height: 26rem; overflow: hidden; border: 1px solid #756344; border-radius: .8rem .8rem 0 0; background: #111b16; }
+.g-story-art .g-scene-art { position: absolute; z-index: -2; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 48%; }
+.g-story-art::after { content: ''; position: absolute; z-index: -1; inset: 0; pointer-events: none; background: linear-gradient(180deg, #101a1500 40%, #101a1540 65%, #101a15 100%); box-shadow: inset 0 0 1.1rem #0008; }
+.g-story-art .g-scene-window { flex: 1 0 10rem; pointer-events: none; }
+.g-story-art .g-log { flex: 0 1 auto; min-height: 0; max-height: 36dvh; overflow-y: auto; overscroll-behavior: contain; justify-content: flex-start; padding: .5rem .9rem; scrollbar-color: #85744f #142019; }
+.g-story-art .g-line { flex-shrink: 0; scroll-margin: .5rem; }
+.g-story-art .g-narrator { padding: .75rem .85rem; background: #142019; border: 1px solid #56604a; border-radius: .45rem; font-size: 1.05rem; line-height: 1.5; }
+.g-story-art .g-character { background: #26362b; border-color: #687256; }
+.g-story-art .g-foot { flex: none; position: relative; padding-top: .65rem; background: #142019; }
+.g-story-art .g-prompt { color: #d6dccf; }
+@media (max-height: 600px) { .g-story-art .g-log { max-height: 32dvh; } .g-story-art .g-narrator { padding: .6rem .7rem; font-size: 1rem; } }

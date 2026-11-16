@@ -35,6 +35,7 @@
   "start": "s1-seven",
   "scenes": {
     "s1-seven": {
+      "background": "art/scene-yard.webp",
       "type": "story",
       "title": "Без десяти семь",
       "lines": [
@@ -89,6 +90,7 @@
       "next": "s2-porch"
     },
     "s2-porch": {
+      "background": "art/scene-porch.webp",
       "type": "story",
       "title": "Крыльцо",
       "lines": [
@@ -126,6 +128,7 @@
       }
     },
     "s3a-inside": {
+      "background": "art/scene-group.webp",
       "type": "story",
       "title": "Внутри",
       "lines": [
@@ -198,6 +201,7 @@
       "next": "s4-after"
     },
     "s3b-outside": {
+      "background": "art/scene-porch.webp",
       "type": "story",
       "title": "Снаружи",
       "lines": [
@@ -265,6 +269,7 @@
       "next": "s4-after"
     },
     "s4-after": {
+      "background": "art/scene-yard.webp",
       "type": "story",
       "title": "После",
       "lines": [
