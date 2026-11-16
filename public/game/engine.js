@@ -31,6 +31,10 @@ export function normalizeGame(raw) {
   if (plain(raw.fights)) for (const [id, value] of Object.entries(raw.fights)) {
     if (plain(value)) game.fights[id] = { won: value.won === true, tries: Number.isInteger(value.tries) && value.tries > 0 ? value.tries : 0 };
   }
+  // Необязательное поле: незаконченный бой. Его нет в сохранении, пока игрок не в бою,
+  // поэтому старые записи остаются той же формы.
+  const battle = normalizeBattle(raw.battle);
+  if (battle) game.battle = battle;
   if (plain(raw.journal)) for (const [id, value] of Object.entries(raw.journal)) {
     if (!plain(value)) continue;
     game.journal[id] = {
@@ -41,6 +45,28 @@ export function normalizeGame(raw) {
     };
   }
   return game;
+}
+
+// Оставляет от сохранённого боя только ожидаемые поля; законченный или повреждённый бой отбрасывается.
+function normalizeBattle(raw) {
+  if (!plain(raw) || typeof raw.fight !== 'string' || !raw.fight || !plain(raw.state)) return null;
+  const s = raw.state, count = value => Number.isInteger(value) && value >= 0;
+  if (![s.hp, s.maxHp, s.foe, s.foeMax, s.turn].every(count) || s.over) return null;
+  if (s.hp < 1 || s.foe < 1 || s.hp > s.maxHp || s.foe > s.foeMax) return null;
+  return {
+    fight: raw.fight.slice(0, 80),
+    state: {
+      hp: s.hp, maxHp: s.maxHp, foe: s.foe, foeMax: s.foeMax, turn: s.turn,
+      guard: s.guard === true, open: s.open === true,
+      cooldowns: plain(s.cooldowns) ? Object.fromEntries(Object.entries(s.cooldowns).filter(([, value]) => count(value))) : {},
+      log: Array.isArray(s.log) ? s.log.filter(plain).slice(0, 12).map(line => ({
+        who: ['you', 'foe', 'note'].includes(line.who) ? line.who : 'note',
+        text: text(line.text, 500),
+        ...(line.hit === 'you' || line.hit === 'foe' ? { hit: line.hit } : {}),
+      })) : [],
+      over: null,
+    },
+  };
 }
 
 export function loadGame(storage = globalThis.localStorage) {

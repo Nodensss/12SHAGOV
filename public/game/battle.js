@@ -5,6 +5,15 @@ export function startBattle(fight) {
   return { hp: fight.playerHp, maxHp: fight.playerHp, foe: fight.hp, foeMax: fight.hp, turn: 0, guard: false, open: !fight.armor, cooldowns: {}, log: [], over: null };
 }
 
+// Возвращает сохранённый бой, если он подходит к этому бою: тот же id и те же запасы тяги и стойкости.
+// Если баланс боя с тех пор поменяли, сохранение не подходит и бой начинается заново.
+export function restoreBattle(saved, fight) {
+  const state = saved?.state;
+  if (!fight || !state || saved.fight !== fight.id || state.over) return null;
+  if (state.maxHp !== fight.playerHp || state.foeMax !== fight.hp) return null;
+  return { ...state, cooldowns: { ...state.cooldowns }, log: state.log.map(line => ({ ...line })) };
+}
+
 export function skillsOf(fight, skills) {
   return fight.skills.map(id => skills.find(s => s.id === id)).filter(Boolean);
 }

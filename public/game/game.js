@@ -4,7 +4,7 @@ import {
   levelOf, recordFight,
   assignSteering, canLeaveSteering, leaveSteering, steeringOf,
 } from './engine.js';
-import { canUse, playTurn, skillsOf, startBattle, validateFight } from './battle.js';
+import { canUse, playTurn, restoreBattle, skillsOf, startBattle, validateFight } from './battle.js';
 
 const root = document.querySelector('#game');
 if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
@@ -319,8 +319,19 @@ function startChapter(id) {
   go({ name: 'play', id });
 }
 
+// Незаконченный бой хранится в сохранении, чтобы пережить перезагрузку страницы.
+// Законченный бой и выход в меню его стирают.
+function keepBattle() {
+  if (battle && !battle.over) game.battle = { fight: view.id, state: battle }; else delete game.battle;
+  persist();
+}
+function dropBattle() {
+  battle = null;
+  if (game.battle) { delete game.battle; persist(); }
+}
+
 const actions = {
-  menu: () => { battle = null; go({ name: 'menu' }); },
+  menu: () => { dropBattle(); go({ name: 'menu' }); },
   bag: () => go({ name: 'bag' }),
   trial: id => go({ name: 'trial', id, card: null, answer: null }),
   'trial-answer': id => { view.answer = id === 'trap'; render(); },
@@ -330,13 +341,14 @@ const actions = {
     if (view.card >= trial.cards.length) { markDone(game, trial.id); persist(); }
     render(); window.scrollTo(0, 0);
   },
-  fight: id => { battle = null; go({ name: 'fight', id }); },
-  'fight-start': () => { battle = startBattle(fights.get(view.id)); view.levelUp = false; render(); window.scrollTo(0, 0); },
+  fight: id => { dropBattle(); go({ name: 'fight', id }); },
+  'fight-start': () => { battle = startBattle(fights.get(view.id)); view.levelUp = false; keepBattle(); render(); window.scrollTo(0, 0); },
   skill: id => {
     const fight = fights.get(view.id), skill = skills.find(s => s.id === id);
     if (!battle || !skill || !canUse(battle, skill)) return;
     battle = playTurn(battle, fight, skill);
-    if (battle.over) { view.levelUp = battle.over === 'win' && !game.fights[fight.id]?.won; recordFight(game, fight.id, battle.over === 'win'); persist(); }
+    if (battle.over) { view.levelUp = battle.over === 'win' && !game.fights[fight.id]?.won; recordFight(game, fight.id, battle.over === 'win'); }
+    keepBattle();
     render();
     if (battle.over) window.scrollTo(0, 0);
   },
@@ -397,7 +409,7 @@ const actions = {
   wipe: () => {
     if (!confirm('Удалить все записи дневника и прогресс игры в этом браузере?')) return;
     try { localStorage.removeItem(GAME_KEY); } catch { /* хранилище недоступно */ }
-    game = freshGame(); go({ name: 'menu' });
+    game = freshGame(); battle = null; go({ name: 'menu' });
   },
 };
 
@@ -450,6 +462,11 @@ async function boot() {
       return chapter && !isLocked(item, game) && saved && chapter.scenes[saved.scene] && chapter.scenes[saved.scene].type !== 'ending' && (saved.scene !== chapter.start || saved.line > 0 || Object.keys(saved.choices || {}).length > 0);
     });
     view = open && game.variant ? { name: 'play', id: open.id } : { name: 'menu' };
+    // Незаконченный бой важнее: возвращаем игрока прямо в него, с тем же ходом.
+    const fightItem = game.battle && index.chapters.find(item => item.id === game.battle.fight && item.type === 'fight');
+    const resumed = fightItem && !isLocked(fightItem, game) && game.variant ? restoreBattle(game.battle, fights.get(fightItem.id)) : null;
+    if (resumed) { battle = resumed; view = { name: 'fight', id: fightItem.id }; }
+    else if (game.battle) { delete game.battle; persist(); }
     render();
   } catch (error) {
     root.innerHTML = '<main class="g-main"><h1>Игра не открылась</h1><p class="g-lead">' + h(error.message) + '. Откройте игру через локальный сервер, как описано в README.</p></main>';

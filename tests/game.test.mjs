@@ -6,7 +6,7 @@ import {
   saveEntry, setDraft, stage, validateChapter, validateVocab,
   itemsOf, levelOf, markDone, recordFight, assignSteering, leaveSteering, restartChapter,
 } from '../public/game/engine.js';
-import { canUse, playTurn, skillsOf, startBattle, validateFight } from '../public/game/battle.js';
+import { canUse, playTurn, restoreBattle, skillsOf, startBattle, validateFight } from '../public/game/battle.js';
 
 const data = new URL('../public/game/data/', import.meta.url);
 const load = async file => JSON.parse(await readFile(new URL(file, data), 'utf8'));
@@ -336,4 +336,34 @@ test('все приёмы и находки имеют прозрачные ор
     }
     assert.ok(alpha, item.id + ': требуется альфа-прозрачность');
   }
+});
+
+test('незаконченный бой переживает сохранение и продолжается с того же хода', () => {
+  const boss = fights.at(-1), by = id => skills.find(s => s.id === id);
+  let live = playTurn(playTurn(startBattle(boss), boss, by('admit')), boss, by('group'));
+  const game = freshGame();
+  game.battle = { fight: boss.id, state: live };
+  const reopened = normalizeGame(JSON.parse(JSON.stringify(game)));
+  const restored = restoreBattle(reopened.battle, boss);
+  assert.deepEqual({ ...restored, log: [] }, { ...live, log: [] });
+  assert.equal(canUse(restored, by('group')), false, 'перерыв приёма сохраняется');
+  assert.deepEqual(playTurn(restored, boss, by('truth')), playTurn(live, boss, by('truth')));
+  assert.equal(restoreBattle(reopened.battle, fights[0]), null, 'чужой бой не подходит');
+  assert.equal(restoreBattle(reopened.battle, { ...boss, hp: boss.hp + 1 }), null, 'после смены баланса бой начинается заново');
+});
+
+test('в сохранении нет боя, пока игрок не в бою, а повреждённый бой отбрасывается', () => {
+  assert.equal('battle' in normalizeGame(freshGame()), false);
+  const state = startBattle(fights[0]);
+  const broken = [
+    null, 'бой', { fight: fights[0].id }, { fight: 5, state },
+    { fight: fights[0].id, state: { ...state, hp: -1 } },
+    { fight: fights[0].id, state: { ...state, hp: state.maxHp + 5 } },
+    { fight: fights[0].id, state: { ...state, foe: 0 } },
+    { fight: fights[0].id, state: { ...state, over: 'win' } },
+    { fight: fights[0].id, state: { ...state, turn: 1.5 } },
+  ];
+  for (const battle of broken) assert.equal('battle' in normalizeGame({ ...freshGame(), battle }), false, JSON.stringify(battle));
+  const messy = normalizeGame({ ...freshGame(), battle: { fight: fights[0].id, extra: 1, state: { ...state, cooldowns: { call: 2, bad: 'x' }, log: [{ who: 'кто-то', text: 'строка', hit: 'нет', junk: 1 }, 'мусор'], junk: true } } });
+  assert.deepEqual(messy.battle, { fight: fights[0].id, state: { ...state, cooldowns: { call: 2 }, log: [{ who: 'note', text: 'строка' }] } });
 });
