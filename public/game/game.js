@@ -107,13 +107,18 @@ function menu() {
     '<p class="g-note">Игра — способ подумать, а не лечение. Если сейчас тяжело, свяжитесь с человеком, которому доверяете, с группой или со специалистом. <a href="../#home">Раздел поддержки — в приложении.</a></p></main>';
 }
 
+// Optional original artwork stays data-driven; labels remain readable without it.
+function iconHtml(item, cls) {
+  return item.icon ? '<img class="' + cls + '" src="' + h(item.icon) + '" alt="" aria-hidden="true" width="48" height="48">' : '';
+}
+
 function bagScreen() {
   const all = itemsOf(items, game), steps = index.steps || [];
   return '<header class="g-top"><button class="g-back" data-act="menu">← Главы</button><span class="g-scene">Рюкзак</span></header>' +
     '<main class="g-main g-bag"><h1 tabindex="-1">Рюкзак</h1><p class="g-lead">То, что герой унёс из сцен. Часть находок зависит от твоих решений — все за одно прохождение не собрать.</p>' +
     steps.map(step => { const list = all.filter(i => i.step === step.id); return list.length ? '<h2>' + h(step.title) + '</h2><div class="g-finds">' + list.map(i => i.found
-      ? '<div class="g-find' + (i.kind === 'support' ? ' is-support' : '') + '"><strong>' + h(i.name) + '</strong><small>' + h(i.text) + '</small></div>'
-      : '<div class="g-find is-unknown"><strong>???</strong><small>Ещё не найдено</small></div>').join('') + '</div>' : ''; }).join('') + '</main>';
+      ? '<div class="g-find' + (i.kind === 'support' ? ' is-support' : '') + '">' + iconHtml(i, 'g-find-icon') + '<strong>' + h(i.name) + '</strong><small>' + h(i.text) + '</small></div>'
+      : '<div class="g-find is-unknown">' + iconHtml(i, 'g-find-icon') + '<strong>???</strong><small>Ещё не найдено</small></div>').join('') + '</div>' : ''; }).join('') + '</main>';
 }
 
 function trialScreen() {
@@ -168,7 +173,7 @@ function fightScreen() {
     '<div class="g-foe g-foe-small' + (hitFoe ? ' is-hit' : '') + (fight.armor && !battle.open ? ' is-armored' : '') + '"><img src="' + h(fight.art) + '" alt="" width="240" height="240"></div>' +
     '<div class="g-battle-log' + (hitYou ? ' is-hit' : '') + '" aria-live="polite">' + (battle.log.length ? battle.log.map(l => '<p class="g-log-' + l.who + '">' + (l.who === 'you' ? '<b>Ты:</b> ' : l.who === 'foe' ? '<b>' + h(fight.name) + ':</b> ' : '') + h(l.text) + '</p>').join('') : '<p class="g-log-note">Твой ход. Выбери приём.</p>') + '</div>' +
     bar('Твоя стойкость', battle.hp, battle.maxHp, 'g-bar-you') + '</main>' +
-    '<footer class="g-foot g-skills">' + skillsOf(fight, skills).map(s => { const wait = battle.cooldowns[s.id] > 0; return '<button class="g-skill" data-act="skill" data-id="' + h(s.id) + '"' + (canUse(battle, s) ? '' : ' disabled') + '><strong>' + h(s.name) + '</strong><small>' + (wait ? (battle.cooldowns[s.id] > 9 ? 'Уже сказано' : 'Через ' + battle.cooldowns[s.id] + ' ход' + (battle.cooldowns[s.id] > 1 ? 'а' : '')) : h(s.hint)) + '</small></button>'; }).join('') + '</footer>';
+    '<footer class="g-foot g-skills">' + skillsOf(fight, skills).map(s => { const wait = battle.cooldowns[s.id] > 0; return '<button class="g-skill" data-act="skill" data-id="' + h(s.id) + '"' + (canUse(battle, s) ? '' : ' disabled') + '><strong>' + iconHtml(s, 'g-skill-icon') + h(s.name) + '</strong><small>' + (wait ? (battle.cooldowns[s.id] > 9 ? 'Уже сказано' : 'Через ' + battle.cooldowns[s.id] + ' ход' + (battle.cooldowns[s.id] > 1 ? 'а' : '')) : h(s.hint)) + '</small></button>'; }).join('') + '</footer>';
 }
 
 function variantScreen() {

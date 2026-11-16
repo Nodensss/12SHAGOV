@@ -354,3 +354,112 @@ textarea::placeholder { color: #8a958a; }
   .g-portrait, .g-foe, .g-bar i, .g-dots i { transition: none; }
   .g-foe.is-hit, .g-battle-log.is-hit { animation: none; }
 }
+
+/* Keep the active controls in document flow; artwork yields space on short phones. */
+.game[data-view="variant"], .game:has(> .g-battle) {
+  height: 100dvh;
+  min-height: 100dvh;
+}
+.game[data-view="variant"] > .g-top, .game:has(> .g-battle) > .g-top,
+.game[data-view="variant"] > .g-foot, .game:has(> .g-battle) > .g-foot {
+  flex: 0 0 auto;
+  position: static;
+}
+.game:has(> .g-battle) .g-battle {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  gap: .45rem;
+  padding-top: .5rem;
+  padding-bottom: .3rem;
+}
+.g-battle .g-foe-small {
+  justify-self: center;
+  align-self: center;
+  height: 100%;
+  width: auto;
+  min-height: 0;
+  max-height: 36dvh;
+  max-width: 100%;
+  aspect-ratio: 1;
+  margin: 0;
+}
+.g-battle .g-battle-log {
+  flex: none;
+  min-height: 0;
+  max-height: 11rem;
+  overflow-y: auto;
+  padding: .4rem .6rem;
+  justify-content: flex-start;
+}
+.game:has(> .g-battle) .g-skills {
+  padding-top: .4rem;
+  padding-bottom: calc(.5rem + env(safe-area-inset-bottom));
+  gap: .35rem;
+}
+.game[data-view="variant"] .g-heroes {
+  min-height: 0;
+  padding-top: .65rem;
+}
+.game[data-view="variant"] .g-carousel { flex: 1; min-height: 0; }
+.game[data-view="variant"] .g-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.game[data-view="variant"] .g-portrait {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: auto;
+  max-height: 48dvh;
+  max-width: 78%;
+  aspect-ratio: 2 / 3;
+}
+.game[data-view="variant"] .g-portrait img { object-fit: contain; }
+.game[data-view="variant"] .g-hero > :not(.g-portrait) { flex: 0 0 auto; }
+.game[data-view="variant"] .g-dots { flex: 0 0 auto; padding-top: .65rem; padding-bottom: .15rem; }
+.g-foot-hero { grid-template-columns: minmax(44px, 2.9rem) 1fr minmax(44px, 2.9rem); }
+@media (max-height: 720px) {
+  .game[data-view="variant"] .g-portrait { margin-bottom: .5rem; }
+  .game[data-view="variant"] .g-foot-hero { padding-top: .5rem; padding-bottom: calc(.5rem + env(safe-area-inset-bottom)); }
+  .g-battle .g-foe-small { max-height: 28dvh; }
+}
+@media (min-width: 32rem) {
+  .game[data-view="variant"], .game:has(> .g-battle) { height: calc(100dvh - 2rem); min-height: calc(100dvh - 2rem); }
+}
+@media (max-height: 720px) {
+  .game:has(> .g-battle) .g-skills { padding-left: .5rem; padding-right: .5rem; gap: .25rem; }
+  .game:has(> .g-battle) .g-skill { padding: .3rem .4rem; }
+  .g-battle .g-battle-log { max-height: none; overflow: visible; line-height: 1.25; gap: .1rem; padding: .3rem .5rem; }
+}
+@media (max-height: 720px) {
+  .g-battle .g-battle-log { display: block; }
+  .g-battle-log .g-log-note { display: inline; }
+  .g-battle-log .g-log-note + .g-log-note::before { content: ' · '; }
+  .g-battle-log .g-log-foe { margin-top: .15rem; }
+}
+
+/* Transparent painted objects: compact on skills, readable in the backpack. */
+.g-skill strong { width: 100%; }
+.g-skill-icon { float: left; width: 20px; height: 20px; margin: 0 .3rem .1rem 0; object-fit: contain; }
+.g-find-icon { display: block; width: 64px; height: 64px; margin: 0 auto .6rem; object-fit: contain; }
+.g-find.is-unknown .g-find-icon { filter: brightness(0); opacity: .8; }
+.g-find.is-unknown .g-find-icon { filter: brightness(0) drop-shadow(0 0 1px #73856d); }
+.g-find.is-unknown strong { color: var(--muted); }
+/* Keep the icon beside the first title line rather than narrowing two lines. */
+.g-skill-icon { margin-bottom: -5px; }
+@media (max-height: 600px) {
+  .game:has(> .g-battle) > .g-top {
+    padding-top: calc(.1rem + env(safe-area-inset-top));
+    padding-bottom: .1rem;
+    min-height: 0;
+  }
+  .game:has(> .g-battle) .g-battle {
+    padding: .3rem .5rem .2rem;
+    gap: .25rem;
+  }
+  .game:has(> .g-battle) .g-skills {
+    padding-top: .2rem;
+    padding-bottom: calc(.3rem + env(safe-area-inset-bottom));
+  }
+}

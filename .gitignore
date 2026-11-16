@@ -12,3 +12,5 @@ test-results/
 
 .dream-loop/
 .agents/
+
+__pycache__/

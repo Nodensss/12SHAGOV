@@ -40,19 +40,23 @@ test('портреты из данных существуют, укладыва�
   const sw = await readFile(new URL('../public/sw.js', import.meta.url), 'utf8');
   const css = await readFile(new URL('../public/game/game.css', import.meta.url), 'utf8');
   const textures = [...css.matchAll(/url\(['"]?\.\/(art\/[\w.-]+)/g)].map(match => match[1]);
-  const assetPaths = new Set([...vocab.variants, ...fights].map(item => item.art).concat(textures));
+  const assetPaths = new Set([...vocab.variants, ...fights].map(item => item.art).concat(textures, skills.map(item => item.icon), items.map(item => item.icon)));
   for (const art of assetPaths) {
-    assert.match(art, /^art\/[\w-]+\.(svg|webp)$/);
+    assert.match(art, /^art\/(?:icons\/)?[\w-]+\.(svg|webp)$/);
     const info = await stat(new URL('../' + art, data));
     assert.ok(info.isFile(), art + ': должен быть файлом');
     assert.ok(info.size > 0 && info.size < 150_000, art + ': лимит 150 КБ');
     assert.ok(sw.includes("'./game/" + art + "'"), art + ': отсутствует в офлайн-кэше');
   }
-  const artDirectory = new URL('../public/game/art/', import.meta.url);
-  let total = 0;
-  for (const entry of await readdir(artDirectory, { withFileTypes: true })) {
-    if (entry.isFile()) total += (await stat(new URL(entry.name, artDirectory))).size;
+  async function directoryBytes(directory) {
+    let bytes = 0;
+    for (const entry of await readdir(directory, { withFileTypes: true })) {
+      const url = new URL(entry.name + (entry.isDirectory() ? '/' : ''), directory);
+      bytes += entry.isDirectory() ? await directoryBytes(url) : (await stat(url)).size;
+    }
+    return bytes;
   }
+  const total = await directoryBytes(new URL('../public/game/art/', import.meta.url));
   assert.ok(total <= 3_000_000, 'вся графика игры, включая прежние SVG, — до 3 МБ');
 });
 
@@ -314,4 +318,22 @@ test('новый сюжет связан с прошлыми шагами, вс�
   assert.ok(items.filter(item => item.step === 3).length >= 2);
   const sw = await readFile(new URL('../public/sw.js', import.meta.url), 'utf8');
   for (const item of index.chapters) assert.ok(sw.includes('./game/data/' + item.file), 'нет офлайн-файла ' + item.file);
+});
+
+
+test('все приёмы и находки имеют прозрачные оригинальные иконки', async () => {
+  for (const item of [...skills, ...items]) {
+    assert.match(item.icon, /^art\/icons\/[\w-]+\.webp$/, item.id);
+    const bytes = await readFile(new URL('../' + item.icon, data));
+    assert.equal(bytes.toString('ascii', 8, 12), 'WEBP');
+    let alpha = false;
+    for (let offset = 12; offset + 8 <= bytes.length;) {
+      const tag = bytes.toString('ascii', offset, offset + 4), size = bytes.readUInt32LE(offset + 4);
+      if (tag === 'VP8X') alpha ||= !!(bytes[offset + 8] & 0x10);
+      if (tag === 'VP8L') alpha ||= !!(bytes[offset + 12] & 0x10);
+      if (tag === 'ALPH') alpha = true;
+      offset += 8 + size + (size % 2);
+    }
+    assert.ok(alpha, item.id + ': требуется альфа-прозрачность');
+  }
 });
