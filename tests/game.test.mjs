@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { access, readFile } from 'node:fs/promises';
+import { access, readFile, readdir, stat } from 'node:fs/promises';
 import {
   advance, answerLater, choose, fill, freshGame, isLocked, leaveJournal, linesOf, normalizeGame, progressOf,
   saveEntry, setDraft, stage, validateChapter, validateVocab,
@@ -34,6 +34,24 @@ test('у каждого героя есть название, описание �
     for (const key of ['label', 'epithet', 'quote', 'lore', 'art']) assert.ok(variant[key], variant.id + ': нет ' + key);
     await access(new URL('../' + variant.art, data));
   }
+});
+
+test('портреты из данных существуют, укладываются в лимит и доступны офлайн', async () => {
+  const sw = await readFile(new URL('../public/sw.js', import.meta.url), 'utf8');
+  const assetPaths = new Set([...vocab.variants, ...fights].map(item => item.art));
+  for (const art of assetPaths) {
+    assert.match(art, /^art\/[\w-]+\.(svg|webp)$/);
+    const info = await stat(new URL('../' + art, data));
+    assert.ok(info.isFile(), art + ': должен быть файлом');
+    assert.ok(info.size > 0 && info.size < 150_000, art + ': лимит 150 КБ');
+    assert.ok(sw.includes("'./game/" + art + "'"), art + ': отсутствует в офлайн-кэше');
+  }
+  const artDirectory = new URL('../public/game/art/', import.meta.url);
+  let total = 0;
+  for (const entry of await readdir(artDirectory, { withFileTypes: true })) {
+    if (entry.isFile()) total += (await stat(new URL(entry.name, artDirectory))).size;
+  }
+  assert.ok(total <= 3_000_000, 'вся графика игры, включая прежние SVG, — до 3 МБ');
 });
 
 test('подстановка слов работает для каждого варианта', () => {

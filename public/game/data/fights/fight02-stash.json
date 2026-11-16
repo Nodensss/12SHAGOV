@@ -3,7 +3,7 @@
   "version": 1,
   "name": "Заначка",
   "tier": "Тяга покрепче",
-  "art": "art/foe-stash.svg",
+  "art": "art/foe-stash.webp",
   "hp": 22,
   "playerHp": 20,
   "regen": 1,

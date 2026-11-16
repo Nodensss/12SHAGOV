@@ -3,7 +3,7 @@
   "version": 1,
   "name": "Старая компания",
   "tier": "Тяжёлая тяга",
-  "art": "art/foe-company.svg",
+  "art": "art/foe-company.webp",
   "hp": 28,
   "playerHp": 22,
   "skills": [

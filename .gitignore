@@ -9,3 +9,6 @@ work/
 coverage/
 playwright-report/
 test-results/
+
+.dream-loop/
+.agents/

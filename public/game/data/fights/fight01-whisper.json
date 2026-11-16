@@ -3,7 +3,7 @@
   "version": 1,
   "name": "Шёпот",
   "tier": "Лёгкая тяга",
-  "art": "art/foe-whisper.svg",
+  "art": "art/foe-whisper.webp",
   "hp": 14,
   "playerHp": 20,
   "skills": [

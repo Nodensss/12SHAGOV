@@ -3,7 +3,7 @@
   "version": 1,
   "name": "Тяга",
   "tier": "Самая тяжёлая",
-  "art": "art/foe-craving.svg",
+  "art": "art/foe-craving.webp",
   "hp": 40,
   "playerHp": 24,
   "skills": [
