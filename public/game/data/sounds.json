@@ -21,14 +21,42 @@
       "step03-key": "room",
       "step03-family": "yard",
       "step03-rain": "rain",
-      "step03-decision": "night"
+      "step03-decision": "night",
+      "step04-resentment-1": "night",
+      "step04-resentment-2": "night",
+      "step04-resentment-3": "night",
+      "step04-fear-1": "night",
+      "step04-fear-2": "night",
+      "step04-fear-3": "night",
+      "step04-deeds-1": "night",
+      "step04-deeds-2": "night",
+      "step04-deeds-3": "night",
+      "step04-bonds-1": "night",
+      "step04-bonds-2": "night",
+      "step04-bonds-3": "night",
+      "step04-worth-1": "night",
+      "step04-worth-2": "night",
+      "step04-worth-3": "night",
+      "step04-notebook": "kitchen"
     },
     "scenes": {
-      "step01-only-once": { "s1-morning": "kitchen", "s4a-home": "kitchen", "s4b-evening": "night" },
-      "step01-stash": { "s4-number": "night" },
-      "step01-door": { "s3a-inside": "room" },
-      "step03-rain": { "s3-rain-group": "room" }
+      "step01-only-once": {
+        "s1-morning": "kitchen",
+        "s4a-home": "kitchen",
+        "s4b-evening": "night"
+      },
+      "step01-stash": {
+        "s4-number": "night"
+      },
+      "step01-door": {
+        "s3a-inside": "room"
+      },
+      "step03-rain": {
+        "s3-rain-group": "room"
+      }
     }
   },
-  "silenceAfter": ["fight04-craving"]
+  "silenceAfter": [
+    "fight04-craving"
+  ]
 }

@@ -1,4 +1,4 @@
-const CACHE = '12shagov-shell-v16';
+const CACHE = '12shagov-shell-v17';
 // Каждый файл на своей строке: так правки разных авторов не сталкиваются при слиянии.
 const ASSETS = [
   './favicon.ico',
@@ -106,6 +106,24 @@ const ASSETS = [
   './game/data/chapters/step01-stash.json',
   './game/data/chapters/step01-sister.json',
   './game/data/chapters/step01-door.json',
+  './game/data/chapters/step04-resentment-1.json',
+  './game/data/chapters/step04-resentment-2.json',
+  './game/data/chapters/step04-resentment-3.json',
+  './game/data/chapters/step04-fear-1.json',
+  './game/data/chapters/step04-fear-2.json',
+  './game/data/chapters/step04-fear-3.json',
+  './game/data/chapters/step04-deeds-1.json',
+  './game/data/chapters/step04-deeds-2.json',
+  './game/data/chapters/step04-deeds-3.json',
+  './game/data/chapters/step04-bonds-1.json',
+  './game/data/chapters/step04-bonds-2.json',
+  './game/data/chapters/step04-bonds-3.json',
+  './game/data/chapters/step04-worth-1.json',
+  './game/data/chapters/step04-worth-2.json',
+  './game/data/chapters/step04-worth-3.json',
+  './game/data/chapters/step04-notebook.json',
+  './game/data/fights/fight05-shame.json',
+  './game/art/foe-shame.svg',
 ];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));

@@ -347,3 +347,22 @@ export function itemsOf(items, game) {
   const have = picked(game);
   return items.map(item => ({ ...item, found: have.has(item.when) }));
 }
+
+// Глубина страницы тетради: сколько её слоёв (1–3) пройдено.
+export function depthOf(pageId, index, game) {
+  const have = picked(game);
+  return index.chapters.filter(item => item.page === pageId && have.has(item.id)).length;
+}
+
+// Приёмы с полем page зависят от тетради: урон и лечение умножаются на глубину страницы,
+// реплика берётся по глубине. Непройденная страница считается за один слой, чтобы данные боя оставались проверяемыми.
+export function scaledSkills(skills, index, game) {
+  return skills.map(skill => {
+    if (!skill.page) return skill;
+    const depth = Math.max(1, depthOf(skill.page, index, game));
+    const scaled = { ...skill, depth, dmg: (skill.dmg || 0) * depth, say: skill.says?.[depth - 1] ?? skill.say };
+    if (skill.heal) scaled.heal = skill.heal * depth;
+    scaled.hint = (scaled.dmg ? scaled.dmg + ' урона' : skill.hint) + ' · слой ' + depth + ' из 3';
+    return scaled;
+  });
+}

@@ -5,6 +5,7 @@ import {
   advance, answerLater, choose, fill, freshGame, isLocked, leaveJournal, linesOf, normalizeGame, progressOf,
   saveEntry, setDraft, stage, validateChapter, validateVocab,
   itemsOf, levelOf, markDone, recordFight, assignSteering, leaveSteering, restartChapter,
+  depthOf, scaledSkills,
 } from '../public/game/engine.js';
 import { canUse, playTurn, restoreBattle, skillsOf, startBattle, validateFight } from '../public/game/battle.js';
 
@@ -181,7 +182,7 @@ test('одной силой воли бой не выиграть, а приём
 });
 
 test('броня босса снимается только признанием', () => {
-  const boss = fights.at(-1), by = id => skills.find(s => s.id === id);
+  const boss = fights.find(fight => fight.id === 'fight04-craving'), by = id => skills.find(s => s.id === id);
   let state = playTurn(startBattle(boss), boss, by('group'));
   assert.equal(state.foe, boss.hp);
   state = playTurn(state, boss, by('admit'));
@@ -245,7 +246,7 @@ test('третий шаг открывается после Ночи, содер
   assert.equal(isLocked(thirdItems[0], game), true);
   markDone(game, 'step02-night');
   assert.equal(isLocked(thirdItems[0], game), false);
-  assert.equal(index.nextStep.title, 'Шаг четвёртый');
+  assert.equal(index.nextStep.title, 'Шаг пятый');
   for (const chapter of thirdChapters) {
     assert.ok(chapter.disclaimer && chapter.basedOn.some(source => source.includes('docs/step03.md')), chapter.id);
     assert.ok(chapter.questions.length >= 2 && chapter.questions.length <= 3, chapter.id);
@@ -340,7 +341,7 @@ test('все приёмы и находки имеют прозрачные ор
 });
 
 test('незаконченный бой переживает сохранение и продолжается с того же хода', () => {
-  const boss = fights.at(-1), by = id => skills.find(s => s.id === id);
+  const boss = fights.find(fight => fight.id === 'fight04-craving'), by = id => skills.find(s => s.id === id);
   let live = playTurn(playTurn(startBattle(boss), boss, by('admit')), boss, by('group'));
   const game = freshGame();
   game.battle = { fight: boss.id, state: live };
@@ -367,4 +368,61 @@ test('в сохранении нет боя, пока игрок не в бою,
   for (const battle of broken) assert.equal('battle' in normalizeGame({ ...freshGame(), battle }), false, JSON.stringify(battle));
   const messy = normalizeGame({ ...freshGame(), battle: { fight: fights[0].id, extra: 1, state: { ...state, cooldowns: { call: 2, bad: 'x' }, log: [{ who: 'кто-то', text: 'строка', hit: 'нет', junk: 1 }, 'мусор'], junk: true } } });
   assert.deepEqual(messy.battle, { fight: fights[0].id, state: { ...state, cooldowns: { call: 2 }, log: [{ who: 'note', text: 'строка' }] } });
+});
+
+test('четвёртый шаг: пять страниц по три слоя, бой открывается после первого слоя каждой страницы', () => {
+  const step = index.steps.find(step => step.id === 4), layers = index.chapters.filter(item => item.step === 4 && item.page);
+  assert.equal(step.layout, 'notebook');
+  assert.equal(step.after, 'step03-decision');
+  assert.equal(step.pages.length, 5);
+  for (const page of step.pages) {
+    const own = layers.filter(item => item.page === page.id);
+    assert.deepEqual(own.map(item => item.depth), [1, 2, 3], page.id);
+    assert.equal(own[0].after, step.after);
+    assert.equal(own[1].after, own[0].id);
+    assert.equal(own[2].after, own[1].id);
+    assert.ok(skills.some(skill => skill.id === page.skill && skill.page === page.id), 'нет приёма страницы ' + page.id);
+  }
+  const shame = index.chapters.find(item => item.id === 'fight05-shame'), game = freshGame();
+  markDone(game, step.after);
+  assert.deepEqual([...shame.needs.of].sort(), layers.filter(item => item.depth === 1).map(item => item.id).sort());
+  for (const id of shame.needs.of) { assert.equal(isLocked(shame, game), true); markDone(game, id); }
+  assert.equal(isLocked(shame, game), false, 'достаточно заглянуть на каждую страницу');
+  assert.equal(isLocked(index.chapters.find(item => item.id === 'step04-notebook'), game), true, 'финал — только после боя');
+});
+
+test('четвёртый шаг: чем глубже страница, тем сильнее приём, а без тетради бой проходим впритык', () => {
+  const shame = fights.find(fight => fight.id === 'fight05-shame'), step = index.steps.find(step => step.id === 4);
+  const play = depth => {
+    const game = freshGame();
+    for (const item of index.chapters.filter(item => item.page && item.depth <= depth)) markDone(game, item.id);
+    const scaled = scaledSkills(skills, index, game);
+    for (const page of step.pages) assert.equal(depthOf(page.id, index, game), depth);
+    let state = startBattle(shame);
+    for (let turn = 0; turn < 40 && !state.over; turn += 1) {
+      const usable = skillsOf(shame, scaled).filter(skill => canUse(state, skill));
+      state = playTurn(state, shame, (!state.open && usable.find(skill => skill.id === shame.armor.opener)) || usable.filter(skill => skill.id !== 'will').sort((a, b) => b.dmg - a.dmg)[0]);
+    }
+    return { state, scaled };
+  };
+  const [one, two, three] = [1, 2, 3].map(play);
+  for (const run of [one, two, three]) assert.equal(run.state.over, 'win');
+  assert.ok(one.state.turn > two.state.turn && two.state.turn > three.state.turn, 'глубже — быстрее победа');
+  assert.ok(three.state.hp > one.state.hp, 'глубже — больше стойкости остаётся');
+  const by = (run, id) => run.scaled.find(skill => skill.id === id);
+  assert.equal(by(three, 'name-deed').dmg, by(one, 'name-deed').dmg * 3);
+  assert.notEqual(by(three, 'name-deed').say, by(one, 'name-deed').say);
+  assert.equal(by(one, 'will').dmg, skills.find(skill => skill.id === 'will').dmg, 'обычные приёмы не меняются');
+  for (const skill of skills.filter(skill => skill.page)) assert.equal(skill.says.length, 3, skill.id);
+});
+
+test('четвёртый шаг: финал видит глубину страниц и закладки', () => {
+  const finale = chapters.find(chapter => chapter.id === 'step04-notebook'), scene = finale.scenes[finale.start];
+  const shallow = freshGame(), deep = freshGame();
+  for (const item of index.chapters.filter(item => item.page)) { if (item.depth === 1) markDone(shallow, item.id); markDone(deep, item.id); }
+  deep.chapters['step04-deeds-1'].choices = { 's4-deed1.choice': 's4-deed1.choice.mark' };
+  const a = linesOf(scene, shallow).map(line => line.id), b = linesOf(scene, deep).map(line => line.id);
+  assert.notDeepEqual(a, b);
+  assert.equal(b.length, a.length + 1, 'закладка добавляет строку');
+  for (const item of items.filter(item => item.step === 4)) assert.ok(item.name && item.text && item.when);
 });

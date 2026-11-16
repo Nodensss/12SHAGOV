@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img">
+  <defs>
+    <radialGradient id="aura" cx="50%" cy="48%" r="62%"><stop offset="0" stop-color="#d9d2c0" stop-opacity=".34"/><stop offset=".6" stop-color="#d9d2c0" stop-opacity=".06"/><stop offset="1" stop-color="#d9d2c0" stop-opacity="0"/></radialGradient>
+    <filter id="glow" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <rect width="240" height="240" fill="#0d0e0c"/><rect width="240" height="240" fill="url(#aura)"/>
+  <g fill="#050605" stroke="#d9d2c0" stroke-opacity=".5" stroke-width="1.2">
+    <g transform="translate(38 44) rotate(18)"><path d="M-13 0 q13 -10 26 0 q-13 10 -26 0Z"/><circle r="4" fill="#d9d2c0" stroke="none"/></g>
+    <g transform="translate(204 52) rotate(-20)"><path d="M-13 0 q13 -10 26 0 q-13 10 -26 0Z"/><circle r="4" fill="#d9d2c0" stroke="none"/></g>
+    <g transform="translate(26 118) rotate(6)"><path d="M-11 0 q11 -8 22 0 q-11 8 -22 0Z"/><circle r="3.4" fill="#d9d2c0" stroke="none"/></g>
+    <g transform="translate(216 124) rotate(-8)"><path d="M-11 0 q11 -8 22 0 q-11 8 -22 0Z"/><circle r="3.4" fill="#d9d2c0" stroke="none"/></g>
+    <g transform="translate(120 22)"><path d="M-14 0 q14 -11 28 0 q-14 11 -28 0Z"/><circle r="4.4" fill="#d9d2c0" stroke="none"/></g>
+    <g transform="translate(46 190) rotate(-14)"><path d="M-10 0 q10 -7 20 0 q-10 7 -20 0Z"/><circle r="3" fill="#d9d2c0" stroke="none"/></g>
+    <g transform="translate(196 194) rotate(12)"><path d="M-10 0 q10 -7 20 0 q-10 7 -20 0Z"/><circle r="3" fill="#d9d2c0" stroke="none"/></g>
+  </g>
+  <path d="M120 232 q-66 -6 -60 -78 q4 -52 32 -70 q28 -16 56 0 q28 18 32 70 q6 72 -60 78Z" fill="#131512" stroke="#d9d2c0" stroke-opacity=".6" stroke-width="1.5"/>
+  <ellipse cx="120" cy="104" rx="30" ry="34" fill="#8d8a7f"/>
+  <path d="M90 96 q-2 -40 30 -42 q32 2 30 42 q-10 -18 -30 -18 q-20 0 -30 18Z" fill="#0b0c0a"/>
+  <g fill="#131512" stroke="#d9d2c0" stroke-opacity=".6" stroke-width="1.4" stroke-linejoin="round">
+    <path d="M70 176 q-2 -44 22 -70 l8 -22 l7 2 l-2 20 l5 -24 l7 1 l-1 24 l6 -22 l7 2 l-4 26 q4 30 -18 58Z"/>
+    <path d="M170 176 q2 -44 -22 -70 l-8 -22 l-7 2 l2 20 l-5 -24 l-7 1 l1 24 l-6 -22 l-7 2 l4 26 q-4 30 18 58Z"/>
+  </g>
+  <path d="M111 104 l6 3 M129 104 l-6 3" stroke="#d9d2c0" stroke-width="2" stroke-linecap="round" filter="url(#glow)"/>
+</svg>

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "_comment": "Список глав. Чтобы добавить главу: положите файл в chapters/ и добавьте строку сюда. Идентификаторы (id) не меняйте после публикации: к ним привязаны прогресс и записи дневника игроков. Поле after — id эпизода, после которого открывается этот. Запись с \"type\": \"fight\" — бой из папки fights/. Победа в бою повышает уровень героя. steps — разделы меню: layout \"path\" — список по порядку, \"map\" — плитки мест. Запись с \"type\": \"trial\" — испытание из папки trials/. needs: { count, of } — открыть, когда пройдено хотя бы count из списка.",
+  "_comment": "Список глав. Чтобы добавить главу: положите файл в chapters/ и добавьте строку сюда. Идентификаторы (id) не меняйте после публикации: к ним привязаны прогресс и записи дневника игроков. Поле after — id эпизода, после которого открывается этот. Запись с \"type\": \"fight\" — бой из папки fights/. Победа в бою повышает уровень героя. steps — разделы меню: layout \"path\" — список по порядку, \"map\" — плитки мест. Запись с \"type\": \"trial\" — испытание из папки trials/. needs: { count, of } — открыть, когда пройдено хотя бы count из списка. layout \"notebook\" — страницы тетради: у записи эпизода есть page (страница) и depth (слой 1–3), страницы перечислены в pages шага.",
   "chapters": [
     {
       "id": "step01-only-once",
@@ -206,6 +206,202 @@
       "file": "chapters/step03-decision.json",
       "after": "step03-rain",
       "final": true
+    },
+    {
+      "id": "step04-resentment-1",
+      "step": 4,
+      "page": "resentment",
+      "depth": 1,
+      "title": "Отец",
+      "teaser": "Список обид пишется сам. Подозрительно легко.",
+      "minutes": "2 минуты",
+      "file": "chapters/step04-resentment-1.json",
+      "after": "step03-decision"
+    },
+    {
+      "id": "step04-resentment-2",
+      "step": 4,
+      "page": "resentment",
+      "depth": 2,
+      "title": "Удочки у двери",
+      "teaser": "Вторая колонка: что эта обида в тебе задела.",
+      "minutes": "2 минуты",
+      "file": "chapters/step04-resentment-2.json",
+      "after": "step04-resentment-1"
+    },
+    {
+      "id": "step04-resentment-3",
+      "step": 4,
+      "page": "resentment",
+      "depth": 3,
+      "title": "Разрешение",
+      "teaser": "Третья колонка — самая узкая: «Моя часть».",
+      "minutes": "2 минуты",
+      "file": "chapters/step04-resentment-3.json",
+      "after": "step04-resentment-2"
+    },
+    {
+      "id": "step04-fear-1",
+      "step": 4,
+      "page": "fear",
+      "depth": 1,
+      "title": "Громче всех",
+      "teaser": "Список страхов выходит длинный и какой-то вежливый.",
+      "minutes": "2 минуты",
+      "file": "chapters/step04-fear-1.json",
+      "after": "step03-decision"
+    },
+    {
+      "id": "step04-fear-2",
+      "step": 4,
+      "page": "fear",
+      "depth": 2,
+      "title": "Пустая строка",
+      "teaser": "Тот страх, который ручка обходит, как лужу.",
+      "minutes": "2 минуты",
+      "file": "chapters/step04-fear-2.json",
+      "after": "step04-fear-1"
+    },
+    {
+      "id": "step04-fear-3",
+      "step": 4,
+      "page": "fear",
+      "depth": 3,
+      "title": "Первым",
+      "teaser": "Какая может быть «моя часть» у страха?",
+      "minutes": "2 минуты",
+      "file": "chapters/step04-fear-3.json",
+      "after": "step04-fear-2"
+    },
+    {
+      "id": "step04-deeds-1",
+      "step": 4,
+      "page": "deeds",
+      "depth": 1,
+      "title": "Взял",
+      "teaser": "Список пишется быстро, как срывают пластырь. Тяжёлая страница.",
+      "minutes": "2 минуты",
+      "file": "chapters/step04-deeds-1.json",
+      "after": "step03-decision"
+    },
+    {
+      "id": "step04-deeds-2",
+      "step": 4,
+      "page": "deeds",
+      "depth": 2,
+      "title": "Шкатулка",
+      "teaser": "Одно слово в списке нужно заменить точным. Тяжёлая страница.",
+      "minutes": "2 минуты",
+      "file": "chapters/step04-deeds-2.json",
+      "after": "step04-deeds-1"
+    },
+    {
+      "id": "step04-deeds-3",
+      "step": 4,
+      "page": "deeds",
+      "depth": 3,
+      "title": "Одна форма",
+      "teaser": "У всех строчек в списке одна и та же форма.",
+      "minutes": "2 минуты",
+      "file": "chapters/step04-deeds-3.json",
+      "after": "step04-deeds-2"
+    },
+    {
+      "id": "step04-bonds-1",
+      "step": 4,
+      "page": "bonds",
+      "depth": 1,
+      "title": "Не сошлись характерами",
+      "teaser": "Четыре истории о тех, кого рядом больше нет.",
+      "minutes": "2 минуты",
+      "file": "chapters/step04-bonds-1.json",
+      "after": "step03-decision"
+    },
+    {
+      "id": "step04-bonds-2",
+      "step": 4,
+      "page": "bonds",
+      "depth": 2,
+      "title": "Контролёр",
+      "teaser": "Как было на самом деле — без «характеров».",
+      "minutes": "2 минуты",
+      "file": "chapters/step04-bonds-2.json",
+      "after": "step04-bonds-1"
+    },
+    {
+      "id": "step04-bonds-3",
+      "step": 4,
+      "page": "bonds",
+      "depth": 3,
+      "title": "Не давал себя знать",
+      "teaser": "Ты их не потерял. А что тогда?",
+      "minutes": "2 минуты",
+      "file": "chapters/step04-bonds-3.json",
+      "after": "step04-bonds-2"
+    },
+    {
+      "id": "step04-worth-1",
+      "step": 4,
+      "page": "worth",
+      "depth": 1,
+      "title": "Чиню вещи",
+      "teaser": "Последняя страница. На ней ручка стоит дольше всего.",
+      "minutes": "2 минуты",
+      "file": "chapters/step04-worth-1.json",
+      "after": "step03-decision"
+    },
+    {
+      "id": "step04-worth-2",
+      "step": 4,
+      "page": "worth",
+      "depth": 2,
+      "title": "Спроси факты",
+      "teaser": "Себе ты сейчас не свидетель. Спрашивать надо факты.",
+      "minutes": "2 минуты",
+      "file": "chapters/step04-worth-2.json",
+      "after": "step04-worth-1"
+    },
+    {
+      "id": "step04-worth-3",
+      "step": 4,
+      "page": "worth",
+      "depth": 3,
+      "title": "Склад",
+      "teaser": "Одни и те же слова стоят на разных страницах.",
+      "minutes": "2 минуты",
+      "file": "chapters/step04-worth-3.json",
+      "after": "step04-worth-2"
+    },
+    {
+      "id": "fight05-shame",
+      "type": "fight",
+      "step": 4,
+      "title": "Бой: Стыд",
+      "teaser": "Он не зовёт употребить. Он говорит: «Сожги тетрадь».",
+      "minutes": "бой",
+      "file": "fights/fight05-shame.json",
+      "after": "step03-decision",
+      "needs": {
+        "count": 5,
+        "of": [
+          "step04-resentment-1",
+          "step04-fear-1",
+          "step04-deeds-1",
+          "step04-bonds-1",
+          "step04-worth-1"
+        ]
+      },
+      "final": true
+    },
+    {
+      "id": "step04-notebook",
+      "step": 4,
+      "title": "Тетрадь на столе",
+      "teaser": "Утро. Тетрадь лежит там, где ты её оставил.",
+      "minutes": "финал · 2 минуты",
+      "file": "chapters/step04-notebook.json",
+      "after": "fight05-shame",
+      "final": true
     }
   ],
   "steps": [
@@ -232,10 +428,54 @@
       "after": "step02-night",
       "lead": "Пять обычных дней, когда всё идёт не по плану. В каждом реши: что делаю я, где прошу помощи, а что отпускаю. Потом выбери поступок.",
       "lockedText": "Откроется после финала второго шага «Ночь без драки»."
+    },
+    {
+      "id": 4,
+      "title": "Шаг четвёртый",
+      "name": "Тетрадь",
+      "layout": "notebook",
+      "after": "step03-decision",
+      "lead": "Пять страниц. У каждой три слоя — насколько глубоко идти, решаешь ты. «Не сегодня» — тоже решение. Каждый слой снимает часть груза и усиливает приём для последнего боя.",
+      "lockedText": "Откроется после финала третьего шага «На завтра».",
+      "depths": [
+        "Заглянуть",
+        "Посмотреть ближе",
+        "Дойти до дна"
+      ],
+      "pages": [
+        {
+          "id": "resentment",
+          "title": "Обиды",
+          "skill": "name-resentment",
+          "note": "Про отца."
+        },
+        {
+          "id": "fear",
+          "title": "Страхи",
+          "skill": "name-fear"
+        },
+        {
+          "id": "deeds",
+          "title": "Поступки",
+          "skill": "name-deed",
+          "note": "Тяжёлая страница: про то, что сделано близким."
+        },
+        {
+          "id": "bonds",
+          "title": "Люди",
+          "skill": "name-bond"
+        },
+        {
+          "id": "worth",
+          "title": "Что во мне есть",
+          "skill": "worth",
+          "note": "Без неё бой со Стыдом не выиграть."
+        }
+      ]
     }
   ],
   "nextStep": {
-    "title": "Шаг четвёртый",
+    "title": "Шаг пятый",
     "teaser": "В работе."
   }
 }

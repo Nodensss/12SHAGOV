@@ -1,5 +1,5 @@
 import {
-  advance, answerLater, choose, deleteEntry, fill, freshGame, GAME_KEY, isLocked, itemsOf, leaveJournal, linesOf, loadGame, markDone, picked,
+  advance, answerLater, choose, deleteEntry, fill, freshGame, GAME_KEY, depthOf, isLocked, itemsOf, leaveJournal, linesOf, loadGame, markDone, picked, scaledSkills,
   progressOf, restartChapter, saveEntry, saveGame, setDraft, stage, validateChapter, validateVocab,
   levelOf, recordFight,
   assignSteering, canLeaveSteering, leaveSteering, steeringOf,
@@ -73,6 +73,37 @@ function placeTile(item) {
     '<small>' + h(saved?.done && support ? 'Опора: ' + support.name : started ? 'Продолжить' : item.teaser) + '</small></button>';
 }
 
+// Приёмы боя с учётом тетради четвёртого шага: чем глубже страница, тем сильнее приём.
+const fightSkills = () => scaledSkills(skills, index, game);
+
+// Тетрадь четвёртого шага: страницы с тремя слоями глубины, шкала груза и финал.
+function notebookSection(step, head, fresh) {
+  const list = index.chapters.filter(item => item.step === step.id), layers = list.filter(item => item.page), finals = list.filter(item => !item.page);
+  const have = picked(game), left = layers.filter(item => !have.has(item.id)).length, depths = step.depths || ['Слой 1', 'Слой 2', 'Слой 3'];
+  const pages = (step.pages || []).map(page => {
+    const own = layers.filter(item => item.page === page.id).sort((a, b) => a.depth - b.depth), depth = own.filter(item => have.has(item.id)).length;
+    const next = own[depth], skill = skills.find(s => s.id === page.skill), saved = next && game.chapters[next.id], chapter = next && chapterOf(next.id);
+    const started = saved && chapter && (saved.scene !== chapter.start || saved.line > 0);
+    return '<article class="g-card g-page' + (depth === own.length ? ' is-full' : '') + '"><div class="g-page-head"><strong>' + h(page.title) + '</strong>' +
+      '<span class="g-depth" role="img" aria-label="Пройдено слоёв: ' + depth + ' из ' + own.length + '">' + own.map((item, i) => '<i' + (i < depth ? ' class="is-on"' : '') + '></i>').join('') + '</span></div>' +
+      '<small>' + h(next ? next.teaser : 'Страница дописана до дна.') + (page.note && !depth ? ' ' + h(page.note) : '') + '</small>' +
+      (skill ? '<small class="g-page-skill">Приём «' + h(skill.name) + '»: ' + (depth ? 'сила ' + depth + ' из ' + own.length : 'ещё не получен') + '</small>' : '') +
+      '<div class="g-row">' + (next
+        ? '<button class="g-btn ' + (depth ? 'g-secondary' : 'g-primary') + '" data-act="play" data-id="' + h(next.id) + '">' + (started ? 'Продолжить' : h(depths[depth] || 'Дальше')) + '</button>'
+        : '<button class="g-btn g-quiet" data-act="restart" data-id="' + h(own.at(-1).id) + '">Перечитать последний слой</button>') + '</div></article>';
+  }).join('');
+  return '<section class="g-section g-section-notebook">' + head + fresh + '<p class="g-lead g-section-lead">' + h(step.lead || '') + '</p>' +
+    '<div class="g-load" role="img" aria-label="Груз: осталось ' + left + ' из ' + layers.length + '"><div class="g-load-top"><strong>Груз</strong><span>' + (left ? 'осталось ' + left + ' из ' + layers.length : 'снят весь') + '</span></div>' +
+    '<div class="g-load-row">' + layers.map((item, i) => '<i' + (i < left ? ' class="is-on"' : '') + '></i>').join('') + '</div></div>' +
+    '<div class="g-list">' + pages + finals.map(item => {
+      if (item.type === 'fight' && isLocked(item, game) && item.needs) {
+        const got = item.needs.of.filter(id => have.has(id)).length;
+        return '<div class="g-card g-card-off"><span class="g-step">Бой · закрыто</span><strong>' + h(item.title) + '</strong><small>Чтобы выйти против него, загляни на каждую страницу. Открыто страниц: ' + got + ' из ' + item.needs.count + '.</small></div>';
+      }
+      return item.type === 'fight' ? fightCard(item) : episodeCard(item);
+    }).join('') + '</div></section>';
+}
+
 function stepSection(step) {
   const list = index.chapters.filter(item => item.step === step.id), done = list.filter(item => picked(game).has(item.id)).length;
   const head = '<div class="g-section-head"><div><span class="g-step">' + h(step.title) + '</span><h2>' + h(step.name) + '</h2></div><span class="g-count">' + done + ' / ' + list.length + '</span></div>';
@@ -82,6 +113,7 @@ function stepSection(step) {
   // Пройденный шаг сворачивается, когда открыт следующий, чтобы не листать его каждый раз.
   const folded = done === list.length && (index.steps || []).some(next => next.id > step.id && next.after && picked(game).has(next.after));
   const fresh = step.after && !done ? '<p class="g-unlocked">Открыт новый шаг</p>' : '';
+  if (step.layout === 'notebook') return notebookSection(step, head, fresh);
   if (step.layout !== 'map') return '<section class="g-section' + (step.layout === 'wheel' ? ' g-section-wheel' : '') + '">' + head + fresh + (folded ? '<details class="g-fold"><summary>Шаг пройден. Показать эпизоды и бои</summary>' : (step.layout === 'wheel' ? '<div class="g-wheel g-wheel-menu" aria-hidden="true"><i></i><b></b></div>' : '') + '<p class="g-lead g-section-lead">' + h(step.lead || '') + '</p>') + '<div class="g-list">' + list.map(item => item.type === 'fight' ? fightCard(item) : item.type === 'trial' ? trialCard(item) : episodeCard(item)).join('') + '</div>' + (folded ? '</details>' : '') + '</section>';
   const supports = itemsOf(items, game).filter(i => i.kind === 'support' && i.step === step.id), places = list.filter(item => !item.final), finals = list.filter(item => item.final);
   return '<section class="g-section g-section-map">' + head + fresh + '<p class="g-lead g-section-lead">' + h(step.lead || '') + '</p>' +
@@ -162,7 +194,7 @@ function fightScreen() {
   const fight = fights.get(view.id), top = '<header class="g-top"><button class="g-back" data-act="menu">← Главы</button><span class="g-scene">' + h(fight.tier) + '</span></header>';
   if (!battle) {
     return top + '<main class="g-main g-fight-intro"><div class="g-foe"><img src="' + h(fight.art) + '" alt="" width="240" height="240"></div><span class="g-step">' + h(fight.tier) + '</span><h2 tabindex="-1">' + h(fight.name) + '</h2>' +
-      fight.intro.map(t => '<p>' + h(t) + '</p>').join('') + '<p class="g-note">Твои приёмы: ' + skillsOf(fight, skills).map(s => h(s.name)).join(' · ') + '</p></main>' +
+      fight.intro.map(t => '<p>' + h(t) + '</p>').join('') + '<p class="g-note">Твои приёмы: ' + skillsOf(fight, fightSkills()).map(s => h(s.name)).join(' · ') + '</p></main>' +
       '<footer class="g-foot"><button class="g-btn g-primary g-fight-btn" data-act="fight-start">Начать бой</button></footer>';
   }
   if (battle.over) {
@@ -177,7 +209,7 @@ function fightScreen() {
     '<div class="g-foe g-foe-small' + (hitFoe ? ' is-hit' : '') + (fight.armor && !battle.open ? ' is-armored' : '') + '"><img src="' + h(fight.art) + '" alt="" width="240" height="240"></div>' +
     '<div class="g-battle-log' + (hitYou ? ' is-hit' : '') + '" aria-live="polite" tabindex="0" aria-label="Журнал боя">' + (battle.log.length ? battle.log.map(l => '<p class="g-log-' + l.who + '">' + (l.who === 'you' ? '<b>Ты:</b> ' : l.who === 'foe' ? '<b>' + h(fight.name) + ':</b> ' : '') + h(l.text) + '</p>').join('') : '<p class="g-log-note">Твой ход. Выбери приём.</p>') + '</div>' +
     bar('Твоя стойкость', battle.hp, battle.maxHp, 'g-bar-you') + '</main>' +
-    '<footer class="g-foot g-skills">' + skillsOf(fight, skills).map(s => { const wait = battle.cooldowns[s.id] > 0; return '<button class="g-skill" data-act="skill" data-id="' + h(s.id) + '"' + (canUse(battle, s) ? '' : ' disabled') + '><strong>' + iconHtml(s, 'g-skill-icon') + h(s.name) + '</strong><small>' + (wait ? (battle.cooldowns[s.id] > 9 ? 'Уже сказано' : 'Через ' + battle.cooldowns[s.id] + ' ход' + (battle.cooldowns[s.id] > 1 ? 'а' : '')) : h(s.hint)) + '</small></button>'; }).join('') + '</footer>';
+    '<footer class="g-foot g-skills">' + skillsOf(fight, fightSkills()).map(s => { const wait = battle.cooldowns[s.id] > 0; return '<button class="g-skill" data-act="skill" data-id="' + h(s.id) + '"' + (canUse(battle, s) ? '' : ' disabled') + '><strong>' + iconHtml(s, 'g-skill-icon') + h(s.name) + '</strong><small>' + (wait ? (battle.cooldowns[s.id] > 9 ? 'Уже сказано' : 'Через ' + battle.cooldowns[s.id] + ' ход' + (battle.cooldowns[s.id] > 1 ? 'а' : '')) : h(s.hint)) + '</small></button>'; }).join('') + '</footer>';
 }
 
 function variantScreen() {
@@ -411,7 +443,7 @@ const actions = {
   fight: id => { dropBattle(); go({ name: 'fight', id }); },
   'fight-start': () => { battle = startBattle(fights.get(view.id)); view.levelUp = false; keepBattle(); render(); window.scrollTo(0, 0); },
   skill: id => {
-    const fight = fights.get(view.id), skill = skills.find(s => s.id === id);
+    const fight = fights.get(view.id), skill = fightSkills().find(s => s.id === id);
     if (!battle || !skill || !canUse(battle, skill)) return;
     battle = playTurn(battle, fight, skill);
     if (battle.over) { view.levelUp = battle.over === 'win' && !game.fights[fight.id]?.won; recordFight(game, fight.id, battle.over === 'win'); }
