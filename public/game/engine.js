@@ -3,6 +3,7 @@
 
 export const GAME_KEY = '12shagov-game-v1';
 const MAX_ENTRY = 20000;
+const STEERING_ZONES = ['act', 'help', 'release'];
 
 export function freshGame() {
   return { version: 1, variant: null, chapters: {}, journal: {}, fights: {} };
@@ -23,6 +24,9 @@ export function normalizeGame(raw) {
       choices: plain(value.choices) ? Object.fromEntries(Object.entries(value.choices).filter(([, v]) => typeof v === 'string')) : {},
       done: value.done === true,
     };
+    // Необязательное поле сохраняет открытую страницу дневника; старые записи
+    // остаются той же формы, если игрок ещё не переключал вопрос.
+    if (typeof value.question === 'string' && value.question.trim()) game.chapters[id].question = value.question;
   }
   if (plain(raw.fights)) for (const [id, value] of Object.entries(raw.fights)) {
     if (plain(value)) game.fights[id] = { won: value.won === true, tries: Number.isInteger(value.tries) && value.tries > 0 ? value.tries : 0 };
@@ -91,7 +95,7 @@ export function validateChapter(chapter, vocab) {
   };
   for (const [sceneId, scene] of Object.entries(scenes)) {
     unique(sceneId, 'сцена');
-    if (!['story', 'journal', 'ending'].includes(scene.type)) errors.push(sceneId + ': неизвестный type');
+    if (!['story', 'journal', 'steering', 'ending'].includes(scene.type)) errors.push(sceneId + ': неизвестный type');
     for (const line of scene.lines || []) {
       unique(line.id, sceneId + ' реплика');
       if (!chapter.speakers?.[line.speaker]) errors.push(line.id + ': неизвестный speaker');
@@ -109,6 +113,27 @@ export function validateChapter(chapter, vocab) {
     if (scene.type === 'journal') {
       if (!scene.questionIds?.length) errors.push(sceneId + ': нет вопросов');
       for (const id of scene.questionIds || []) if (!questions.has(id)) errors.push(sceneId + ': нет вопроса ' + id);
+      target(scene.next, sceneId);
+    }
+    if (scene.type === 'steering') {
+      const hasText = value => typeof value === 'string' && value.trim().length > 0;
+      const zones = Array.isArray(scene.zones) ? scene.zones : [];
+      if (zones.length !== STEERING_ZONES.length || new Set(zones.map(zone => zone?.id)).size !== STEERING_ZONES.length || zones.some(zone => !STEERING_ZONES.includes(zone?.id))) errors.push(sceneId + ': нужны три разные зоны act, help, release');
+      for (const zone of zones) if (!hasText(zone?.title) || !hasText(zone?.hint)) errors.push(sceneId + ': зона без названия или пояснения');
+      if (!hasText(scene.intro) || !hasText(scene.continueLabel)) errors.push(sceneId + ': нет введения или подписи продолжения');
+      const parts = Array.isArray(scene.parts) ? scene.parts : [];
+      if (parts.length < 2 || parts.length > 4) errors.push(sceneId + ': нужны от двух до четырёх частей ситуации');
+      for (const part of parts) {
+        unique(part?.id, sceneId + ' часть ситуации');
+        if (!hasText(part?.text)) errors.push(sceneId + ': часть ситуации без текста');
+        const options = Array.isArray(part?.options) ? part.options : [];
+        if (options.length !== STEERING_ZONES.length || new Set(options.map(option => option?.zone)).size !== STEERING_ZONES.length || options.some(option => !STEERING_ZONES.includes(option?.zone))) errors.push((part?.id || sceneId) + ': нужен один вариант для каждой зоны');
+        for (const option of options) {
+          unique(option?.id, sceneId + ' решение');
+          if (!hasText(option?.text)) errors.push((option?.id || sceneId) + ': нет отклика на решение');
+        }
+      }
+      if (scene.choice) errors.push(sceneId + ': выбор действий должен быть отдельной сюжетной сценой');
       target(scene.next, sceneId);
     }
   }
@@ -183,6 +208,7 @@ function enter(progress, chapter, sceneId) {
 export function stage(progress, chapter, game) {
   const scene = chapter.scenes[progress.scene];
   if (scene.type === 'journal') return 'journal';
+  if (scene.type === 'steering') return 'steering';
   if (scene.type === 'ending') return 'ending';
   if (progress.line < linesOf(scene, game).length - 1) return 'line';
   return scene.choice ? 'choice' : 'next';
@@ -200,7 +226,43 @@ export function choose(progress, chapter, optionId, game) {
   const option = scene.choice?.options.find(o => o.id === optionId);
   if (!option || stage(progress, chapter, game) !== 'choice') return progress;
   progress.choices[scene.choice.id] = option.id;
-  enter(progress, chapter, option.next);
+  enter(progress, chapter, resolveNext(option.next, game));
+  return progress;
+}
+
+// Раскладка хранится теми же постоянными id, что обычные выборы. Старые сохранения
+// не требуют миграции, а реплики и находки могут ссылаться на решение через if / when.
+export function steeringOf(progress, chapter) {
+  const scene = chapter?.scenes?.[progress?.scene];
+  if (scene?.type !== 'steering' || !Array.isArray(scene.parts) || !Array.isArray(scene.zones)) return {};
+  const selections = [];
+  for (const part of scene.parts) {
+    if (!part || !Array.isArray(part.options) || !Object.hasOwn(progress?.choices || {}, part.id)) continue;
+    const chosen = part.options.find(option => option && option.id === progress.choices[part.id] && STEERING_ZONES.includes(option.zone) && scene.zones.some(zone => zone?.id === option.zone));
+    if (chosen) selections.push([part.id, chosen]);
+  }
+  return Object.fromEntries(selections);
+}
+
+export function assignSteering(progress, chapter, partId, zoneId) {
+  const scene = chapter?.scenes?.[progress?.scene];
+  if (scene?.type !== 'steering' || !Array.isArray(scene.zones) || !Array.isArray(scene.parts) || !STEERING_ZONES.includes(zoneId) || !scene.zones.some(zone => zone?.id === zoneId)) return progress;
+  const part = scene.parts.find(part => part?.id === partId), option = Array.isArray(part?.options) && part.options.find(option => option?.zone === zoneId);
+  if (!option || typeof option.id !== 'string' || !option.id) return progress;
+  if (!plain(progress.choices)) progress.choices = {};
+  Object.defineProperty(progress.choices, part.id, { value: option.id, writable: true, enumerable: true, configurable: true });
+  return progress;
+}
+
+export function canLeaveSteering(progress, chapter) {
+  const scene = chapter?.scenes?.[progress?.scene];
+  if (scene?.type !== 'steering' || !Array.isArray(scene.parts) || !scene.parts.length) return false;
+  const selected = steeringOf(progress, chapter);
+  return scene.parts.every(part => part && Object.hasOwn(selected, part.id));
+}
+
+export function leaveSteering(progress, chapter, game) {
+  if (canLeaveSteering(progress, chapter)) enter(progress, chapter, resolveNext(chapter.scenes[progress.scene].next, game));
   return progress;
 }
 

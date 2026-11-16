@@ -4,7 +4,7 @@ import { access, readFile } from 'node:fs/promises';
 import {
   advance, answerLater, choose, fill, freshGame, isLocked, leaveJournal, linesOf, normalizeGame, progressOf,
   saveEntry, setDraft, stage, validateChapter, validateVocab,
-  itemsOf, levelOf, markDone, recordFight,
+  itemsOf, levelOf, markDone, recordFight, assignSteering, leaveSteering, restartChapter,
 } from '../public/game/engine.js';
 import { canUse, playTurn, skillsOf, startBattle, validateFight } from '../public/game/battle.js';
 
@@ -43,7 +43,7 @@ test('подстановка слов работает для каждого в�
   assert.equal(fill('только {once}', vocab, 'нет-такого'), fill('только {once}', vocab, vocab.default));
 });
 
-function playThrough(game, chapter, pick) {
+function playThrough(game, chapter, pick, placements = []) {
   delete game.chapters[chapter.id];
   const progress = progressOf(game, chapter), visited = [];
   for (let guard = 0; guard < 500; guard += 1) {
@@ -57,6 +57,10 @@ function playThrough(game, chapter, pick) {
       if (pick === 0) { setDraft(game, id, '  вымышленная запись  ', chapter.id); assert.equal(saveEntry(game, id, chapter.id), true); }
       else { setDraft(game, id, 'черновик', chapter.id); answerLater(game, id, chapter.id); }
       leaveJournal(progress, chapter, game);
+    } else if (now === 'steering') {
+      const scene = chapter.scenes[progress.scene];
+      scene.parts.forEach((part, index) => assignSteering(progress, chapter, part.id, placements[index] || scene.zones[pick].id));
+      leaveSteering(progress, chapter, game);
     } else advance(progress, chapter, game);
   }
   assert.fail('глава не закончилась');
@@ -76,13 +80,17 @@ test('обе ветки каждого эпизода доходят до кон
 
 test('эпизоды открываются по порядку, а условия ссылаются на существующие варианты', () => {
   const options = [];
-  for (const chapter of chapters) for (const scene of Object.values(chapter.scenes)) for (const o of scene.choice?.options || []) options.push(o.id);
+  for (const chapter of chapters) for (const scene of Object.values(chapter.scenes)) {
+    for (const o of scene.choice?.options || []) options.push(o.id);
+    for (const part of scene.parts || []) for (const option of part.options || []) options.push(option.id);
+  }
   assert.equal(new Set(options).size, options.length, 'id вариантов выбора уникальны во всей игре');
   options.push(...index.chapters.map(item => item.id));
   assert.equal(new Set(options).size, options.length, 'id эпизодов не совпадают с id вариантов');
   for (const item of items) assert.ok(options.includes(item.when), item.id + ': ' + item.when);
   for (const chapter of chapters) for (const scene of Object.values(chapter.scenes)) {
-    const conditional = [...(scene.lines || []), ...(Array.isArray(scene.next) ? scene.next : [])];
+    const conditional = [...(scene.lines || []), ...(Array.isArray(scene.next) ? scene.next : []),
+      ...(scene.choice?.options || []).flatMap(option => Array.isArray(option.next) ? option.next : [])];
     for (const item of conditional) for (const key of ['if', 'ifNot']) if (item[key]) assert.ok(options.includes(item[key]), chapter.id + ': ' + item[key]);
   }
   const game = freshGame();
@@ -193,4 +201,97 @@ test('испытания: в каждом есть и ловушки, и пра�
     for (const card of trial.cards) assert.ok(card.text && card.why && typeof card.trap === 'boolean', card.id);
     assert.ok(trial.intro.length && trial.outro.length);
   });
+});
+
+const thirdItems = index.chapters.filter(item => item.step === 3);
+const thirdChapters = thirdItems.map(item => chapters.find(chapter => chapter.id === item.id));
+
+test('третий шаг открывается после Ночи, содержит пять ситуаций с Рулём и финал', () => {
+  const step = index.steps.find(step => step.id === 3);
+  assert.equal(step?.after, 'step02-night');
+  assert.equal(step.layout, 'wheel');
+  assert.ok(thirdItems.length >= 5 && thirdItems.length <= 7);
+  assert.equal(thirdItems.filter(item => item.final).length, 1);
+  assert.equal(thirdItems.at(-1).final, true);
+  assert.equal(thirdItems[0].after, 'step02-night');
+  const game = freshGame();
+  assert.equal(isLocked(thirdItems[0], game), true);
+  markDone(game, 'trial01-trap');
+  assert.equal(isLocked(thirdItems[0], game), true);
+  markDone(game, 'step02-night');
+  assert.equal(isLocked(thirdItems[0], game), false);
+  assert.equal(index.nextStep.title, 'Шаг четвёртый');
+  for (const chapter of thirdChapters) {
+    assert.ok(chapter.disclaimer && chapter.basedOn.some(source => source.includes('docs/step03.md')), chapter.id);
+    assert.ok(chapter.questions.length >= 2 && chapter.questions.length <= 3, chapter.id);
+    assert.ok(Object.values(chapter.scenes).some(scene => scene.type === 'journal'), chapter.id);
+    const choices = Object.values(chapter.scenes).filter(scene => scene.choice);
+    assert.ok(choices.length, chapter.id);
+    assert.ok(choices.every(scene => scene.choice.options.length === 2), chapter.id);
+    if (!thirdItems.find(item => item.id === chapter.id).final) {
+      const wheel = Object.values(chapter.scenes).filter(scene => scene.type === 'steering');
+      assert.equal(wheel.length, 1, chapter.id);
+      assert.deepEqual(wheel[0].zones.map(zone => zone.id), ['act', 'help', 'release']);
+    }
+  }
+});
+
+test('все раскладки Руля и обе ветки пяти ситуаций доходят до конца', () => {
+  const zones = ['act', 'help', 'release'];
+  for (const chapter of thirdChapters.filter(chapter => Object.values(chapter.scenes).some(scene => scene.type === 'steering'))) {
+    for (const a of zones) for (const b of zones) for (const c of zones) for (const action of [0, 1]) {
+      const game = freshGame(), { progress } = playThrough(game, chapter, action, [a, b, c]);
+      assert.equal(progress.done, true, chapter.id + ' ' + [a, b, c, action].join('/'));
+    }
+    const sameAction = zones.map(zone => playThrough(freshGame(), chapter, 0, [zone, zone, zone]).visited);
+    assert.notDeepEqual(sameAction[0], sameAction[1], chapter.id + ': раскладка должна менять сюжет');
+  }
+});
+
+test('финал третьего шага помнит решения, старый дневник и прогресс сохраняются', () => {
+  const previous = {
+    version: 1, variant: 'drugs',
+    chapters: { 'step02-night': { scene: 'legacy-ending', line: 0, choices: { old: 'n2.choice.maybe' }, done: true } },
+    fights: { 'fight01-whisper': { won: true, tries: 2 } },
+    journal: { 'old-question': { draft: 'Сохранённый черновик', text: 'Сохранённая запись', savedAt: '2026-11-01T09:00:00.000Z', later: false, chapter: 'step01-only-once' } },
+  };
+  const a = normalizeGame(previous), b = normalizeGame(previous), final = thirdChapters.at(-1);
+  for (const chapter of thirdChapters.slice(0, -1)) {
+    playThrough(a, chapter, 0, ['act', 'help', 'release']);
+    playThrough(b, chapter, 1, ['release', 'act', 'help']);
+  }
+  const endA = playThrough(a, final, 0).progress, endB = playThrough(b, final, 0).progress;
+  assert.notDeepEqual(linesOf(final.scenes[endA.scene], a).map(line => line.id), linesOf(final.scenes[endB.scene], b).map(line => line.id));
+  assert.deepEqual(a.journal['old-question'], previous.journal['old-question']);
+  assert.deepEqual(a.chapters['step02-night'], previous.chapters['step02-night']);
+  assert.deepEqual(a.fights, previous.fights);
+  const restored = normalizeGame(JSON.parse(JSON.stringify(a)));
+  assert.deepEqual(restored, a);
+  restartChapter(restored, thirdChapters[0]);
+  assert.deepEqual(restored.journal['old-question'], previous.journal['old-question']);
+  assert.equal(restored.chapters['step02-night'].done, true);
+});
+
+test('новый сюжет связан с прошлыми шагами, все условия и офлайн-файлы существуют', async () => {
+  const ids = new Set(index.chapters.map(item => item.id));
+  for (const chapter of chapters) for (const scene of Object.values(chapter.scenes)) {
+    for (const option of scene.choice?.options || []) ids.add(option.id);
+    for (const part of scene.parts || []) for (const option of part.options || []) ids.add(option.id);
+  }
+  const references = [];
+  function inspect(value, owner) {
+    if (!value || typeof value !== 'object') return;
+    for (const [key, child] of Object.entries(value)) {
+      if (['if', 'ifNot', 'when'].includes(key)) { assert.ok(ids.has(child), owner + ': неизвестное условие ' + child); references.push({ owner, id: child }); }
+      else inspect(child, owner);
+    }
+  }
+  for (const chapter of chapters) inspect(chapter, chapter.id);
+  inspect(items, 'items');
+  const previousIds = new Set(index.chapters.filter(item => item.step < 3).map(item => item.id));
+  for (const chapter of chapters.filter(chapter => chapter.step < 3)) for (const scene of Object.values(chapter.scenes)) for (const option of scene.choice?.options || []) previousIds.add(option.id);
+  assert.ok(new Set(references.filter(ref => thirdChapters.some(chapter => chapter.id === ref.owner) && previousIds.has(ref.id)).map(ref => ref.id)).size >= 3);
+  assert.ok(items.filter(item => item.step === 3).length >= 2);
+  const sw = await readFile(new URL('../public/sw.js', import.meta.url), 'utf8');
+  for (const item of index.chapters) assert.ok(sw.includes('./game/data/' + item.file), 'нет офлайн-файла ' + item.file);
 });

@@ -216,5 +216,38 @@ textarea::placeholder { color: #8a958a; }
 .g-trap.is-open i:first-child { transform: rotate(-50deg); }
 .g-trap.is-open i:last-child { transform: rotate(50deg); }
 
+/* Третий шаг: три зоны решения. Здесь нет правильного цвета или шкалы ответа. */
+.g-section-wheel .g-section-head { border-color: #8c7954; }
+.g-section-wheel .g-list .g-card { background: linear-gradient(145deg, #34382c, var(--panel) 68%); }
+.g-wheel { position: relative; flex: 0 0 3.8rem; width: 3.8rem; height: 3.8rem; border: 3px solid var(--warm); border-radius: 50%; color: var(--warm); box-shadow: inset 0 0 0 3px var(--bg), inset 0 0 0 4px #8c7954; }
+.g-wheel::before, .g-wheel::after, .g-wheel i { content: ''; position: absolute; left: calc(50% - 1px); top: 50%; width: 2px; height: calc(50% - 3px); background: currentColor; transform-origin: 50% 0; }
+.g-wheel::before { transform: rotate(60deg); }
+.g-wheel::after { transform: rotate(-60deg); }
+.g-wheel i { transform: rotate(180deg); }
+.g-wheel b { position: absolute; left: calc(50% - .4rem); top: calc(50% - .4rem); width: .8rem; height: .8rem; border: 2px solid currentColor; border-radius: 50%; background: var(--panel); }
+.g-wheel-menu { float: right; width: 2.6rem; height: 2.6rem; margin: .9rem 0 .2rem 1rem; }
+.g-section-wheel .g-section-lead { clear: none; }
+.g-section-wheel .g-list { clear: both; }
+.g-steering { padding-bottom: 2rem; }
+.g-steering-heading { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.1rem; }
+.g-steering-heading h2 { min-width: 0; margin: 0; font-size: 1.65rem; }
+.g-steering-zones { display: grid; gap: .6rem; margin: 1.25rem 0 1.5rem; }
+.g-steering-zone { padding: .7rem .8rem; border-left: 2px solid var(--warm); background: #1a241e; border-radius: 0 .65rem .65rem 0; }
+.g-steering-zone[data-zone='help'] { border-color: var(--hope); }
+.g-steering-zone[data-zone='release'] { border-color: var(--sage); }
+.g-steering-zone dt { color: var(--ink); font-weight: 600; font-size: .9rem; }
+.g-steering-zone dd { color: var(--muted); margin: .15rem 0 0; font-size: .85rem; line-height: 1.45; }
+.g-steering-parts { display: grid; gap: 1.2rem; }
+.g-steering-part { min-width: 0; margin: 0; padding: .8rem .8rem 1rem; border: 1px solid var(--line); border-radius: 1rem; background: var(--panel); scroll-margin: 4.5rem 0 7rem; }
+.g-steering-part legend { max-width: 100%; padding: 0 .3rem; font-family: Georgia, "Times New Roman", serif; font-size: 1.08rem; line-height: 1.35; }
+.g-steering-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .4rem; }
+.g-steering-choice { min-width: 0; min-height: 3.25rem; padding: .55rem .35rem; background: #202c24; border-color: #65715b; color: var(--ink); font-weight: 500; font-size: .82rem; line-height: 1.35; }
+.g-steering-choice[aria-pressed='true'] { color: #201b12; background: var(--warm); border-color: var(--warm); box-shadow: inset 0 0 0 1px #201b12; }
+.g-steering-response { margin: .85rem 0 0; padding-top: .8rem; border-top: 1px solid var(--line); color: var(--ink); font-family: Georgia, "Times New Roman", serif; font-size: 1rem; line-height: 1.55; }
+@media (max-width: 359px) {
+  .g-steering-options { grid-template-columns: 1fr; }
+  .g-steering-choice { justify-content: flex-start; min-height: 2.75rem; padding: .55rem .7rem; text-align: left; font-size: .9rem; }
+}
+
 @media (min-width: 32rem) { body { padding: 1rem 0; } .game { min-height: calc(100dvh - 2rem); border-radius: 1.5rem; overflow: clip; border: 1px solid var(--line); } }
 @media (prefers-reduced-motion: reduce) { .g-line.is-new, .g-door i, .g-foe.is-hit, .g-battle-log.is-hit { animation: none; } }

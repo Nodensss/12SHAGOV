@@ -1,0 +1,380 @@
+{
+  "id": "step03-decision",
+  "version": 1,
+  "step": 3,
+  "title": "На завтра",
+  "disclaimer": "Авторская вымышленная история о темах третьего шага. Это не текст литературы АН и не лечение. Записи необязательны; решение остаётся за тобой.",
+  "basedOn": [
+    "docs/step03.md → «Духовные принципы и мост к Шагу 4»: верность решению и следующий поступок",
+    "docs/step03.md → «Ядро Шага 3: понятия»: своё понимание Силы и ежедневность"
+  ],
+  "speakers": {
+    "narrator": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    },
+    "marat": {
+      "name": "Марат",
+      "role": "character"
+    },
+    "lena": {
+      "name": "Лена",
+      "role": "character"
+    },
+    "tamara": {
+      "name": "Тамара",
+      "role": "character"
+    },
+    "foreman": {
+      "name": "Бригадир · сообщение",
+      "role": "character"
+    },
+    "timka": {
+      "name": "Тимка · голосовое",
+      "role": "character"
+    }
+  },
+  "start": "s3-decision-intro",
+  "questions": [
+    {
+      "id": "q.step03.decision.value",
+      "text": "Какая ценность помогает мне выбрать одно действие на завтра?"
+    },
+    {
+      "id": "q.step03.decision.trust",
+      "text": "Что для меня сегодня означает доверие и какую поддержку я выбираю самостоятельно?"
+    },
+    {
+      "id": "q.step03.decision.action",
+      "text": "Какой небольшой поступок я хочу попробовать? Что можно изменить в этом плане, если обстоятельства поменяются?"
+    }
+  ],
+  "scenes": {
+    "s3-decision-intro": {
+      "type": "story",
+      "title": "На кухне",
+      "lines": [
+        {
+          "id": "s3-decision-intro.l01",
+          "speaker": "narrator",
+          "text": "На кухне сохнут ботинки, а на подоконнике лежит самолёт. Несколько дней не сложились в аккуратную историю, где после верного решения всё сразу становится удобно."
+        },
+        {
+          "id": "s3-decision-intro.l02",
+          "speaker": "narrator",
+          "text": "Ты вспомнил, как уточнил время у Лены. Точный ответ оказался полезнее ожидаемого согласия.",
+          "if": "s3-message.choice.clarify"
+        },
+        {
+          "id": "s3-decision-intro.l03",
+          "speaker": "narrator",
+          "text": "Ты вспомнил паузу перед ответом Лене. Ожидание перестало означать, что весь день тебе нечем заняться.",
+          "ifNot": "s3-message.choice.clarify"
+        },
+        {
+          "id": "s3-decision-intro.l04",
+          "speaker": "narrator",
+          "text": "На квитанции остался вопрос о короткой смене. Отказ не исчез, но ты не пообещал того, чего не собирался делать.",
+          "if": "s3-shift.choice.limited"
+        },
+        {
+          "id": "s3-decision-intro.l05",
+          "speaker": "narrator",
+          "text": "В календаре рядом стоят работа и другой разговор о поддержке. Твой план пришлось перестроить, а не бросить.",
+          "if": "s3-shift.choice.reschedule"
+        },
+        {
+          "id": "s3-decision-intro.l06",
+          "speaker": "narrator",
+          "text": "На лестнице у группы кто-то встречал людей, пока ты искал ключ. Делом можно было поделиться.",
+          "if": "s3-key.choice.fetch"
+        },
+        {
+          "id": "s3-decision-intro.l07",
+          "speaker": "narrator",
+          "text": "Ты остался у входа, а запасной ключ принёс другой человек. Ответственность не исчезла, когда перестала быть одиночной.",
+          "if": "s3-key.choice.host"
+        },
+        {
+          "id": "s3-decision-intro.l08",
+          "speaker": "narrator",
+          "text": "Среда пока под вопросом. Ты уже сделал предложение Лене и не можешь сам поставить рядом её согласие.",
+          "if": "s3-family.choice.offer"
+        },
+        {
+          "id": "s3-decision-intro.l09",
+          "speaker": "narrator",
+          "text": "Ты не решил судьбу всех воскресений одним обиженным звонком. Следующий разговор с Леной ещё впереди.",
+          "if": "s3-family.choice.pause"
+        },
+        {
+          "id": "s3-decision-intro.l10",
+          "speaker": "you",
+          "text": "Если я называю всё это Силой — это ведь мои слова? Не чьё-то условие допуска?"
+        },
+        {
+          "id": "s3-decision-intro.l11",
+          "speaker": "narrator",
+          "text": "На экране остаётся незаконченная заметка Марату. Ты можешь назвать опорой людей, свои принципы, Бога в собственном понимании или пока оставить название открытым. Из этого не следует обязанность слушаться каждого, кто рядом."
+        }
+      ],
+      "next": [
+        {
+          "if": "s3-rain-people.help",
+          "to": "s3-decision-together"
+        },
+        {
+          "if": "s3-family-family.release",
+          "to": "s3-decision-space"
+        },
+        {
+          "to": "s3-decision-pause"
+        }
+      ]
+    },
+    "s3-decision-together": {
+      "type": "story",
+      "title": "Разговор",
+      "lines": [
+        {
+          "id": "s3-decision-together.l01",
+          "speaker": "narrator",
+          "text": "Ты всё-таки набираешь Марата. Не чтобы получить готовое разрешение на завтра."
+        },
+        {
+          "id": "s3-decision-together.l02",
+          "speaker": "marat",
+          "text": "Я могу послушать. Иногда скажу, как было у меня. Но у тебя своя жизнь, и я могу ошибаться."
+        },
+        {
+          "id": "s3-decision-together.l03",
+          "speaker": "you",
+          "text": "Тогда завтра попробую сказать, что мне нужно. И послушать ответ, даже если он мне не понравится."
+        }
+      ],
+      "next": "s3-decision-choice"
+    },
+    "s3-decision-space": {
+      "type": "story",
+      "title": "Свободное место",
+      "lines": [
+        {
+          "id": "s3-decision-space.l01",
+          "speaker": "narrator",
+          "text": "Ты оставляешь в календаре свободное окно. В нём не написано, как именно Лена или Тимка должны тебя порадовать."
+        },
+        {
+          "id": "s3-decision-space.l02",
+          "speaker": "narrator",
+          "text": "Свободное место пугает меньше, когда можно самому выбрать, чем заняться, а не ждать подтверждения своей нужности."
+        },
+        {
+          "id": "s3-decision-space.l03",
+          "speaker": "you",
+          "text": "Завтра можно снова предложить встречу. И прожить день, если она случится не завтра."
+        }
+      ],
+      "next": "s3-decision-choice"
+    },
+    "s3-decision-pause": {
+      "type": "story",
+      "title": "Не разом",
+      "lines": [
+        {
+          "id": "s3-decision-pause.l01",
+          "speaker": "narrator",
+          "text": "Ты пока не умеешь быстро замечать, где заканчивается твоя часть. Иногда вспоминаешь об этом уже после спора."
+        },
+        {
+          "id": "s3-decision-pause.l02",
+          "speaker": "narrator",
+          "text": "На полях квитанции хватает места для исправления. Решение на завтра не нужно превращать в клятву на всю жизнь."
+        },
+        {
+          "id": "s3-decision-pause.l03",
+          "speaker": "you",
+          "text": "Можно остановиться в середине. Уточнить. Попросить помощи. Начать разговор ещё раз."
+        }
+      ],
+      "next": "s3-decision-choice"
+    },
+    "s3-decision-choice": {
+      "type": "story",
+      "title": "Один следующий шаг",
+      "lines": [
+        {
+          "id": "s3-decision-choice.l01",
+          "speaker": "narrator",
+          "text": "Под лампой лежит пустая тетрадь. Смотреть на собственную историю всё ещё страшно. Сегодня не обязательно разбирать её целиком."
+        }
+      ],
+      "choice": {
+        "id": "s3-decision.choice",
+        "prompt": "С какого поступка начать завтра?",
+        "options": [
+          {
+            "id": "s3-decision.choice.write",
+            "label": "Начать с одной заметки о себе",
+            "next": "s3-decision-write"
+          },
+          {
+            "id": "s3-decision.choice.talk",
+            "label": "Сначала договориться о разговоре",
+            "next": "s3-decision-talk"
+          }
+        ]
+      }
+    },
+    "s3-decision-write": {
+      "type": "story",
+      "title": "Одна заметка",
+      "lines": [
+        {
+          "id": "s3-decision-write.l01",
+          "speaker": "narrator",
+          "text": "Ты открываешь тетрадь на первой странице. Завтра запишешь один конкретный случай, который хочется понять. Без списка всех своих ошибок."
+        },
+        {
+          "id": "s3-decision-write.l02",
+          "speaker": "narrator",
+          "text": "Это твой черновик, не отчёт для чужой проверки. Если станет тяжело, можно остановиться и обсудить, как продолжить."
+        }
+      ],
+      "next": "s3-decision-journal"
+    },
+    "s3-decision-talk": {
+      "type": "story",
+      "title": "Договорённость",
+      "lines": [
+        {
+          "id": "s3-decision-talk.l01",
+          "speaker": "narrator",
+          "text": "Ты пишешь Марату, можно ли завтра поговорить о следующем шаге. Пока он не ответил, оставляешь в плане только отправленную просьбу."
+        },
+        {
+          "id": "s3-decision-talk.l02",
+          "speaker": "narrator",
+          "text": "Разговор не обязывает рассказывать всё сразу. Ты можешь заранее назвать темы, которые сейчас не хочешь обсуждать."
+        }
+      ],
+      "next": "s3-decision-journal"
+    },
+    "s3-decision-journal": {
+      "type": "journal",
+      "title": "Страница дневника",
+      "intro": "Можно оставить здесь свой небольшой план, изменить его позже или не записывать ничего. Продолжение истории не зависит от ответа.",
+      "questionIds": [
+        "q.step03.decision.value",
+        "q.step03.decision.trust",
+        "q.step03.decision.action"
+      ],
+      "next": [
+        {
+          "if": "s3-decision.choice.write",
+          "to": "s3-decision-end-write"
+        },
+        {
+          "to": "s3-decision-end-talk"
+        }
+      ]
+    },
+    "s3-decision-end-write": {
+      "type": "ending",
+      "title": "Третий шаг · решение на сегодня",
+      "lines": [
+        {
+          "id": "s3-decision-end-write.l01",
+          "speaker": "narrator",
+          "text": "На завтра у тебя одна страница, а не обещание полностью переделать себя."
+        },
+        {
+          "id": "s3-decision-end-write.l01-family-release",
+          "speaker": "narrator",
+          "text": "Самолёт остаётся на подоконнике. Ты не ставишь рядом срок, к которому Лена и Тимка должны доказать, что помнят о тебе.",
+          "if": "s3-family-family.release"
+        },
+        {
+          "id": "s3-decision-end-write.l01-family-other",
+          "speaker": "narrator",
+          "text": "Рядом с самолётом лежит напоминание уточнить встречу. Ещё один разговор можно провести без обещания заранее управлять его концом.",
+          "ifNot": "s3-family-family.release"
+        },
+        {
+          "id": "s3-decision-end-write.l01-message-clarify",
+          "speaker": "narrator",
+          "text": "Первой строкой хочется оставить то короткое уточнение Лене: одну просьбу вместо целой защитительной речи.",
+          "if": "s3-message.choice.clarify"
+        },
+        {
+          "id": "s3-decision-end-write.l01-message-wait",
+          "speaker": "narrator",
+          "text": "Ты оставляешь на листке место для паузы. Не каждый ответ нужно придумывать в ту же секунду, когда загорается экран.",
+          "ifNot": "s3-message.choice.clarify"
+        },
+        {
+          "id": "s3-decision-end-write.l02",
+          "speaker": "narrator",
+          "text": "За окном снова слышен дождь. Ты выключаешь лампу. Ответы придут в своё время; свои следующие поступки ещё предстоит выбирать."
+        },
+        {
+          "id": "s3-decision-end-write.l03",
+          "speaker": "narrator",
+          "text": "Дальше — четвёртый шаг: посмотреть на собственную историю. К этим ситуациям можно вернуться и попробовать другой путь."
+        }
+      ]
+    },
+    "s3-decision-end-talk": {
+      "type": "ending",
+      "title": "Третий шаг · решение на сегодня",
+      "lines": [
+        {
+          "id": "s3-decision-end-talk.l01",
+          "speaker": "narrator",
+          "text": "На завтра у тебя просьба о разговоре, а не передача другому человеку права решать за тебя."
+        },
+        {
+          "id": "s3-decision-end-talk.l01-family-release",
+          "speaker": "narrator",
+          "text": "Самолёт остаётся на подоконнике. Ты не ставишь рядом срок, к которому Лена и Тимка должны доказать, что помнят о тебе.",
+          "if": "s3-family-family.release"
+        },
+        {
+          "id": "s3-decision-end-talk.l01-family-other",
+          "speaker": "narrator",
+          "text": "Рядом с самолётом лежит напоминание уточнить встречу. Ещё один разговор можно провести без обещания заранее управлять его концом.",
+          "ifNot": "s3-family-family.release"
+        },
+        {
+          "id": "s3-decision-end-talk.l01-message-clarify",
+          "speaker": "narrator",
+          "text": "Первой строкой хочется оставить то короткое уточнение Лене: одну просьбу вместо целой защитительной речи.",
+          "if": "s3-message.choice.clarify"
+        },
+        {
+          "id": "s3-decision-end-talk.l01-message-wait",
+          "speaker": "narrator",
+          "text": "Ты оставляешь на листке место для паузы. Не каждый ответ нужно придумывать в ту же секунду, когда загорается экран.",
+          "ifNot": "s3-message.choice.clarify"
+        },
+        {
+          "id": "s3-decision-end-talk.l02",
+          "speaker": "narrator",
+          "text": "За окном снова слышен дождь. Ты выключаешь лампу. Ответы придут в своё время; свои следующие поступки ещё предстоит выбирать."
+        },
+        {
+          "id": "s3-decision-end-talk.l03",
+          "speaker": "narrator",
+          "text": "Дальше — четвёртый шаг: посмотреть на собственную историю. К этим ситуациям можно вернуться и попробовать другой путь."
+        }
+      ]
+    }
+  }
+}

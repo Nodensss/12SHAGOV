@@ -2,10 +2,14 @@ import {
   advance, answerLater, choose, deleteEntry, fill, freshGame, GAME_KEY, isLocked, itemsOf, leaveJournal, linesOf, loadGame, markDone, picked,
   progressOf, restartChapter, saveEntry, saveGame, setDraft, stage, validateChapter, validateVocab,
   levelOf, recordFight,
+  assignSteering, canLeaveSteering, leaveSteering, steeringOf,
 } from './engine.js';
 import { canUse, playTurn, skillsOf, startBattle, validateFight } from './battle.js';
 
 const root = document.querySelector('#game');
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+  navigator.serviceWorker.register(new URL('../sw.js', import.meta.url)).catch(() => {});
+}
 const h = value => String(value == null ? '' : value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const json = async path => {
   const response = await fetch(new URL(path, import.meta.url), { cache: 'no-cache' });
@@ -43,7 +47,7 @@ function episodeCard(item) {
   const chapter = chapterOf(item.id), saved = game.chapters[item.id], tag = 'Шаг ' + h(item.step);
   if (!chapter) return '<div class="g-card g-card-off"><span class="g-step">' + tag + '</span><strong>' + h(item.title) + '</strong><small>Глава не загрузилась. Проверьте файл ' + h(item.file) + '.</small></div>';
   if (isLocked(item, game)) return '<div class="g-card g-card-off"><span class="g-step">' + tag + ' · закрыто</span><strong>' + h(item.title) + '</strong><small>' + h(lockedText(item)) + '</small></div>';
-  const started = saved && (saved.scene !== chapter.start || saved.line > 0) && chapter.scenes[saved.scene]?.type !== 'ending';
+  const started = saved && (saved.scene !== chapter.start || saved.line > 0 || Object.keys(saved.choices || {}).length > 0) && chapter.scenes[saved.scene]?.type !== 'ending';
   return '<article class="g-card' + (item.final ? ' g-card-final' : '') + '"><span class="g-step">' + h(item.minutes) + (saved?.done ? ' · пройдено' : '') + '</span><strong>' + h(item.title) + '</strong><small>' + h(item.teaser) + '</small>' +
     '<div class="g-row"><button class="g-btn ' + (saved?.done && !started ? 'g-secondary' : 'g-primary') + '" data-act="' + (!started && saved?.done ? 'restart' : 'play') + '" data-id="' + h(item.id) + '">' + (started ? 'Продолжить' : saved?.done ? 'Пройти ещё раз' : 'Начать') + '</button>' +
     (started ? '<button class="g-btn g-quiet" data-act="restart" data-id="' + h(item.id) + '">Сначала</button>' : '') + '</div></article>';
@@ -61,7 +65,7 @@ function trialCard(item) {
 function placeTile(item) {
   const chapter = chapterOf(item.id), saved = game.chapters[item.id], support = items.find(i => i.when === item.id);
   if (!chapter) return '<div class="g-tile is-off"><strong>' + h(item.title) + '</strong><small>Не загрузилось</small></div>';
-  const started = saved && (saved.scene !== chapter.start || saved.line > 0) && chapter.scenes[saved.scene]?.type !== 'ending';
+  const started = saved && (saved.scene !== chapter.start || saved.line > 0 || Object.keys(saved.choices || {}).length > 0) && chapter.scenes[saved.scene]?.type !== 'ending';
   return '<button class="g-tile' + (saved?.done ? ' is-done' : '') + '" data-act="' + (!started && saved?.done ? 'restart' : 'play') + '" data-id="' + h(item.id) + '"><span class="g-tile-mark" aria-hidden="true">' + (saved?.done ? '✦' : '○') + '</span><strong>' + h(item.title) + '</strong>' +
     '<small>' + h(saved?.done && support ? 'Опора: ' + support.name : started ? 'Продолжить' : item.teaser) + '</small></button>';
 }
@@ -70,12 +74,12 @@ function stepSection(step) {
   const list = index.chapters.filter(item => item.step === step.id), done = list.filter(item => picked(game).has(item.id)).length;
   const head = '<div class="g-section-head"><div><span class="g-step">' + h(step.title) + '</span><h2>' + h(step.name) + '</h2></div><span class="g-count">' + done + ' / ' + list.length + '</span></div>';
   if (step.after && !picked(game).has(step.after)) {
-    return '<section class="g-section is-locked">' + head + '<div class="g-card g-card-off"><strong>Закрыто</strong><small>Откроется, когда первый шаг будет пройден целиком — вместе с боссом и последним испытанием.</small></div></section>';
+    return '<section class="g-section is-locked">' + head + '<div class="g-card g-card-off"><strong>Закрыто</strong><small>' + h(step.lockedText || 'Откроется, когда первый шаг будет пройден целиком — вместе с боссом и последним испытанием.') + '</small></div></section>';
   }
   // Пройденный шаг сворачивается, когда открыт следующий, чтобы не листать его каждый раз.
   const folded = done === list.length && (index.steps || []).some(next => next.id > step.id && next.after && picked(game).has(next.after));
   const fresh = step.after && !done ? '<p class="g-unlocked">Открыт новый шаг</p>' : '';
-  if (step.layout !== 'map') return '<section class="g-section">' + head + (folded ? '<details class="g-fold"><summary>Шаг пройден. Показать эпизоды и бои</summary>' : '<p class="g-lead g-section-lead">' + h(step.lead || '') + '</p>') + '<div class="g-list">' + list.map(item => item.type === 'fight' ? fightCard(item) : item.type === 'trial' ? trialCard(item) : episodeCard(item)).join('') + '</div>' + (folded ? '</details>' : '') + '</section>';
+  if (step.layout !== 'map') return '<section class="g-section' + (step.layout === 'wheel' ? ' g-section-wheel' : '') + '">' + head + fresh + (folded ? '<details class="g-fold"><summary>Шаг пройден. Показать эпизоды и бои</summary>' : (step.layout === 'wheel' ? '<div class="g-wheel g-wheel-menu" aria-hidden="true"><i></i><b></b></div>' : '') + '<p class="g-lead g-section-lead">' + h(step.lead || '') + '</p>') + '<div class="g-list">' + list.map(item => item.type === 'fight' ? fightCard(item) : item.type === 'trial' ? trialCard(item) : episodeCard(item)).join('') + '</div>' + (folded ? '</details>' : '') + '</section>';
   const supports = itemsOf(items, game).filter(i => i.kind === 'support' && i.step === step.id), places = list.filter(item => !item.final), finals = list.filter(item => item.final);
   return '<section class="g-section g-section-map">' + head + fresh + '<p class="g-lead g-section-lead">' + h(step.lead || '') + '</p>' +
     '<div class="g-supports" role="img" aria-label="Опор найдено: ' + supports.filter(i => i.found).length + ' из ' + supports.length + '">' + supports.map(i => '<i' + (i.found ? ' class="is-on"' : '') + '></i>').join('') + '<span>Опоры: ' + supports.filter(i => i.found).length + ' из ' + supports.length + '</span></div>' +
@@ -97,7 +101,7 @@ function menu() {
     levelBar() + '<div class="g-row g-wrap g-tools"><button class="g-btn g-secondary" data-act="bag">Рюкзак · ' + found + ' из ' + items.length + '</button>' +
     '<button class="g-btn g-secondary" data-act="diary">Дневник' + (saved || later ? ' · ' + [saved ? saved + ' зап.' : '', later ? later + ' отл.' : ''].filter(Boolean).join(', ') : '') + '</button></div>' +
     steps.map(stepSection).join('') +
-    '<div class="g-card g-card-off g-next-step"><span class="g-step">Дальше</span><strong>Шаг третий</strong><small>В работе.</small></div>' +
+    (index.nextStep ? '<div class="g-card g-card-off g-next-step"><span class="g-step">Дальше</span><strong>' + h(index.nextStep.title) + '</strong><small>' + h(index.nextStep.teaser) + '</small></div>' : '') +
     '<div class="g-row g-wrap"><button class="g-btn g-quiet" data-act="variant">Герой: ' + h(variant ? variant.label : 'выбрать') + '</button></div>' +
     (storageOk ? '' : '<p class="g-warn" role="alert">Браузер не разрешает сохранять данные. Прогресс и записи пропадут после закрытия вкладки.</p>') +
     '<p class="g-note">Игра — способ подумать, а не лечение. Если сейчас тяжело, свяжитесь с человеком, которому доверяете, с группой или со специалистом. <a href="../#home">Раздел поддержки — в приложении.</a></p></main>';
@@ -205,6 +209,7 @@ function play() {
   const chapter = chapterOf(view.id), progress = progressOf(game, chapter), scene = chapter.scenes[progress.scene], now = stage(progress, chapter, game);
   const top = '<header class="g-top"><button class="g-back" data-act="menu">← Главы</button><span class="g-scene">' + h(chapter.title) + ' · ' + h(scene.title || '') + '</span></header>';
   if (now === 'journal') return top + journal(chapter, scene);
+  if (now === 'steering') return top + steering(chapter, scene, progress);
   if (now === 'ending') {
     return top + '<main class="g-main g-ending"><div class="g-door" aria-hidden="true"><i></i></div><h2 tabindex="-1">' + h(scene.title) + '</h2>' +
       linesOf(scene, game).map(line => '<p>' + say(line.text) + '</p>').join('') + '<p class="g-note">' + h(chapter.disclaimer || '') + '</p></main>' +
@@ -218,16 +223,36 @@ function play() {
   return top + log + foot;
 }
 
-function pickQuestion(scene) {
+// «Руль»: раскладка — решение игрока, а не проверка на правильность.
+// Вариант каждой части сохраняется как обычный выбор главы и влияет на следующие реплики.
+function steering(chapter, scene, progress) {
+  const selections = steeringOf(progress, chapter);
+  return '<main class="g-main g-steering"><div class="g-steering-heading"><div class="g-wheel" aria-hidden="true"><i></i><b></b></div><h2 tabindex="-1">' + h(scene.title) + '</h2></div>' +
+    '<p class="g-lead">' + say(scene.intro) + '</p>' +
+    '<dl class="g-steering-zones">' + scene.zones.map(zone => '<div class="g-steering-zone" data-zone="' + h(zone.id) + '"><dt>' + h(zone.title) + '</dt><dd>' + say(zone.hint) + '</dd></div>').join('') + '</dl>' +
+    '<div class="g-steering-parts">' + scene.parts.map(part => {
+      const selection = selections[part.id], responseId = 'g-response-' + part.id;
+      return '<fieldset class="g-steering-part" data-part="' + h(part.id) + '"><legend>' + say(part.text) + '</legend><div class="g-steering-options">' + scene.zones.map(zone =>
+        '<button class="g-btn g-steering-choice" type="button" data-act="steering-assign" data-id="' + h(part.id) + '" data-zone="' + h(zone.id) + '" aria-pressed="' + (selection?.zone === zone.id ? 'true' : 'false') + '"' + (selection ? ' aria-describedby="' + h(responseId) + '"' : '') + '>' + h(zone.title) + '</button>').join('') + '</div>' +
+        (selection ? '<p class="g-steering-response" id="' + h(responseId) + '" role="status">' + say(selection.text) + '</p>' : '') + '</fieldset>';
+    }).join('') + '</div></main>' +
+    '<footer class="g-foot"><button class="g-btn g-primary" data-act="steering-next"' + (canLeaveSteering(progress, chapter) ? '' : ' disabled') + '>' + h(scene.continueLabel) + '</button></footer>';
+}
+
+function pickQuestion(chapter, scene) {
+  const progress = progressOf(game, chapter);
   if (journalIndex == null) {
+    const selected = scene.questionIds.indexOf(progress.question);
     const withDraft = scene.questionIds.findIndex(id => { const e = game.journal[id]; return e && e.draft && e.draft !== e.text; });
-    journalIndex = Math.max(0, withDraft);
+    journalIndex = selected >= 0 ? selected : Math.max(0, withDraft);
   }
-  return scene.questionIds[journalIndex % scene.questionIds.length];
+  const id = scene.questionIds[journalIndex % scene.questionIds.length];
+  if (progress.question !== id) { progress.question = id; persist(); }
+  return id;
 }
 
 function journal(chapter, scene) {
-  const id = pickQuestion(scene), question = chapter.questions.find(q => q.id === id), entry = game.journal[id];
+  const id = pickQuestion(chapter, scene), question = chapter.questions.find(q => q.id === id), entry = game.journal[id];
   return '<main class="g-main g-journal"><h2 tabindex="-1">Страница дневника</h2><p class="g-lead">' + h(scene.intro || '') + '</p>' +
     '<label class="g-question" for="g-answer">' + say(question.text) + '</label>' +
     '<textarea id="g-answer" data-question="' + h(id) + '" data-chapter="' + h(chapter.id) + '" rows="6" maxlength="20000" placeholder="Можно одно слово. Можно ничего.">' + h(entry?.draft || '') + '</textarea>' +
@@ -305,8 +330,30 @@ const actions = {
   'hero-next': () => slideHero(1),
   play: id => startChapter(id),
   restart: id => { restartChapter(game, chapterOf(id)); persist(); startChapter(id); },
-  next: () => { const chapter = chapterOf(view.id); advance(progressOf(game, chapter), chapter, game); persist(); render(); },
+  next: () => {
+    const chapter = chapterOf(view.id), progress = progressOf(game, chapter);
+    advance(progress, chapter, game); persist(); render();
+    if (stage(progress, chapter, game) === 'steering') {
+      window.scrollTo(0, 0);
+      root.querySelector('.g-steering h2')?.focus({ preventScroll: true });
+    }
+  },
   choose: id => { const chapter = chapterOf(view.id); choose(progressOf(game, chapter), chapter, id, game); persist(); render(); window.scrollTo(0, 0); },
+  'steering-assign': (id, target) => {
+    const chapter = chapterOf(view.id);
+    if (!chapter) return;
+    const zone = target.dataset.zone;
+    assignSteering(progressOf(game, chapter), chapter, id, zone);
+    persist(); render();
+    // The selected button survives conceptually after rendering: keep keyboard position and scroll.
+    Array.from(root.querySelectorAll('[data-act="steering-assign"]')).find(button => button.dataset.id === id && button.dataset.zone === zone)?.focus({ preventScroll: true });
+  },
+  'steering-next': () => {
+    const chapter = chapterOf(view.id), progress = chapter && progressOf(game, chapter);
+    if (!chapter || !canLeaveSteering(progress, chapter)) return;
+    leaveSteering(progress, chapter, game); persist(); render(); window.scrollTo(0, 0);
+    root.querySelector('.g-next, .g-choice, h2')?.focus({ preventScroll: true });
+  },
   'other-question': () => { flushDraft(); journalIndex += 1; render(); root.querySelector('#g-answer')?.focus(); },
   'journal-save': () => {
     const area = root.querySelector('#g-answer'), chapter = chapterOf(view.id);
@@ -341,7 +388,7 @@ root.addEventListener('click', event => {
   const target = event.target.closest('[data-act]');
   if (!target || !root.contains(target) || !target.dataset.act) return;
   if (target.matches('.g-log') && getSelection()?.toString()) return;
-  actions[target.dataset.act]?.(target.dataset.id);
+  actions[target.dataset.act]?.(target.dataset.id, target);
 });
 root.addEventListener('input', event => {
   const area = event.target.closest('textarea[data-question]');
@@ -383,7 +430,7 @@ async function boot() {
     // После перезагрузки возвращаем игрока в незавершённую главу.
     const open = index.chapters.find(item => {
       const chapter = chapterOf(item.id), saved = game.chapters[item.id];
-      return chapter && !isLocked(item, game) && saved && chapter.scenes[saved.scene] && chapter.scenes[saved.scene].type !== 'ending' && (saved.scene !== chapter.start || saved.line > 0);
+      return chapter && !isLocked(item, game) && saved && chapter.scenes[saved.scene] && chapter.scenes[saved.scene].type !== 'ending' && (saved.scene !== chapter.start || saved.line > 0 || Object.keys(saved.choices || {}).length > 0);
     });
     view = open && game.variant ? { name: 'play', id: open.id } : { name: 'menu' };
     render();
