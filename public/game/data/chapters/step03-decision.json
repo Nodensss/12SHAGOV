@@ -231,7 +231,8 @@
             "next": "s3-decision-talk"
           }
         ]
-      }
+      },
+      "background": "art/scene-night-notebook.webp"
     },
     "s3-decision-write": {
       "type": "story",
@@ -248,7 +249,8 @@
           "text": "Это черновик, а не объяснительная. Станет тяжело — закроешь тетрадь и скажешь об этом кому-нибудь из своих."
         }
       ],
-      "next": "s3-decision-journal"
+      "next": "s3-decision-journal",
+      "background": "art/scene-night-notebook.webp"
     },
     "s3-decision-talk": {
       "type": "story",
@@ -265,7 +267,8 @@
           "text": "Разговор не обязывает вывалить всё сразу. Можно заранее сказать: вот про это я пока не готов."
         }
       ],
-      "next": "s3-decision-journal"
+      "next": "s3-decision-journal",
+      "background": "art/scene-night-notebook.webp"
     },
     "s3-decision-journal": {
       "type": "journal",

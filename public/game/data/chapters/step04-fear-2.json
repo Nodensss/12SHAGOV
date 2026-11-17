@@ -72,7 +72,8 @@
             "next": "s4-fear2-b"
           }
         ]
-      }
+      },
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-fear2-b": {
       "type": "story",
@@ -96,7 +97,8 @@
           "text": "Под этим страхом, кажется, есть дно. Что-то, из-за чего ты двадцать лет бил первым и уходил первым."
         }
       ],
-      "next": "s4-fear2-j"
+      "next": "s4-fear2-j",
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-fear2-j": {
       "type": "journal",

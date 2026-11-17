@@ -519,3 +519,25 @@ textarea::placeholder { color: #8a958a; }
 .g-page small { margin-top: .35rem; }
 .g-page .g-page-skill { color: var(--warm); font-size: .8rem; }
 @media (prefers-reduced-motion: reduce) { .g-load-row i { transition: none; } }
+
+/* Five data-positioned places on the courtyard; tiles remain an independent view. */
+.g-map-switch { display: flex; gap: .4rem; margin: .8rem 0 .6rem; }
+.g-map-switch .g-btn { flex: 1; min-height: 44px; padding: .5rem; }
+.g-map-switch [aria-pressed="true"] { border-color: #d5b57b; color: #fff0cf; background: #4a4932; }
+.g-map-switch button:disabled { opacity: .45; }
+.g-courtyard { position: relative; width: 100%; height: clamp(280px, 86vw, 330px); border: 1px solid #9a865e; border-radius: .75rem; overflow: hidden; background: #18271f; isolation: isolate; }
+.g-map-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; z-index: -1; }
+.g-courtyard .g-map-node { position: absolute; left: var(--map-x); top: var(--map-y); transform: translate(-50%, -50%); width: 43%; min-height: 52px; padding: .35rem .3rem; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: .1rem; text-align: center; border: 1px solid #ad9569; border-radius: .45rem; background: #17261df0; box-shadow: 0 3px 10px #0009, inset 0 1px #ead6aa25; }
+.g-map-node strong { font-size: 1rem; margin: 0; line-height: 1.15; color: #f3e6ca; }
+.g-map-node small { margin: 0; font-size: .8rem; line-height: 1.2; color: #c2cdbd; }
+.g-courtyard .g-map-node.is-done { border-color: #93c5ce; background: #213932f2; }
+.g-map-node.is-done strong span { color: #9dd8e7; }
+.g-map-node:focus-visible { outline: 3px solid #fff0b9; outline-offset: 2px; z-index: 2; }
+
+/* Existing painted silhouettes gain size and light without reducing type or targets. */
+.g-skill strong { min-height: 32px; }
+.g-skill-icon { float: left; width: 36px; height: 36px; margin: -2px .3rem -2px -2px; filter: brightness(1.65) saturate(1.12) drop-shadow(0 1px 1px #000); }
+.g-skill { min-height: 61px; }
+@media (min-height: 540px) and (max-height: 600px) {
+  .game:has(> .g-battle) .g-battle { grid-template-rows: auto minmax(96px, 1fr) minmax(2.75rem, auto) auto; }
+}

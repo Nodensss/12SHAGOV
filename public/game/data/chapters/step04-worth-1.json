@@ -77,7 +77,8 @@
             "next": "s4-worth1-b"
           }
         ]
-      }
+      },
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-worth1-b": {
       "type": "story",
@@ -101,7 +102,8 @@
           "text": "Что писать дальше, ты не знаешь. Но одна строчка уже есть — и она не врёт."
         }
       ],
-      "next": "s4-worth1-j"
+      "next": "s4-worth1-j",
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-worth1-j": {
       "type": "journal",

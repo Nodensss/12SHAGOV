@@ -77,7 +77,8 @@
             "next": "s4-worth3-b"
           }
         ]
-      }
+      },
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-worth3-b": {
       "type": "story",
@@ -106,7 +107,8 @@
           "text": "Тетрадь лежит на столе. В ней — всё. И ты всё ещё здесь."
         }
       ],
-      "next": "s4-worth3-j"
+      "next": "s4-worth3-j",
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-worth3-j": {
       "type": "journal",

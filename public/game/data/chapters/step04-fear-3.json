@@ -77,7 +77,8 @@
             "next": "s4-fear3-b"
           }
         ]
-      }
+      },
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-fear3-b": {
       "type": "story",
@@ -101,7 +102,8 @@
           "text": "Страх никуда не ушёл. Но он назван, записан и занимает одну страницу, а не всю жизнь."
         }
       ],
-      "next": "s4-fear3-j"
+      "next": "s4-fear3-j",
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-fear3-j": {
       "type": "journal",

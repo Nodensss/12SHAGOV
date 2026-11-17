@@ -77,7 +77,8 @@
             "next": "s4-deed2-b"
           }
         ]
-      }
+      },
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-deed2-b": {
       "type": "story",
@@ -101,7 +102,8 @@
           "text": "Ты перечитываешь весь список сверху вниз. И замечаешь, что у всех строчек одна и та же форма."
         }
       ],
-      "next": "s4-deed2-j"
+      "next": "s4-deed2-j",
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-deed2-j": {
       "type": "journal",

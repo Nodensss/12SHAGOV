@@ -73,7 +73,8 @@
             "next": "s4-res1-b"
           }
         ]
-      }
+      },
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-res1-b": {
       "type": "story",
@@ -97,7 +98,8 @@
           "text": "Под списком остаётся пустое место. Марат говорил, там будет вторая колонка: «Что это во мне задело». Ты пока туда не смотришь."
         }
       ],
-      "next": "s4-res1-j"
+      "next": "s4-res1-j",
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-res1-j": {
       "type": "journal",

@@ -20,6 +20,10 @@ const json = async path => {
 
 let game = loadGame(), index = { chapters: [] }, vocab = { variants: [] }, chapters = new Map(), fights = new Map(), trials = new Map(), skills = [], items = [];
 let battle = null;
+const MAP_VIEW_KEY = '12shagov-game-map-view';
+let mapView = 'map';
+try { if (localStorage.getItem(MAP_VIEW_KEY) === 'tiles') mapView = 'tiles'; } catch { /* Storage can be unavailable. */ }
+const failedMaps = new Set();
 const sound = createSound();
 let soundMap = {};
 let view = { name: 'menu' }, journalIndex = null, draftTimer, storageOk = true;
@@ -73,6 +77,26 @@ function placeTile(item) {
     '<small>' + h(saved?.done && support ? 'Опора: ' + support.name : started ? 'Продолжить' : item.teaser) + '</small></button>';
 }
 
+// Optional map metadata only describes presentation; chapters still own progress and actions.
+function mapConfig(step, places) {
+  const map = step.map;
+  if (!map || typeof map.art !== 'string' || !/^art\/[a-z0-9/_-]+\.(webp|png|svg)$/.test(map.art) || !Array.isArray(map.places)) return null;
+  if (map.places.length !== places.length || new Set(map.places.map(p => p?.id)).size !== places.length) return null;
+  return places.every(item => map.places.some(p => p && p.id === item.id && Number.isFinite(p.x) && Number.isFinite(p.y) && p.x >= 22 && p.x <= 78 && p.y >= 10 && p.y <= 90)) ? map : null;
+}
+function courtyard(step, places) {
+  const map = mapConfig(step, places), available = map && !failedMaps.has(step.id), on = available && mapView === 'map';
+  const toggle = '<div class="g-map-switch" role="group" aria-label="Вид мест"><button class="g-btn g-secondary" data-act="map-view" data-id="map" aria-pressed="' + !!on + '"' + (available ? '' : ' disabled') + '>Карта</button><button class="g-btn g-secondary" data-act="map-view" data-id="tiles" aria-pressed="' + !on + '">Плитки</button></div>';
+  if (!on) return toggle + '<div class="g-map">' + places.map(placeTile).join('') + '</div>';
+  return toggle + '<div class="g-courtyard"><img class="g-map-art" data-step="' + step.id + '" src="' + h(map.art) + '" alt="' + h(map.alt || '') + '">' + places.map(item => {
+    const p = map.places.find(p => p.id === item.id), chapter = chapterOf(item.id), saved = game.chapters[item.id];
+    const started = saved && chapter && (saved.scene !== chapter.start || saved.line > 0 || Object.keys(saved.choices || {}).length > 0) && chapter.scenes[saved.scene]?.type !== 'ending';
+    const support = items.find(i => i.when === item.id);
+    const status = saved?.done ? (support ? support.name : 'Пройдено') : started ? 'Продолжить' : 'Открыть';
+    return '<button class="g-map-node g-tile' + (saved?.done ? ' is-done' : '') + (started ? ' is-started' : '') + '" style="--map-x:' + p.x + '%;--map-y:' + p.y + '%" data-act="' + (!started && saved?.done ? 'restart' : 'play') + '" data-id="' + h(item.id) + '"' + (chapter ? '' : ' disabled') + '><strong><span aria-hidden="true">' + (saved?.done ? '✦ ' : '○ ') + '</span>' + h(item.title) + '</strong><small>' + (chapter ? status : 'Не загрузилось') + '</small></button>';
+  }).join('') + '</div>';
+}
+
 // Приёмы боя с учётом тетради четвёртого шага: чем глубже страница, тем сильнее приём.
 const fightSkills = () => scaledSkills(skills, index, game);
 
@@ -118,7 +142,7 @@ function stepSection(step) {
   const supports = itemsOf(items, game).filter(i => i.kind === 'support' && i.step === step.id), places = list.filter(item => !item.final), finals = list.filter(item => item.final);
   return '<section class="g-section g-section-map">' + head + fresh + '<p class="g-lead g-section-lead">' + h(step.lead || '') + '</p>' +
     '<div class="g-supports" role="img" aria-label="Опор найдено: ' + supports.filter(i => i.found).length + ' из ' + supports.length + '">' + supports.map(i => '<i' + (i.found ? ' class="is-on"' : '') + '></i>').join('') + '<span>Опоры: ' + supports.filter(i => i.found).length + ' из ' + supports.length + '</span></div>' +
-    '<div class="g-map">' + places.map(placeTile).join('') + '</div><div class="g-list">' + finals.map(item => {
+    courtyard(step, places) + '<div class="g-list">' + finals.map(item => {
       if (!isLocked(item, game)) return episodeCard(item);
       const have = item.needs ? item.needs.of.filter(id => picked(game).has(id)).length : 0;
       return '<div class="g-card g-card-off"><span class="g-step">Закрыто</span><strong>' + h(item.title) + '</strong><small>' + (item.needs ? 'Нужно опор: ' + item.needs.count + '. Найдено: ' + have + '.' : h(lockedText(item))) + '</small></div>';
@@ -333,6 +357,11 @@ function diary() {
 function render() {
   root.innerHTML = view.name === 'fight' ? fightScreen() : view.name === 'trial' ? trialScreen() : view.name === 'bag' ? bagScreen() : view.name === 'play' ? play() : view.name === 'diary' ? diary() : view.name === 'variant' ? variantScreen() : menu();
   root.dataset.view = view.name;
+  for (const img of root.querySelectorAll('.g-map-art')) {
+    const fallback = () => { failedMaps.add(Number(img.dataset.step)); render(); };
+    img.addEventListener('error', fallback, { once: true });
+    if (img.complete && !img.naturalWidth) { fallback(); return; }
+  }
   const carousel = root.querySelector('.g-carousel');
   if (carousel) {
     carousel.scrollLeft = Number(carousel.dataset.start) * carousel.clientWidth;
@@ -424,6 +453,13 @@ function dropBattle() {
 }
 
 const actions = {
+  'map-view': id => {
+    if (id !== 'map' && id !== 'tiles') return;
+    mapView = id;
+    try { localStorage.setItem(MAP_VIEW_KEY, id); } catch { /* Keep the in-memory preference. */ }
+    render();
+    root.querySelector('[data-act="map-view"][data-id="' + id + '"]')?.focus({ preventScroll: true });
+  },
   sound: () => {
     sound.setEnabled(!sound.enabled);
     if (sound.enabled) sound.play('choice');

@@ -73,7 +73,8 @@
             "next": "s4-bond1-b"
           }
         ]
-      }
+      },
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-bond1-b": {
       "type": "story",
@@ -97,7 +98,8 @@
           "text": "Катино последнее сообщение до сих пор висит в телефоне. Ты его не открываешь. Но и не удаляешь."
         }
       ],
-      "next": "s4-bond1-j"
+      "next": "s4-bond1-j",
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-bond1-j": {
       "type": "journal",

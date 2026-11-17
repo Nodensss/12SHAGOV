@@ -76,7 +76,8 @@
             "next": "s4-worth2-b"
           }
         ]
-      }
+      },
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-worth2-b": {
       "type": "story",
@@ -100,7 +101,8 @@
           "text": "Страница заполнена на треть. И ты замечаешь странное: некоторые слова отсюда ты уже писал — на других страницах. Только там они стояли в другой колонке."
         }
       ],
-      "next": "s4-worth2-j"
+      "next": "s4-worth2-j",
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-worth2-j": {
       "type": "journal",

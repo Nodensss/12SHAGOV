@@ -86,7 +86,8 @@
           "text": "Написать своё сообщение ты можешь. Заставить Лену поверить тебе к пяти часам — нет. Такой кнопки в телефоне нет."
         }
       ],
-      "next": "s3-message-wheel"
+      "next": "s3-message-wheel",
+      "background": "art/scene-morning-phone.webp"
     },
     "s3-message-wheel": {
       "type": "steering",
@@ -251,7 +252,8 @@
             "next": "s3-message-wait"
           }
         ]
-      }
+      },
+      "background": "art/scene-morning-phone.webp"
     },
     "s3-message-clarify": {
       "type": "story",
@@ -278,7 +280,8 @@
           "text": "Пять часов теперь свободны. Радости в этом нет. Зато ты знаешь, как есть, — а не как тебе с утра казалось."
         }
       ],
-      "next": "s3-message-journal"
+      "next": "s3-message-journal",
+      "background": "art/scene-morning-phone.webp"
     },
     "s3-message-wait": {
       "type": "story",
@@ -305,7 +308,8 @@
           "text": "Напоминание ты удаляешь. Ближе вы с Леной за одно утро не стали. Но сегодня никто никого не ждёт зря у кружка — уже немало."
         }
       ],
-      "next": "s3-message-journal"
+      "next": "s3-message-journal",
+      "background": "art/scene-morning-phone.webp"
     },
     "s3-message-journal": {
       "type": "journal",

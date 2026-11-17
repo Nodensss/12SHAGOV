@@ -73,7 +73,8 @@
             "next": "s4-deed1-b"
           }
         ]
-      }
+      },
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-deed1-b": {
       "type": "story",
@@ -97,7 +98,8 @@
           "text": "Список закончен. Но слово «взял» торчит из него, как гвоздь."
         }
       ],
-      "next": "s4-deed1-j"
+      "next": "s4-deed1-j",
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-deed1-j": {
       "type": "journal",

@@ -68,7 +68,8 @@
             "next": "s4-fear1-b"
           }
         ]
-      }
+      },
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-fear1-b": {
       "type": "story",
@@ -92,7 +93,8 @@
           "text": "Внизу страницы остаётся одна пустая строка. Ты знаешь, для чего она."
         }
       ],
-      "next": "s4-fear1-j"
+      "next": "s4-fear1-j",
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-fear1-j": {
       "type": "journal",

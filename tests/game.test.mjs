@@ -42,7 +42,8 @@ test('портреты из данных существуют, укладыва�
   const css = await readFile(new URL('../public/game/game.css', import.meta.url), 'utf8');
   const textures = [...css.matchAll(/url\(['"]?\.\/(art\/[\w.-]+)/g)].map(match => match[1]);
   const backgrounds = chapters.flatMap(chapter => [chapter.background, ...Object.values(chapter.scenes).map(scene => scene.background)]).filter(Boolean);
-  const assetPaths = new Set([...vocab.variants, ...fights].map(item => item.art).concat(textures, skills.map(item => item.icon), items.map(item => item.icon), backgrounds));
+  const mapArt = (index.steps || []).map(step => step.map?.art).filter(Boolean);
+  const assetPaths = new Set([...vocab.variants, ...fights].map(item => item.art).concat(textures, skills.map(item => item.icon), items.map(item => item.icon), backgrounds, mapArt));
   for (const art of assetPaths) {
     assert.match(art, /^art\/(?:icons\/)?[\w-]+\.(svg|webp)$/);
     const info = await stat(new URL('../' + art, data));
@@ -60,6 +61,19 @@ test('портреты из данных существуют, укладыва�
   }
   const total = await directoryBytes(new URL('../public/game/art/', import.meta.url));
   assert.ok(total <= 3_000_000, 'вся графика игры, включая прежние SVG, — до 3 МБ');
+});
+
+test('карта ссылается на все места шага и задаёт координаты в пределах изображения', () => {
+  const step = index.steps.find(step => step.id === 2);
+  assert.equal(step.layout, 'map');
+  assert.match(step.map.art, /^art\/[a-z0-9-]+\.webp$/);
+  assert.ok(typeof step.map.alt === 'string' && step.map.alt.trim());
+  const places = index.chapters.filter(item => item.step === step.id && !item.final).map(item => item.id).sort();
+  assert.deepEqual(step.map.places.map(place => place.id).sort(), places);
+  for (const place of step.map.places) {
+    assert.ok(Number.isFinite(place.x) && place.x >= 22 && place.x <= 78, place.id);
+    assert.ok(Number.isFinite(place.y) && place.y >= 10 && place.y <= 90, place.id);
+  }
 });
 
 test('графика четвёртого шага использует собственные иконки и портрет Стыда', () => {

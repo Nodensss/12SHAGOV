@@ -31,6 +31,7 @@ jobs:
           python tests/game-art-flow.py
           python tests/game-sound-flow.py
           python tests/game-background-flow.py
+          python tests/game-map-flow.py
           python tests/game-step04-flow.py
       - name: Третий шаг
         run: python tests/game-step03-flow.py

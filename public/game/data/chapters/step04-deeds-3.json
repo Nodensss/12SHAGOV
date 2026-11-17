@@ -68,7 +68,8 @@
             "next": "s4-deed3-b"
           }
         ]
-      }
+      },
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-deed3-b": {
       "type": "story",
@@ -97,7 +98,8 @@
           "text": "Странно: страница самая тяжёлая в тетради, а дышится после неё легче, чем после любой другой. На ней не осталось ничего, что нужно прятать."
         }
       ],
-      "next": "s4-deed3-j"
+      "next": "s4-deed3-j",
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-deed3-j": {
       "type": "journal",

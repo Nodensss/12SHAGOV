@@ -93,7 +93,8 @@
           "text": "Найти другую дорогу ты можешь. Выключить дождь — нет. А что делать с этой разницей, решаешь всё-таки ты."
         }
       ],
-      "next": "s3-rain-wheel"
+      "next": "s3-rain-wheel",
+      "background": "art/scene-rain-stop.webp"
     },
     "s3-rain-wheel": {
       "type": "steering",
@@ -258,7 +259,8 @@
             "next": "s3-rain-meet"
           }
         ]
-      }
+      },
+      "background": "art/scene-rain-stop.webp"
     },
     "s3-rain-group": {
       "type": "story",
@@ -280,7 +282,8 @@
           "text": "За окном всё тот же дождь. А здесь — вечер, в который, оказывается, можно войти и с опозданием."
         }
       ],
-      "next": "s3-rain-journal"
+      "next": "s3-rain-journal",
+      "background": "art/scene-group.webp"
     },
     "s3-rain-meet": {
       "type": "story",

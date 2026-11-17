@@ -77,7 +77,8 @@
             "next": "s4-bond2-b"
           }
         ]
-      }
+      },
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-bond2-b": {
       "type": "story",
@@ -101,7 +102,8 @@
           "text": "Ты хотел, чтобы тебя спасали. И чтобы при этом не лезли. Одновременно. Такого не вынесет ни один человек."
         }
       ],
-      "next": "s4-bond2-j"
+      "next": "s4-bond2-j",
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-bond2-j": {
       "type": "journal",

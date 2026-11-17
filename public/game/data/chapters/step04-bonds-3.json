@@ -68,7 +68,8 @@
             "next": "s4-bond3-b"
           }
         ]
-      }
+      },
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-bond3-b": {
       "type": "story",
@@ -97,7 +98,8 @@
           "text": "Ты видишь. Четыре имени. И рядом с каждым теперь стоит глагол, в котором есть ты."
         }
       ],
-      "next": "s4-bond3-j"
+      "next": "s4-bond3-j",
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-bond3-j": {
       "type": "journal",

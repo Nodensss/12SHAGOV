@@ -82,7 +82,8 @@
             "next": "s4-res3-b"
           }
         ]
-      }
+      },
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-res3-b": {
       "type": "story",
@@ -111,7 +112,8 @@
           "text": "Ты закрываешь тетрадь и впервые за много лет вспоминаешь не то воскресенье, а другое: как он учил тебя насаживать червя и у него тряслись руки."
         }
       ],
-      "next": "s4-res3-j"
+      "next": "s4-res3-j",
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-res3-j": {
       "type": "journal",

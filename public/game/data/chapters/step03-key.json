@@ -86,7 +86,8 @@
           "text": "Хочется, чтобы она отвернулась, а ты быстро всё исправил и никто ничего не заметил. Но она уже здесь. И замок всё ещё не поворачивается."
         }
       ],
-      "next": "s3-key-wheel"
+      "next": "s3-key-wheel",
+      "background": "art/scene-stairs-locked.webp"
     },
     "s3-key-wheel": {
       "type": "steering",
@@ -251,7 +252,8 @@
             "next": "s3-key-host"
           }
         ]
-      }
+      },
+      "background": "art/scene-stairs-locked.webp"
     },
     "s3-key-fetch": {
       "type": "story",
@@ -273,7 +275,8 @@
           "text": "Стулья расставляете в шесть рук. Ты говоришь: «Это я связки перепутал». — «Бывает», — отвечает кто-то, не оборачиваясь. И всё. Никакого суда."
         }
       ],
-      "next": "s3-key-journal"
+      "next": "s3-key-journal",
+      "background": "art/scene-stairs-locked.webp"
     },
     "s3-key-host": {
       "type": "story",
@@ -295,7 +298,8 @@
           "text": "Когда замок наконец щёлкает, на лестнице идут три разговора сразу. Ты подхватываешь Тамарин пакет и заносишь внутрь. Дверь открыли вчетвером."
         }
       ],
-      "next": "s3-key-journal"
+      "next": "s3-key-journal",
+      "background": "art/scene-stairs-locked.webp"
     },
     "s3-key-journal": {
       "type": "journal",

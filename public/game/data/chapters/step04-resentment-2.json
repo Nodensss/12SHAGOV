@@ -82,7 +82,8 @@
             "next": "s4-res2-b"
           }
         ]
-      }
+      },
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-res2-b": {
       "type": "story",
@@ -111,7 +112,8 @@
           "text": "А под этим, кажется, есть ещё слой. Тот, ради которого ты держишь эту обиду так крепко."
         }
       ],
-      "next": "s4-res2-j"
+      "next": "s4-res2-j",
+      "background": "art/scene-night-notebook.webp"
     },
     "s4-res2-j": {
       "type": "journal",
