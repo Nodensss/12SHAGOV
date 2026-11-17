@@ -1,0 +1,365 @@
+{
+  "id": "step05-box",
+  "version": 1,
+  "step": 5,
+  "title": "Шкатулка",
+  "returnLabel": "К разговору",
+  "disclaimer": "Вымышленная история о разговоре героя с Маратом. Это не литература АН и не указание, кому и что рассказывать. Личные записи остаются в этом браузере.",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_05_Пятый.md: разговор с выбранным человеком, право на паузу и свои границы; приложение ничего не отправляет",
+    "public/steps.js → шаг 5: подготовка разговора и договорённостей, без обязательного раскрытия тяжёлого",
+    "public/game/data/chapters/step04-*.json: вымышленная тетрадь героя, пять страниц, глубина и закладки"
+  ],
+  "background": "art/scene-kitchen.webp",
+  "speakers": {
+    "narrator": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "marat": {
+      "name": "Марат",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "start": "s5-box-offer",
+  "scenes": {
+    "s5-box-offer": {
+      "type": "story",
+      "title": "Шкатулка",
+      "lines": [
+        {
+          "id": "s5-box-offer.l01",
+          "speaker": "narrator",
+          "text": "Внизу страницы два слова вписаны тесно, возле самого поля. Ты ставишь чашку подальше от тетради."
+        },
+        {
+          "id": "s5-box-offer.l02",
+          "speaker": "marat",
+          "text": "На этой закладка. С неё или не с неё — решай.",
+          "if": "s4-deed1.choice.mark"
+        },
+        {
+          "id": "s5-box-offer.l03",
+          "speaker": "voice",
+          "text": "Скажи: занимал у матери. Почти правда."
+        }
+      ],
+      "choice": {
+        "id": "s5-box.choice",
+        "prompt": "Что ты прочитаешь?",
+        "options": [
+          {
+            "id": "s5-box.choice.read",
+            "label": "Прочитать как есть",
+            "next": "s5-box-read"
+          },
+          {
+            "id": "s5-box.choice.soften",
+            "label": "Смягчить",
+            "next": "s5-box-soften"
+          },
+          {
+            "id": "s5-box.choice.later",
+            "label": "Об этом не сегодня",
+            "next": "s5-box-later"
+          }
+        ]
+      }
+    },
+    "s5-box-read": {
+      "type": "story",
+      "title": "Шкатулка",
+      "lines": [
+        {
+          "id": "s5-box-read.l01",
+          "speaker": "you",
+          "text": "Я врал Лене про деньги. На работе врал. К Тимке не пришёл."
+        },
+        {
+          "id": "s5-box-read.l02",
+          "speaker": "narrator",
+          "text": "Ты доходишь до последней строки. Бумага трётся о ноготь."
+        },
+        {
+          "id": "s5-box-read.l03",
+          "speaker": "you",
+          "text": "И у матери из шкатулки забрал деньги. Она мне их не давала."
+        },
+        {
+          "id": "s5-box-read.l04",
+          "speaker": "marat",
+          "text": "Угу. Я слышу."
+        },
+        {
+          "id": "s5-box-read.l05",
+          "speaker": "you",
+          "text": "Я написал точнее: украл. Она потом искала. Думала, сама переложила.",
+          "depth": {
+            "of": [
+              "step04-deeds-1",
+              "step04-deeds-2",
+              "step04-deeds-3"
+            ],
+            "min": 2,
+            "max": 3
+          }
+        },
+        {
+          "id": "s5-box-read.l06",
+          "speaker": "you",
+          "text": "А я сидел рядом, пил чай и помогал искать.",
+          "depth": {
+            "of": [
+              "step04-deeds-1",
+              "step04-deeds-2",
+              "step04-deeds-3"
+            ],
+            "min": 2,
+            "max": 3
+          }
+        },
+        {
+          "id": "s5-box-read.l07",
+          "speaker": "narrator",
+          "text": "Марат смотрит в свою чашку. Когда ты замолкаешь, он не заполняет тишину.",
+          "depth": {
+            "of": [
+              "step04-deeds-1",
+              "step04-deeds-2",
+              "step04-deeds-3"
+            ],
+            "min": 2,
+            "max": 3
+          }
+        },
+        {
+          "id": "s5-box-read.l08",
+          "speaker": "you",
+          "text": "У меня в нескольких строках одно и то же. Я делал так, чтобы люди сомневались в себе, а не во мне.",
+          "depth": {
+            "of": [
+              "step04-deeds-1",
+              "step04-deeds-2",
+              "step04-deeds-3"
+            ],
+            "min": 3,
+            "max": 3
+          }
+        },
+        {
+          "id": "s5-box-read.l09",
+          "speaker": "you",
+          "text": "На болезнь я всё это тоже списывал. Но возле шкатулки сидел я.",
+          "depth": {
+            "of": [
+              "step04-deeds-1",
+              "step04-deeds-2",
+              "step04-deeds-3"
+            ],
+            "min": 3,
+            "max": 3
+          }
+        },
+        {
+          "id": "s5-box-read.l10",
+          "speaker": "marat",
+          "text": "Я у своей матери тоже брал. Потом приехал лампочку менять. Стоял на табуретке, изображал полезного сына."
+        },
+        {
+          "id": "s5-box-read.l11",
+          "speaker": "you",
+          "text": "Ты ей потом сказал?"
+        },
+        {
+          "id": "s5-box-read.l12",
+          "speaker": "marat",
+          "text": "Потом — да. Не в тот вечер, когда первый раз прочитал об этом."
+        },
+        {
+          "id": "s5-box-read.l13",
+          "speaker": "you",
+          "text": "У меня рука сейчас к телефону тянется."
+        },
+        {
+          "id": "s5-box-read.l14",
+          "speaker": "marat",
+          "text": "У меня тогда тянулась. Хотел всё разом выложить и хоть поспать."
+        },
+        {
+          "id": "s5-box-read.l15",
+          "speaker": "marat",
+          "text": "Я сначала с человеком посидел. Мы потом ещё отдельно разбирали, как с ней говорить. Я тогда мог и этим разговором навалить на неё."
+        },
+        {
+          "id": "s5-box-read.l16",
+          "speaker": "narrator",
+          "text": "Ты достаёшь телефон, чтобы он не давил на ногу, и кладёшь рядом. Экран остаётся тёмным."
+        },
+        {
+          "id": "s5-box-read.l17",
+          "speaker": "you",
+          "text": "Мне больше на этой странице пока нечего читать."
+        },
+        {
+          "id": "s5-box-read.l18",
+          "speaker": "marat",
+          "text": "Давай чайник заново поставлю."
+        },
+        {
+          "id": "s5-box-read.l19",
+          "speaker": "narrator",
+          "text": "Ты отпускаешь край листа. Марат встаёт к плите. Про шкатулку теперь знаешь не только ты."
+        }
+      ],
+      "next": "s5-box-journal"
+    },
+    "s5-box-soften": {
+      "type": "story",
+      "title": "Шкатулка",
+      "lines": [
+        {
+          "id": "s5-box-soften.l01",
+          "speaker": "you",
+          "text": "С деньгами дома всякое было. Я занимал без спроса. Потом всё собирался вернуть."
+        },
+        {
+          "id": "s5-box-soften.l02",
+          "speaker": "narrator",
+          "text": "Последние слова ты говоришь быстрее. Про «собирался» на странице ничего нет."
+        },
+        {
+          "id": "s5-box-soften.l03",
+          "speaker": "marat",
+          "text": "Я своё сначала тоже читал аккуратно. Даже «пропало» говорил. Как будто это слово про кошелёк, а меня там не было."
+        },
+        {
+          "id": "s5-box-soften.l04",
+          "speaker": "narrator",
+          "text": "Марат замолкает. Не наклоняется к листу и не просит сумму."
+        },
+        {
+          "id": "s5-box-soften.l05",
+          "speaker": "you",
+          "text": "Я сейчас не теми словами прочитал."
+        },
+        {
+          "id": "s5-box-soften.l06",
+          "speaker": "marat",
+          "text": "Можно ещё раз. Можно пока остановиться."
+        }
+      ],
+      "choice": {
+        "id": "s5-box.revisit",
+        "prompt": "Как дальше?",
+        "options": [
+          {
+            "id": "s5-box.revisit.read",
+            "label": "Перечитать как есть",
+            "next": "s5-box-read"
+          },
+          {
+            "id": "s5-box.revisit.keep",
+            "label": "Оставить как прозвучало",
+            "next": "s5-box-journal"
+          }
+        ]
+      }
+    },
+    "s5-box-later": {
+      "type": "story",
+      "title": "Шкатулка",
+      "lines": [
+        {
+          "id": "s5-box-later.l01",
+          "speaker": "you",
+          "text": "Шкатулку сегодня не трогаю."
+        },
+        {
+          "id": "s5-box-later.l02",
+          "speaker": "marat",
+          "text": "Хорошо."
+        },
+        {
+          "id": "s5-box-later.l03",
+          "speaker": "you",
+          "text": "Я боюсь, что если начну, не смогу остановиться."
+        },
+        {
+          "id": "s5-box-later.l04",
+          "speaker": "marat",
+          "text": "Тогда оставим. Хочешь воды?"
+        },
+        {
+          "id": "s5-box-later.l05",
+          "speaker": "narrator",
+          "text": "Ты киваешь. Он ставит стакан рядом с тетрадью. Не на неё."
+        },
+        {
+          "id": "s5-box-later.l06",
+          "speaker": "narrator",
+          "text": "Ты пьёшь. Страница остаётся в тетради. Её никто не забирает у тебя."
+        }
+      ],
+      "next": "s5-box-journal"
+    },
+    "s5-box-journal": {
+      "type": "journal",
+      "title": "Пара строк для себя",
+      "intro": "Это разговор героя. Здесь можно записать о себе, без подробностей тяжёлого. Можно выбрать другой вопрос или ответить позже.",
+      "questionIds": [
+        "q.step05.box.1",
+        "q.step05.box.2"
+      ],
+      "next": "s5-box-end"
+    },
+    "s5-box-end": {
+      "type": "ending",
+      "title": "Шкатулка",
+      "lines": [
+        {
+          "id": "s5-box-end.l01",
+          "speaker": "narrator",
+          "text": "Лист ложится на стол между чашками. Эти строки уже прозвучали.",
+          "if": "s5-box.choice.read"
+        },
+        {
+          "id": "s5-box-end.l02",
+          "speaker": "narrator",
+          "text": "Ты находишь свои слова со второго захода. Марат дослушивает.",
+          "if": "s5-box.revisit.read"
+        },
+        {
+          "id": "s5-box-end.l03",
+          "speaker": "narrator",
+          "text": "Страница прозвучала не целиком. Можно будет вернуться к ней.",
+          "if": "s5-box.choice.soften",
+          "ifNot": "s5-box.revisit.read"
+        },
+        {
+          "id": "s5-box-end.l04",
+          "speaker": "narrator",
+          "text": "Сегодня эта страница остаётся у тебя. Выбирать следующую не обязательно сразу.",
+          "if": "s5-box.choice.later"
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "id": "q.step05.box.1",
+      "text": "Как я хочу попросить остановиться, если разговора станет слишком много?"
+    },
+    {
+      "id": "q.step05.box.2",
+      "text": "Что помогает мне говорить точнее, не перечисляя подробности тяжёлого?"
+    }
+  ]
+}

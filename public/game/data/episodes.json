@@ -402,6 +402,97 @@
       "file": "chapters/step04-notebook.json",
       "after": "fight05-shame",
       "final": true
+    },
+    {
+      "id": "step05-arrival",
+      "step": 5,
+      "title": "Суббота",
+      "teaser": "У Марата на кухне. Сначала — договориться.",
+      "minutes": "2 минуты",
+      "file": "chapters/step05-arrival.json",
+      "after": "step04-notebook"
+    },
+    {
+      "id": "step05-father",
+      "step": 5,
+      "title": "Отец",
+      "teaser": "Страница для разговора. Темп и слова выбираешь ты.",
+      "minutes": "3–4 минуты",
+      "file": "chapters/step05-father.json",
+      "after": "step05-arrival"
+    },
+    {
+      "id": "step05-fear",
+      "step": 5,
+      "title": "Страхи",
+      "teaser": "Страница для разговора. Темп и слова выбираешь ты.",
+      "minutes": "3–4 минуты",
+      "file": "chapters/step05-fear.json",
+      "after": "step05-arrival"
+    },
+    {
+      "id": "step05-box",
+      "step": 5,
+      "title": "Шкатулка",
+      "teaser": "Страница для разговора. Темп и слова выбираешь ты.",
+      "minutes": "3–4 минуты",
+      "file": "chapters/step05-box.json",
+      "after": "step05-arrival"
+    },
+    {
+      "id": "step05-people",
+      "step": 5,
+      "title": "Люди",
+      "teaser": "Страница для разговора. Темп и слова выбираешь ты.",
+      "minutes": "3–4 минуты",
+      "file": "chapters/step05-people.json",
+      "after": "step05-arrival"
+    },
+    {
+      "id": "step05-worth",
+      "step": 5,
+      "title": "Что во мне есть",
+      "teaser": "Страница для разговора. Темп и слова выбираешь ты.",
+      "minutes": "3–4 минуты",
+      "file": "chapters/step05-worth.json",
+      "after": "step05-arrival"
+    },
+    {
+      "id": "step05-after",
+      "step": 5,
+      "title": "После чая",
+      "teaser": "Что прозвучало и что осталось на другой раз.",
+      "minutes": "3 минуты",
+      "file": "chapters/step05-after.json",
+      "after": "step05-arrival",
+      "allOfAny": [
+        [
+          "s5-father.choice.read",
+          "s5-father.choice.soften",
+          "s5-father.choice.later"
+        ],
+        [
+          "s5-fear.choice.read",
+          "s5-fear.choice.soften",
+          "s5-fear.choice.later"
+        ],
+        [
+          "s5-box.choice.read",
+          "s5-box.choice.soften",
+          "s5-box.choice.later"
+        ],
+        [
+          "s5-people.choice.read",
+          "s5-people.choice.soften",
+          "s5-people.choice.later"
+        ],
+        [
+          "s5-worth.choice.read",
+          "s5-worth.choice.soften",
+          "s5-worth.choice.later"
+        ]
+      ],
+      "final": true
     }
   ],
   "steps": [
@@ -503,10 +594,100 @@
           "note": "Без неё бой со Стыдом не выиграть."
         }
       ]
+    },
+    {
+      "id": 5,
+      "title": "Шаг пятый",
+      "name": "Разговор",
+      "layout": "conversation",
+      "after": "step04-notebook",
+      "lockedText": "Откроется после четвёртого шага «Тетрадь на столе».",
+      "lead": "Суббота у Марата. Пять страниц, любой порядок. Можно прочитать как есть, смягчить или оставить на другой день.",
+      "intro": "step05-arrival",
+      "finale": "step05-after",
+      "pages": [
+        {
+          "id": "resentment",
+          "title": "Обиды",
+          "chapter": "step05-father",
+          "bookmark": "s4-res1.choice.mark",
+          "choice": "s5-father.choice",
+          "read": "s5-father.choice.read",
+          "soften": "s5-father.choice.soften",
+          "later": "s5-father.choice.later",
+          "revisitChoice": "s5-father.revisit",
+          "reread": "s5-father.revisit.read"
+        },
+        {
+          "id": "fear",
+          "title": "Страхи",
+          "chapter": "step05-fear",
+          "bookmark": "s4-fear1.choice.mark",
+          "choice": "s5-fear.choice",
+          "read": "s5-fear.choice.read",
+          "soften": "s5-fear.choice.soften",
+          "later": "s5-fear.choice.later",
+          "revisitChoice": "s5-fear.revisit",
+          "reread": "s5-fear.revisit.read"
+        },
+        {
+          "id": "deeds",
+          "title": "Поступки",
+          "chapter": "step05-box",
+          "bookmark": "s4-deed1.choice.mark",
+          "choice": "s5-box.choice",
+          "read": "s5-box.choice.read",
+          "soften": "s5-box.choice.soften",
+          "later": "s5-box.choice.later",
+          "revisitChoice": "s5-box.revisit",
+          "reread": "s5-box.revisit.read"
+        },
+        {
+          "id": "bonds",
+          "title": "Люди",
+          "chapter": "step05-people",
+          "bookmark": "s4-bond1.choice.mark",
+          "choice": "s5-people.choice",
+          "read": "s5-people.choice.read",
+          "soften": "s5-people.choice.soften",
+          "later": "s5-people.choice.later",
+          "revisitChoice": "s5-people.revisit",
+          "reread": "s5-people.revisit.read"
+        },
+        {
+          "id": "worth",
+          "title": "Что во мне есть",
+          "chapter": "step05-worth",
+          "bookmark": "s4-worth1.choice.mark",
+          "choice": "s5-worth.choice",
+          "read": "s5-worth.choice.read",
+          "soften": "s5-worth.choice.soften",
+          "later": "s5-worth.choice.later",
+          "revisitChoice": "s5-worth.revisit",
+          "reread": "s5-worth.revisit.read"
+        }
+      ],
+      "labels": {
+        "secret": "Тайна",
+        "secretHint": "Страницы, которые пока не прозвучали как есть. Не нужно сводить число к нулю, чтобы закончить разговор.",
+        "suggested": "Закладка: Марат предлагает начать здесь",
+        "depth": "Слоёв в тетради",
+        "open": "Открыть страницу",
+        "resume": "Продолжить",
+        "again": "Вернуться к странице",
+        "pending": "Пока не выбрано",
+        "read": "Прочитано как есть",
+        "soften": "Смягчено — можно перечитать",
+        "later": "Об этом не сегодня",
+        "decision": "Решение по страницам",
+        "introHint": "Сначала — договориться о разговоре.",
+        "finaleHint": "Сначала выбери, как быть с каждой страницей. Читать всё как есть не обязательно."
+      },
+      "cover": "art/scene-kitchen.webp"
     }
   ],
   "nextStep": {
-    "title": "Шаг пятый",
-    "teaser": "В работе."
+    "title": "Шаг шестой",
+    "teaser": "В работе. Готовность заметить, что хочется менять, а за что пока держишься."
   }
 }

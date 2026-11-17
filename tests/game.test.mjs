@@ -5,7 +5,7 @@ import {
   advance, answerLater, choose, fill, freshGame, isLocked, leaveJournal, linesOf, normalizeGame, progressOf,
   saveEntry, setDraft, stage, validateChapter, validateVocab,
   itemsOf, levelOf, markDone, recordFight, assignSteering, leaveSteering, restartChapter,
-  depthOf, scaledSkills,
+  depthOf, scaledSkills, conversationState, validateConversation,
 } from '../public/game/engine.js';
 import { canUse, playTurn, restoreBattle, skillsOf, startBattle, validateFight } from '../public/game/battle.js';
 
@@ -120,15 +120,17 @@ function playThrough(game, chapter, pick, placements = []) {
   assert.fail('глава не закончилась');
 }
 
-test('обе ветки каждого эпизода доходят до концовки разными сценами', () => {
+test('эпизоды доходят до концовки, а ветки выбора различаются', () => {
   for (const chapter of chapters) {
     const first = freshGame(), second = freshGame();
     const a = playThrough(first, chapter, 0), b = playThrough(second, chapter, 1);
-    assert.notDeepEqual(a.visited, b.visited, chapter.id);
+    if (Object.values(chapter.scenes).some(scene => scene.choice)) assert.notDeepEqual(a.visited, b.visited, chapter.id);
     assert.equal(a.progress.done && b.progress.done, true);
     const saved = Object.values(first.journal)[0], later = Object.values(second.journal)[0];
-    assert.equal(saved.text, 'вымышленная запись');
-    assert.deepEqual([later.text, later.draft, later.later], ['', 'черновик', true]);
+    if (chapter.questions.length) {
+      assert.equal(saved.text, 'вымышленная запись');
+      assert.deepEqual([later.text, later.draft, later.later], ['', 'черновик', true]);
+    } else assert.equal(Object.keys(first.journal).length + Object.keys(second.journal).length, 0);
   }
 });
 
@@ -145,7 +147,10 @@ test('эпизоды открываются по порядку, а услови
   for (const chapter of chapters) for (const scene of Object.values(chapter.scenes)) {
     const conditional = [...(scene.lines || []), ...(Array.isArray(scene.next) ? scene.next : []),
       ...(scene.choice?.options || []).flatMap(option => Array.isArray(option.next) ? option.next : [])];
-    for (const item of conditional) for (const key of ['if', 'ifNot']) if (item[key]) assert.ok(options.includes(item[key]), chapter.id + ': ' + item[key]);
+    for (const item of conditional) {
+      for (const key of ['if', 'ifNot']) if (item[key]) assert.ok(options.includes(item[key]), chapter.id + ': ' + item[key]);
+      for (const id of [...(item.ifAny || []), ...(item.ifNone || []), ...(item.depth?.of || [])]) assert.ok(options.includes(id), chapter.id + ': ' + id);
+    }
   }
   const game = freshGame();
   index.chapters.forEach((item, i) => {
@@ -274,7 +279,7 @@ test('третий шаг открывается после Ночи, содер
   assert.equal(isLocked(thirdItems[0], game), true);
   markDone(game, 'step02-night');
   assert.equal(isLocked(thirdItems[0], game), false);
-  assert.equal(index.nextStep.title, 'Шаг пятый');
+  assert.equal(index.nextStep.title, 'Шаг шестой');
   for (const chapter of thirdChapters) {
     assert.ok(chapter.disclaimer && chapter.basedOn.some(source => source.includes('docs/step03.md')), chapter.id);
     assert.ok(chapter.questions.length >= 2 && chapter.questions.length <= 3, chapter.id);
@@ -453,4 +458,110 @@ test('четвёртый шаг: финал видит глубину стран
   assert.notDeepEqual(a, b);
   assert.equal(b.length, a.length + 1, 'закладка добавляет строку');
   for (const item of items.filter(item => item.step === 4)) assert.ok(item.name && item.text && item.when);
+});
+
+function finishTalk(game, chapter, mode, revisit = 'keep') {
+  const progress = progressOf(game, chapter);
+  for (let guard = 0; guard < 400; guard += 1) {
+    const now = stage(progress, chapter, game), scene = chapter.scenes[progress.scene];
+    if (now === 'ending') return progress;
+    if (now === 'choice') {
+      const suffix = scene.choice.id.endsWith('.revisit') ? revisit : mode;
+      const option = scene.choice.options.find(option => option.id.endsWith('.' + suffix));
+      assert.ok(option, chapter.id + ': ' + suffix);
+      choose(progress, chapter, option.id, game);
+    } else if (now === 'journal') leaveJournal(progress, chapter, game);
+    else advance(progress, chapter, game);
+  }
+  assert.fail('разговор не закончился: ' + chapter.id);
+}
+
+test('пятый шаг: схема разговора, постоянные ссылки и пять страниц четвёртого шага', () => {
+  const step = index.steps.find(step => step.id === 5), fourth = index.steps.find(step => step.id === 4);
+  assert.deepEqual(validateConversation(step, index), []);
+  assert.equal(step.after, 'step04-notebook');
+  assert.deepEqual(step.pages.map(p => p.id).sort(), fourth.pages.map(p => p.id).sort());
+  assert.equal(index.chapters.filter(item => item.step === 5 && item.type === 'fight').length, 0);
+  const ids = new Set(chapters.flatMap(c => Object.values(c.scenes).flatMap(s => (s.choice?.options || []).map(o => o.id))));
+  for (const p of step.pages) {
+    for (const key of ['bookmark', 'read', 'soften', 'later', 'reread']) assert.ok(ids.has(p[key]), p.id + ': ' + key);
+    const c = chapters.find(c => c.id === p.chapter), offer = c.scenes[c.start];
+    assert.equal(offer.choice.id, p.choice);
+    assert.deepEqual(offer.choice.options.map(o => o.id), [p.read, p.soften, p.later]);
+    assert.equal(index.chapters.find(i => i.id === c.id).page, undefined, 'разговор не увеличивает глубину тетради');
+    assert.ok(Object.values(c.scenes).some(s => s.type === 'journal'));
+  }
+  assert.ok(validateConversation({...step,pages:[step.pages[0],step.pages[0]]},index).length);
+  assert.ok(validateConversation({...step,labels:{}},index).length);
+});
+
+test('пятый шаг: три решения каждой страницы, отложить всё можно и закончить', () => {
+  const step = index.steps.find(s => s.id === 5), final = index.chapters.find(i => i.id === step.finale);
+  for (const mode of ['read','soften','later']) {
+    const game = freshGame(); markDone(game, step.intro);
+    assert.equal(isLocked(final,game),true);
+    for (const [n,p] of step.pages.entries()) {
+      finishTalk(game,chapters.find(c=>c.id===p.chapter),mode);
+      const state=conversationState(step,index,game);
+      assert.equal(state.decided,n+1); assert.equal(state[mode],n+1);
+      assert.equal(state.secret,mode==='read'?5-n-1:5);
+      assert.equal(isLocked(final,game),n<4);
+    }
+    finishTalk(game,chapters.find(c=>c.id===step.finale),'read');
+    assert.equal(game.chapters[step.finale].done,true);
+  }
+});
+
+test('пятый шаг: перечитывание заменяет смягчённое, но не считается второй страницей', () => {
+  const step=index.steps.find(s=>s.id===5), p=step.pages[0], game=freshGame();markDone(game,step.intro);
+  finishTalk(game,chapters.find(c=>c.id===p.chapter),'soften','read');
+  const state=conversationState(step,index,game);
+  assert.deepEqual([state.read,state.soften,state.decided,state.secret],[1,0,1,4]);
+  assert.equal(isLocked(index.chapters.find(i=>i.id===step.finale),game),true);
+  const final=chapters.find(c=>c.id===step.finale);
+  const text=linesOf(final.scenes[final.start],game).map(l=>l.text).join('\n');
+  assert.ok(text.includes('Про отца удалось'));
+  assert.ok(!text.includes('Про отца вслух осталось'));
+  restartChapter(game,chapters.find(c=>c.id===p.chapter));
+  assert.equal(conversationState(step,index,game).decided,0);
+});
+
+test('пятый шаг: чтение растёт с глубиной и не меняет исходную тетрадь', () => {
+  const step=index.steps.find(s=>s.id===5);
+  for (const p of step.pages) {
+    const lengths=[];
+    for (const d of [1,2,3]) {
+      const game=freshGame();
+      for(const item of index.chapters.filter(i=>i.page===p.id && i.depth<=d))markDone(game,item.id);
+      const c=chapters.find(c=>c.id===p.chapter), read=c.scenes[c.start].choice.options[0].next;
+      const text=linesOf(c.scenes[read],game).map(l=>l.text).join('\n');
+      lengths.push(text.length); assert.equal(conversationState(step,index,game).pages.find(x=>x.id===p.id).depth,d);
+      finishTalk(game,c,'read');assert.equal(depthOf(p.id,index,game),d);
+    }
+    assert.ok(lengths[0]<lengths[1] && lengths[1]<lengths[2],p.id);
+  }
+});
+
+test('пятый шаг: закладки предлагаются первыми, старые записи и решения переживают нормализацию', () => {
+  const step=index.steps.find(s=>s.id===5), game=freshGame();game.variant='drugs';
+  markDone(game,'step04-notebook');
+  game.chapters['step04-deeds-1']={scene:null,line:0,choices:{'s4-deed1.choice':'s4-deed1.choice.mark'},done:true};
+  game.journal.legacy={draft:'прежний черновик',text:'прежняя запись',savedAt:null,later:false,chapter:'step01-only-once'};
+  const legacy=structuredClone(game);
+  assert.equal(conversationState(step,index,game).pages[0].id,'deeds');
+  finishTalk(game,chapters.find(c=>c.id===step.pages[0].chapter),'soften','read');
+  const reopened=normalizeGame(JSON.parse(JSON.stringify(game)));
+  assert.deepEqual(conversationState(step,index,reopened),conversationState(step,index,game));
+  assert.deepEqual(reopened.journal,legacy.journal);
+  for(const id of Object.keys(legacy.chapters))assert.deepEqual(reopened.chapters[id],legacy.chapters[id]);
+});
+
+test('условия глубины и наборов решений проверяются и не ломают прежние if', () => {
+  const c=structuredClone(chapters.find(c=>c.id==='step05-father'));
+  c.scenes[c.start].lines[0].depth={of:['x','x'],min:2,max:1};
+  assert.ok(validateChapter(c,vocab).some(e=>e.includes('глубина')));
+  delete c.scenes[c.start].lines[0].depth;c.scenes[c.start].lines[0].ifAny='x';
+  assert.ok(validateChapter(c,vocab).some(e=>e.includes('ifAny')));
+  const game=freshGame();markDone(game,'a');
+  assert.deepEqual(linesOf({lines:[{id:'a',ifAny:['a','b']},{id:'b',ifNone:['a']},{id:'c',depth:{of:['a','b'],min:1,max:1}}]},game).map(l=>l.id),['a','c']);
 });

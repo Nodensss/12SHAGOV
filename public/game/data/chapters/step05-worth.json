@@ -1,0 +1,310 @@
+{
+  "id": "step05-worth",
+  "version": 1,
+  "step": 5,
+  "title": "Что во мне есть",
+  "returnLabel": "К разговору",
+  "disclaimer": "Вымышленная история о разговоре героя с Маратом. Это не литература АН и не указание, кому и что рассказывать. Личные записи остаются в этом браузере.",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_05_Пятый.md: разговор с выбранным человеком, право на паузу и свои границы; приложение ничего не отправляет",
+    "public/steps.js → шаг 5: подготовка разговора и договорённостей, без обязательного раскрытия тяжёлого",
+    "public/game/data/chapters/step04-*.json: вымышленная тетрадь героя, пять страниц, глубина и закладки"
+  ],
+  "background": "art/scene-kitchen.webp",
+  "speakers": {
+    "narrator": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "marat": {
+      "name": "Марат",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "start": "s5-worth-offer",
+  "scenes": {
+    "s5-worth-offer": {
+      "type": "story",
+      "title": "Что во мне есть",
+      "lines": [
+        {
+          "id": "s5-worth-offer.l01",
+          "speaker": "narrator",
+          "text": "Эта страница исписана меньше других. Ты держишь её так, будто случайно открыл не там."
+        },
+        {
+          "id": "s5-worth-offer.l02",
+          "speaker": "marat",
+          "text": "Тут тоже уголок. Да, эту тоже можно читать.",
+          "if": "s4-worth1.choice.mark"
+        },
+        {
+          "id": "s5-worth-offer.l03",
+          "speaker": "voice",
+          "text": "Хватит уже. Хорошее потом, если спросят."
+        }
+      ],
+      "choice": {
+        "id": "s5-worth.choice",
+        "prompt": "Что ты прочитаешь?",
+        "options": [
+          {
+            "id": "s5-worth.choice.read",
+            "label": "Прочитать как есть",
+            "next": "s5-worth-read"
+          },
+          {
+            "id": "s5-worth.choice.soften",
+            "label": "Смягчить",
+            "next": "s5-worth-soften"
+          },
+          {
+            "id": "s5-worth.choice.later",
+            "label": "Об этом не сегодня",
+            "next": "s5-worth-later"
+          }
+        ]
+      }
+    },
+    "s5-worth-read": {
+      "type": "story",
+      "title": "Что во мне есть",
+      "lines": [
+        {
+          "id": "s5-worth-read.l01",
+          "speaker": "you",
+          "text": "Здесь написано: чиню вещи. Я долго ничего другого придумать не мог."
+        },
+        {
+          "id": "s5-worth-read.l02",
+          "speaker": "marat",
+          "text": "А я в такой список сначала написал: прихожу вовремя. И тут же зачеркнул. Решил, мало для списка."
+        },
+        {
+          "id": "s5-worth-read.l03",
+          "speaker": "you",
+          "text": "Ещё я сказал правду Лене. И не ушёл от тетради, хотя хотелось.",
+          "depth": {
+            "of": [
+              "step04-worth-1",
+              "step04-worth-2",
+              "step04-worth-3"
+            ],
+            "min": 2,
+            "max": 3
+          }
+        },
+        {
+          "id": "s5-worth-read.l04",
+          "speaker": "marat",
+          "text": "Я когда своё вслух слышал, начинал прибавлять: ну, это любой может. Даже тут торговался.",
+          "depth": {
+            "of": [
+              "step04-worth-1",
+              "step04-worth-2",
+              "step04-worth-3"
+            ],
+            "min": 2,
+            "max": 3
+          }
+        },
+        {
+          "id": "s5-worth-read.l05",
+          "speaker": "you",
+          "text": "Я не хочу выдирать остальные страницы. Но эту тоже оставлю. И на обложке название уже есть.",
+          "depth": {
+            "of": [
+              "step04-worth-1",
+              "step04-worth-2",
+              "step04-worth-3"
+            ],
+            "min": 3,
+            "max": 3
+          }
+        },
+        {
+          "id": "s5-worth-read.l06",
+          "speaker": "you",
+          "text": "«Я, как есть». Ты можешь не смеяться?",
+          "depth": {
+            "of": [
+              "step04-worth-1",
+              "step04-worth-2",
+              "step04-worth-3"
+            ],
+            "min": 3,
+            "max": 3
+          }
+        },
+        {
+          "id": "s5-worth-read.l07",
+          "speaker": "marat",
+          "text": "Не смеюсь. У меня на обложке вообще фамилия была. С ошибкой. Торопился.",
+          "depth": {
+            "of": [
+              "step04-worth-1",
+              "step04-worth-2",
+              "step04-worth-3"
+            ],
+            "min": 3,
+            "max": 3
+          }
+        },
+        {
+          "id": "s5-worth-read.l08",
+          "speaker": "narrator",
+          "text": "Ты замечаешь, что держишь лист обеими руками. Ослабляешь хватку."
+        },
+        {
+          "id": "s5-worth-read.l09",
+          "speaker": "you",
+          "text": "Странно это читать. Как будто хвастаюсь."
+        },
+        {
+          "id": "s5-worth-read.l10",
+          "speaker": "marat",
+          "text": "Я своё прятал примерно так же, как плохое. Другому человеку про меня хорошее сказать можно было. Себе — нет."
+        },
+        {
+          "id": "s5-worth-read.l11",
+          "speaker": "narrator",
+          "text": "За стеной включают воду. Кран у Марата на секунду перестаёт капать. Ты успеваешь дочитать."
+        }
+      ],
+      "next": "s5-worth-journal"
+    },
+    "s5-worth-soften": {
+      "type": "story",
+      "title": "Что во мне есть",
+      "lines": [
+        {
+          "id": "s5-worth-soften.l01",
+          "speaker": "you",
+          "text": "Ну, тут мелочи. Всякое руками делаю. В целом ничего особенного."
+        },
+        {
+          "id": "s5-worth-soften.l02",
+          "speaker": "narrator",
+          "text": "Ты почти пропускаешь написанное. На странице целое предложение, а вслух от него остаётся «ничего»."
+        },
+        {
+          "id": "s5-worth-soften.l03",
+          "speaker": "marat",
+          "text": "Я слово «мелочи» любил. В нём любой мой день помещался и не высовывался."
+        },
+        {
+          "id": "s5-worth-soften.l04",
+          "speaker": "narrator",
+          "text": "Он улыбается своей чашке. Ты перечитываешь строку глазами."
+        }
+      ],
+      "choice": {
+        "id": "s5-worth.revisit",
+        "prompt": "Как дальше?",
+        "options": [
+          {
+            "id": "s5-worth.revisit.read",
+            "label": "Перечитать как есть",
+            "next": "s5-worth-read"
+          },
+          {
+            "id": "s5-worth.revisit.keep",
+            "label": "Оставить как прозвучало",
+            "next": "s5-worth-journal"
+          }
+        ]
+      }
+    },
+    "s5-worth-later": {
+      "type": "story",
+      "title": "Что во мне есть",
+      "lines": [
+        {
+          "id": "s5-worth-later.l01",
+          "speaker": "you",
+          "text": "Эту страницу тоже оставлю на другой раз."
+        },
+        {
+          "id": "s5-worth-later.l02",
+          "speaker": "marat",
+          "text": "Оставь."
+        },
+        {
+          "id": "s5-worth-later.l03",
+          "speaker": "you",
+          "text": "Про неё труднее, чем кажется."
+        },
+        {
+          "id": "s5-worth-later.l04",
+          "speaker": "marat",
+          "text": "Мне тоже трудно было. Я думал, её в тетрадь по ошибке добавили."
+        },
+        {
+          "id": "s5-worth-later.l05",
+          "speaker": "narrator",
+          "text": "Марат закрывает сахарницу. Тетрадь ты закрываешь сам, когда решишь."
+        }
+      ],
+      "next": "s5-worth-journal"
+    },
+    "s5-worth-journal": {
+      "type": "journal",
+      "title": "Пара строк для себя",
+      "intro": "Это разговор героя. Здесь можно записать о себе, без подробностей тяжёлого. Можно выбрать другой вопрос или ответить позже.",
+      "questionIds": [
+        "q.step05.worth.1",
+        "q.step05.worth.2"
+      ],
+      "next": "s5-worth-end"
+    },
+    "s5-worth-end": {
+      "type": "ending",
+      "title": "Что во мне есть",
+      "lines": [
+        {
+          "id": "s5-worth-end.l01",
+          "speaker": "narrator",
+          "text": "Лист ложится на стол между чашками. Эти строки уже прозвучали.",
+          "if": "s5-worth.choice.read"
+        },
+        {
+          "id": "s5-worth-end.l02",
+          "speaker": "narrator",
+          "text": "Ты находишь свои слова со второго захода. Марат дослушивает.",
+          "if": "s5-worth.revisit.read"
+        },
+        {
+          "id": "s5-worth-end.l03",
+          "speaker": "narrator",
+          "text": "Страница прозвучала не целиком. Можно будет вернуться к ней.",
+          "if": "s5-worth.choice.soften",
+          "ifNot": "s5-worth.revisit.read"
+        },
+        {
+          "id": "s5-worth-end.l04",
+          "speaker": "narrator",
+          "text": "Сегодня эта страница остаётся у тебя. Выбирать следующую не обязательно сразу.",
+          "if": "s5-worth.choice.later"
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "id": "q.step05.worth.1",
+      "text": "Что хорошее о себе мне трудно произнести вслух?"
+    },
+    {
+      "id": "q.step05.worth.2",
+      "text": "Какую простую вещь о себе я хочу назвать без слова «но»?"
+    }
+  ]
+}

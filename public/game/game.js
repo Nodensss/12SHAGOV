@@ -1,7 +1,7 @@
 import {
   advance, answerLater, choose, deleteEntry, fill, freshGame, GAME_KEY, depthOf, isLocked, itemsOf, leaveJournal, linesOf, loadGame, markDone, picked, scaledSkills,
   progressOf, restartChapter, saveEntry, saveGame, setDraft, stage, validateChapter, validateVocab,
-  levelOf, recordFight,
+  levelOf, recordFight, conversationState, validateConversation,
   assignSteering, canLeaveSteering, leaveSteering, steeringOf,
 } from './engine.js';
 import { canUse, playTurn, restoreBattle, skillsOf, startBattle, validateFight } from './battle.js';
@@ -45,7 +45,13 @@ function go(next) {
   view = next; journalIndex = null;
   render();
   window.scrollTo(0, 0);
-  root.querySelector('h1, h2')?.focus({ preventScroll: true });
+  const section = next.section && root.querySelector('[data-talk-step="' + CSS.escape(String(next.section)) + '"]');
+  if (section) {
+    window.scrollTo(0, section.getBoundingClientRect().top + scrollY - (root.querySelector('.g-top')?.offsetHeight || 0));
+    const heading = section.querySelector('h2');
+    heading?.setAttribute('tabindex', '-1');
+    heading?.focus({ preventScroll: true });
+  } else root.querySelector('h1, h2')?.focus({ preventScroll: true });
 }
 
 /* ---------- Экраны ---------- */
@@ -128,6 +134,28 @@ function notebookSection(step, head, fresh) {
     }).join('') + '</div></section>';
 }
 
+// The conversation table keeps boundaries and softened readings as full decisions.
+function conversationSection(step, head, fresh) {
+  const list = index.chapters.filter(item => item.step === step.id);
+  if (validateConversation(step, index).length) return '<section class="g-section">' + head + '<div class="g-list">' + list.map(episodeCard).join('') + '</div></section>';
+  const state = conversationState(step, index, game), labels = step.labels;
+  const intro = list.find(item => item.id === step.intro), finale = list.find(item => item.id === step.finale);
+  const arrived = picked(game).has(step.intro);
+  const table = step.cover && /^art\/[a-z0-9-]+\.webp$/.test(step.cover) ? '<div class="g-talk-table" aria-hidden="true"><img src="' + h(step.cover) + '" alt=""></div>' : '';
+  const secret = '<div class="g-load g-secret" role="img" aria-label="' + h(labels.secret) + ': ' + state.secret + ' / ' + state.pages.length + '"><div class="g-load-top"><strong>' + h(labels.secret) + '</strong><span>' + state.secret + ' / ' + state.pages.length + '</span></div><div class="g-load-row" style="grid-template-columns:repeat(' + state.pages.length + ',1fr)">' + state.pages.map((p, i) => '<i' + (i < state.secret ? ' class="is-on"' : '') + '></i>').join('') + '</div></div><p class="g-note">' + h(labels.secretHint) + '</p>';
+  const pages = state.pages.map(page => {
+    const chapter = chapterOf(page.chapter), saved = game.chapters[page.chapter];
+    const started = saved && chapter && chapter.scenes[saved.scene] && chapter.scenes[saved.scene].type !== 'ending' && (saved.scene !== chapter.start || saved.line > 0 || Object.keys(saved.choices || {}).length);
+    return '<article class="g-card g-talk-page" data-page="' + h(page.id) + '" data-mode="' + h(page.mode || '') + '">' +
+      (page.marked ? '<span class="g-talk-mark">' + h(labels.suggested) + '</span>' : '') +
+      '<strong>' + h(page.title) + '</strong><small>' + h(labels.depth) + ': ' + page.depth + '</small>' +
+      '<p class="g-talk-status">' + h(labels[page.mode || 'pending']) + '</p><div class="g-row"><button class="g-btn g-secondary" data-act="' + (started || !page.mode ? 'play' : 'restart') + '" data-id="' + h(page.chapter) + '"' + (chapter ? '' : ' disabled') + '>' + h(started ? labels.resume : page.mode ? labels.again : labels.open) + '</button></div></article>';
+  }).join('');
+  return '<section class="g-section g-section-conversation" data-talk-step="' + h(step.id) + '">' + head + fresh + table + '<p class="g-lead g-section-lead">' + h(step.lead) + '</p>' + secret +
+    (!arrived ? '<p class="g-note">' + h(labels.introHint) + '</p>' + episodeCard(intro) : '<div class="g-talk-count">' + h(labels.decision) + ': ' + state.decided + ' / ' + state.pages.length + '</div><div class="g-list g-talk-pages">' + pages + '</div>' +
+      (isLocked(finale, game) ? '<div class="g-card g-card-off g-talk-finale"><strong>' + h(finale.title) + '</strong><small>' + h(labels.finaleHint) + '</small></div>' : episodeCard(finale))) + '</section>';
+}
+
 function stepSection(step) {
   const list = index.chapters.filter(item => item.step === step.id), done = list.filter(item => picked(game).has(item.id)).length;
   const head = '<div class="g-section-head"><div><span class="g-step">' + h(step.title) + '</span><h2>' + h(step.name) + '</h2></div><span class="g-count">' + done + ' / ' + list.length + '</span></div>';
@@ -138,6 +166,7 @@ function stepSection(step) {
   const folded = done === list.length && (index.steps || []).some(next => next.id > step.id && next.after && picked(game).has(next.after));
   const fresh = step.after && !done ? '<p class="g-unlocked">Открыт новый шаг</p>' : '';
   if (step.layout === 'notebook') return notebookSection(step, head, fresh);
+  if (step.layout === 'conversation') return conversationSection(step, head, fresh);
   if (step.layout !== 'map') return '<section class="g-section' + (step.layout === 'wheel' ? ' g-section-wheel' : '') + '">' + head + fresh + (folded ? '<details class="g-fold"><summary>Шаг пройден. Показать эпизоды и бои</summary>' : (step.layout === 'wheel' ? '<div class="g-wheel g-wheel-menu" aria-hidden="true"><i></i><b></b></div>' : '') + '<p class="g-lead g-section-lead">' + h(step.lead || '') + '</p>') + '<div class="g-list">' + list.map(item => item.type === 'fight' ? fightCard(item) : item.type === 'trial' ? trialCard(item) : episodeCard(item)).join('') + '</div>' + (folded ? '</details>' : '') + '</section>';
   const supports = itemsOf(items, game).filter(i => i.kind === 'support' && i.step === step.id), places = list.filter(item => !item.final), finals = list.filter(item => item.final);
   return '<section class="g-section g-section-map">' + head + fresh + '<p class="g-lead g-section-lead">' + h(step.lead || '') + '</p>' +
@@ -278,13 +307,13 @@ function sceneHeading(chapter, scene) {
 
 function play() {
   const chapter = chapterOf(view.id), progress = progressOf(game, chapter), scene = chapter.scenes[progress.scene], now = stage(progress, chapter, game);
-  const top = '<header class="g-top"><button class="g-back" data-act="menu">← Главы</button><span class="g-scene">' + h(sceneHeading(chapter, scene)) + '</span></header>';
+  const top = '<header class="g-top"><button class="g-back" data-act="menu">← ' + h(chapter.returnLabel || 'Главы') + '</button><span class="g-scene">' + h(sceneHeading(chapter, scene)) + '</span></header>';
   if (now === 'journal') return top + journal(chapter, scene);
   if (now === 'steering') return top + steering(chapter, scene, progress);
   if (now === 'ending') {
     return top + '<main class="g-main g-ending"><div class="g-door" aria-hidden="true"><i></i></div><h2 tabindex="-1">' + h(scene.title) + '</h2>' +
       linesOf(scene, game).map(line => '<p>' + say(line.text) + '</p>').join('') + '<p class="g-note">' + h(chapter.disclaimer || '') + '</p></main>' +
-      '<footer class="g-foot"><button class="g-btn g-primary" data-act="menu">К главам</button><button class="g-btn g-secondary" data-act="diary">Открыть дневник</button><button class="g-btn g-quiet" data-act="restart" data-id="' + h(chapter.id) + '">Пройти иначе</button></footer>';
+      '<footer class="g-foot"><button class="g-btn g-primary" data-act="menu">' + h(chapter.returnLabel || 'К главам') + '</button><button class="g-btn g-secondary" data-act="diary">Открыть дневник</button><button class="g-btn g-quiet" data-act="restart" data-id="' + h(chapter.id) + '">Пройти иначе</button></footer>';
   }
   const shown = linesOf(scene, game).slice(0, progress.line + 1);
   const log = '<main class="g-main g-log" data-act="' + (now === 'choice' ? '' : 'next') + '" aria-live="polite">' + shown.map((line, i) => lineHtml(chapter, line, i === shown.length - 1)).join('') + '</main>';
@@ -294,7 +323,7 @@ function play() {
   // Optional artwork is local data; chapters without it keep the original scene markup.
   const background = scene.background ?? chapter.background;
   if (typeof background === 'string' && /^art\/[a-z0-9-]+\.webp$/.test(background)) {
-    return top + '<section class="g-story-art"><img class="g-scene-art" src="' + h(background) + '" alt="" aria-hidden="true">' +
+    return top + '<section class="g-story-art' + ((index.steps || []).find(step => step.id === chapter.step)?.layout === 'conversation' ? ' g-talk-story' : '') + '"><img class="g-scene-art" src="' + h(background) + '" alt="" aria-hidden="true">' +
       '<div class="g-scene-window" aria-hidden="true"></div>' + log + foot + '</section>';
   }
   return top + log + foot;
@@ -466,7 +495,10 @@ const actions = {
     for (const button of root.querySelectorAll('.g-sound')) { button.setAttribute('aria-pressed', sound.enabled); button.setAttribute('aria-label', sound.enabled ? 'Выключить звук' : 'Включить звук'); }
     for (const label of root.querySelectorAll('[data-sound-label]')) label.textContent = soundLabel();
   },
-  menu: () => { dropBattle(); go({ name: 'menu' }); },
+  menu: () => {
+    const step = (index.steps || []).find(step => step.id === chapterOf(view.id)?.step);
+    dropBattle(); go({ name: 'menu', ...(step?.layout === 'conversation' ? { section: step.id } : {}) });
+  },
   bag: () => go({ name: 'bag' }),
   trial: id => go({ name: 'trial', id, card: null, answer: null }),
   'trial-answer': id => { view.answer = id === 'trap'; render(); },
@@ -579,6 +611,7 @@ async function boot() {
     soundMap = await json('./data/sounds.json').catch(() => ({}));
     sound.configure(soundMap);
     const problems = validateVocab(vocab);
+    for (const step of index.steps || []) if (step.layout === 'conversation') problems.push(...validateConversation(step, index));
     await Promise.all(index.chapters.map(async item => {
       try {
         if (item.type === 'trial') {

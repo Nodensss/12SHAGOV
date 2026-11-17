@@ -1,0 +1,338 @@
+{
+  "id": "step05-after",
+  "version": 1,
+  "step": 5,
+  "title": "После чая",
+  "returnLabel": "К разговору",
+  "disclaimer": "Вымышленная история о разговоре героя с Маратом. Это не литература АН и не указание, кому и что рассказывать. Личные записи остаются в этом браузере.",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_05_Пятый.md: разговор с выбранным человеком, право на паузу и свои границы; приложение ничего не отправляет",
+    "public/steps.js → шаг 5: подготовка разговора и договорённостей, без обязательного раскрытия тяжёлого",
+    "public/game/data/chapters/step04-*.json: вымышленная тетрадь героя, пять страниц, глубина и закладки"
+  ],
+  "background": "art/scene-night-notebook.webp",
+  "speakers": {
+    "narrator": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "marat": {
+      "name": "Марат",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "start": "s5-after-table",
+  "scenes": {
+    "s5-after-table": {
+      "type": "story",
+      "title": "У Марата",
+      "lines": [
+        {
+          "id": "s5-after-table.l01",
+          "speaker": "narrator",
+          "text": "Чайник успел вскипеть дважды. Возле твоей чашки мокрый круг. Ты водишь по нему ногтем."
+        },
+        {
+          "id": "s5-after-table.l02",
+          "speaker": "marat",
+          "text": "Всё на сегодня?"
+        },
+        {
+          "id": "s5-after-table.l03",
+          "speaker": "you",
+          "text": "На сегодня — да."
+        },
+        {
+          "id": "s5-after-table.l04",
+          "speaker": "narrator",
+          "text": "Про отца удалось сказать без того привычного разгона, после которого ты уже никого не слышал.",
+          "if": "s5-father.choice.read"
+        },
+        {
+          "id": "s5-after-table.l05",
+          "speaker": "narrator",
+          "text": "Про отца удалось сказать без того привычного разгона, после которого ты уже никого не слышал.",
+          "if": "s5-father.revisit.read"
+        },
+        {
+          "id": "s5-after-table.l06",
+          "speaker": "narrator",
+          "text": "Про отца вслух осталось «сложные отношения». На бумаге слов больше.",
+          "if": "s5-father.choice.soften",
+          "ifNot": "s5-father.revisit.read"
+        },
+        {
+          "id": "s5-after-table.l07",
+          "speaker": "narrator",
+          "text": "Страница про отца пока остаётся закрытой. Марат не просит открыть её напоследок.",
+          "if": "s5-father.choice.later"
+        },
+        {
+          "id": "s5-after-table.l08",
+          "speaker": "narrator",
+          "text": "Слово «боюсь» остаётся в этой кухне. Марат его услышал и не засмеялся.",
+          "if": "s5-fear.choice.read"
+        },
+        {
+          "id": "s5-after-table.l09",
+          "speaker": "narrator",
+          "text": "Слово «боюсь» остаётся в этой кухне. Марат его услышал и не засмеялся.",
+          "if": "s5-fear.revisit.read"
+        },
+        {
+          "id": "s5-after-table.l10",
+          "speaker": "narrator",
+          "text": "Список страхов прозвучал короче, чем написан. Пустая строка ждёт следующего раза.",
+          "if": "s5-fear.choice.soften",
+          "ifNot": "s5-fear.revisit.read"
+        },
+        {
+          "id": "s5-after-table.l11",
+          "speaker": "narrator",
+          "text": "Страхи сегодня не прочитаны. Ты сам решаешь, когда вернуться к этой странице.",
+          "if": "s5-fear.choice.later"
+        },
+        {
+          "id": "s5-after-table.l12",
+          "speaker": "narrator",
+          "text": "Про шкатулку теперь знает ещё один человек. Мама по-прежнему не знает, и разговор с ней не сделан за этим столом.",
+          "if": "s5-box.choice.read"
+        },
+        {
+          "id": "s5-after-table.l13",
+          "speaker": "narrator",
+          "text": "Про шкатулку теперь знает ещё один человек. Мама по-прежнему не знает, и разговор с ней не сделан за этим столом.",
+          "if": "s5-box.revisit.read"
+        },
+        {
+          "id": "s5-after-table.l14",
+          "speaker": "narrator",
+          "text": "Вместо строки про шкатулку прозвучали аккуратные слова. Ты слышишь разницу.",
+          "if": "s5-box.choice.soften",
+          "ifNot": "s5-box.revisit.read"
+        },
+        {
+          "id": "s5-after-table.l15",
+          "speaker": "narrator",
+          "text": "Шкатулка осталась на своей странице. Стакан воды, который принёс Марат, уже пуст.",
+          "if": "s5-box.choice.later"
+        },
+        {
+          "id": "s5-after-table.l16",
+          "speaker": "narrator",
+          "text": "Ты назвал людей и то, что делал рядом с ними. Никому из них отсюда ничего не отправляется.",
+          "if": "s5-people.choice.read"
+        },
+        {
+          "id": "s5-after-table.l17",
+          "speaker": "narrator",
+          "text": "Ты назвал людей и то, что делал рядом с ними. Никому из них отсюда ничего не отправляется.",
+          "if": "s5-people.revisit.read"
+        },
+        {
+          "id": "s5-after-table.l18",
+          "speaker": "narrator",
+          "text": "Про людей опять получилось «разошлись». Ты не вычёркиваешь имена из тетради.",
+          "if": "s5-people.choice.soften",
+          "ifNot": "s5-people.revisit.read"
+        },
+        {
+          "id": "s5-after-table.l19",
+          "speaker": "narrator",
+          "text": "Имена сегодня остаются под твоей ладонью. Разговор на этом не обрывается.",
+          "if": "s5-people.choice.later"
+        },
+        {
+          "id": "s5-after-table.l20",
+          "speaker": "narrator",
+          "text": "Ты прочитал и про то, что в тебе есть. Эту страницу тоже больше не приходится прятать.",
+          "if": "s5-worth.choice.read"
+        },
+        {
+          "id": "s5-after-table.l21",
+          "speaker": "narrator",
+          "text": "Ты прочитал и про то, что в тебе есть. Эту страницу тоже больше не приходится прятать.",
+          "if": "s5-worth.revisit.read"
+        },
+        {
+          "id": "s5-after-table.l22",
+          "speaker": "narrator",
+          "text": "Хорошее опять уместилось в слове «мелочи». Сам лист остался целым.",
+          "if": "s5-worth.choice.soften",
+          "ifNot": "s5-worth.revisit.read"
+        },
+        {
+          "id": "s5-after-table.l23",
+          "speaker": "narrator",
+          "text": "Страница про хорошее тоже отложена. Марат не приписывает туда ничего за тебя.",
+          "if": "s5-worth.choice.later"
+        },
+        {
+          "id": "s5-after-table.l24",
+          "speaker": "you",
+          "text": "Я думал, ты после этого будешь смотреть по-другому.",
+          "ifAny": [
+            "s5-father.choice.read",
+            "s5-father.revisit.read",
+            "s5-fear.choice.read",
+            "s5-fear.revisit.read",
+            "s5-box.choice.read",
+            "s5-box.revisit.read",
+            "s5-people.choice.read",
+            "s5-people.revisit.read",
+            "s5-worth.choice.read",
+            "s5-worth.revisit.read"
+          ]
+        },
+        {
+          "id": "s5-after-table.l25",
+          "speaker": "marat",
+          "text": "Я сейчас думаю, хлеб убрать или ещё посидим. На тебя я смотрю.",
+          "ifAny": [
+            "s5-father.choice.read",
+            "s5-father.revisit.read",
+            "s5-fear.choice.read",
+            "s5-fear.revisit.read",
+            "s5-box.choice.read",
+            "s5-box.revisit.read",
+            "s5-people.choice.read",
+            "s5-people.revisit.read",
+            "s5-worth.choice.read",
+            "s5-worth.revisit.read"
+          ]
+        },
+        {
+          "id": "s5-after-table.l26",
+          "speaker": "you",
+          "text": "Я почти ничего не прочитал.",
+          "ifNone": [
+            "s5-father.choice.read",
+            "s5-father.revisit.read",
+            "s5-fear.choice.read",
+            "s5-fear.revisit.read",
+            "s5-box.choice.read",
+            "s5-box.revisit.read",
+            "s5-people.choice.read",
+            "s5-people.revisit.read",
+            "s5-worth.choice.read",
+            "s5-worth.revisit.read"
+          ]
+        },
+        {
+          "id": "s5-after-table.l27",
+          "speaker": "marat",
+          "text": "Мы же договаривались: сколько захочешь. Я ещё чай заварю.",
+          "ifNone": [
+            "s5-father.choice.read",
+            "s5-father.revisit.read",
+            "s5-fear.choice.read",
+            "s5-fear.revisit.read",
+            "s5-box.choice.read",
+            "s5-box.revisit.read",
+            "s5-people.choice.read",
+            "s5-people.revisit.read",
+            "s5-worth.choice.read",
+            "s5-worth.revisit.read"
+          ]
+        },
+        {
+          "id": "s5-after-table.l28",
+          "speaker": "narrator",
+          "text": "Ты складываешь листы, которые оставил на другой день. Марат не заглядывает через плечо.",
+          "ifAny": [
+            "s5-father.choice.later",
+            "s5-fear.choice.later",
+            "s5-box.choice.later",
+            "s5-people.choice.later",
+            "s5-worth.choice.later"
+          ]
+        },
+        {
+          "id": "s5-after-table.l29",
+          "speaker": "narrator",
+          "text": "Ты застёгиваешь рюкзак. На стуле остаётся нитка от обложки."
+        },
+        {
+          "id": "s5-after-table.l30",
+          "speaker": "you",
+          "text": "И что теперь? Я завтра опять могу всё по-старому."
+        },
+        {
+          "id": "s5-after-table.l31",
+          "speaker": "marat",
+          "text": "Я после своего разговора на следующий же день наорал на человека. Думал, ну всё, зря читал."
+        },
+        {
+          "id": "s5-after-table.l32",
+          "speaker": "you",
+          "text": "А потом?"
+        },
+        {
+          "id": "s5-after-table.l33",
+          "speaker": "marat",
+          "text": "Потом заметил, как заранее набираю воздух, чтобы орать. До слов заметил. Долго мне этого не хватало."
+        },
+        {
+          "id": "s5-after-table.l34",
+          "speaker": "narrator",
+          "text": "Ты вспоминаешь, как обычно набираешь воздух сам. Перед «да вы вообще» и перед «я же сказал»."
+        },
+        {
+          "id": "s5-after-table.l35",
+          "speaker": "marat",
+          "text": "В следующий раз можем про это посидеть. Не сегодня. Я уже чайник забыл выключить."
+        },
+        {
+          "id": "s5-after-table.l36",
+          "speaker": "narrator",
+          "text": "Он поворачивается к плите, а чайник давно выключен. Вы оба на него смотрите. Потом Марат всё-таки убирает хлеб."
+        }
+      ],
+      "next": "s5-after-journal"
+    },
+    "s5-after-journal": {
+      "type": "journal",
+      "title": "После разговора",
+      "intro": "Можно записать, что осталось после разговора. Без отчёта и без подробностей, которые не хочется сохранять.",
+      "questionIds": [
+        "q.step05.after.1",
+        "q.step05.after.2"
+      ],
+      "next": "s5-after-end"
+    },
+    "s5-after-end": {
+      "type": "ending",
+      "title": "Кухня за спиной",
+      "lines": [
+        {
+          "id": "s5-after-end.l01",
+          "speaker": "narrator",
+          "text": "На лестнице ты останавливаешься, чтобы поправить лямку рюкзака. Тетрадь на месте. В кармане — телефон, который ты так никому и не отдал."
+        },
+        {
+          "id": "s5-after-end.l02",
+          "speaker": "narrator",
+          "text": "За дверью Марат возится с краном. Он опять капает. Ты идёшь вниз, пока слышно."
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "id": "q.step05.after.1",
+      "text": "Что я хочу оставить до следующего разговора?"
+    },
+    {
+      "id": "q.step05.after.2",
+      "text": "Какую привычную реакцию я замечаю раньше, чем прежде?"
+    }
+  ]
+}

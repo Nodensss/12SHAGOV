@@ -37,7 +37,14 @@
       "step04-worth-1": "night",
       "step04-worth-2": "night",
       "step04-worth-3": "night",
-      "step04-notebook": "kitchen"
+      "step04-notebook": "kitchen",
+      "step05-arrival": "kitchen",
+      "step05-father": "kitchen",
+      "step05-fear": "kitchen",
+      "step05-box": "kitchen",
+      "step05-people": "kitchen",
+      "step05-worth": "kitchen",
+      "step05-after": "night"
     },
     "scenes": {
       "step01-only-once": {

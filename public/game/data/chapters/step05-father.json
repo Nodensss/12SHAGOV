@@ -1,0 +1,350 @@
+{
+  "id": "step05-father",
+  "version": 1,
+  "step": 5,
+  "title": "Отец",
+  "returnLabel": "К разговору",
+  "disclaimer": "Вымышленная история о разговоре героя с Маратом. Это не литература АН и не указание, кому и что рассказывать. Личные записи остаются в этом браузере.",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_05_Пятый.md: разговор с выбранным человеком, право на паузу и свои границы; приложение ничего не отправляет",
+    "public/steps.js → шаг 5: подготовка разговора и договорённостей, без обязательного раскрытия тяжёлого",
+    "public/game/data/chapters/step04-*.json: вымышленная тетрадь героя, пять страниц, глубина и закладки"
+  ],
+  "background": "art/scene-kitchen.webp",
+  "speakers": {
+    "narrator": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "marat": {
+      "name": "Марат",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "start": "s5-father-offer",
+  "scenes": {
+    "s5-father-offer": {
+      "type": "story",
+      "title": "Отец",
+      "lines": [
+        {
+          "id": "s5-father-offer.l01",
+          "speaker": "narrator",
+          "text": "На этой странице буквы крупнее, чем на остальных. В нескольких местах ручка продавила следующий лист."
+        },
+        {
+          "id": "s5-father-offer.l02",
+          "speaker": "marat",
+          "text": "Тут уголок. Хочешь начать с него?",
+          "if": "s4-res1.choice.mark"
+        },
+        {
+          "id": "s5-father-offer.l03",
+          "speaker": "narrator",
+          "text": "Ты разглаживаешь край ладонью. Начать можно с первой строки, не со всей жизни сразу."
+        },
+        {
+          "id": "s5-father-offer.l04",
+          "speaker": "voice",
+          "text": "Скажи просто: не ладили. Ему хватит."
+        }
+      ],
+      "choice": {
+        "id": "s5-father.choice",
+        "prompt": "Что ты прочитаешь?",
+        "options": [
+          {
+            "id": "s5-father.choice.read",
+            "label": "Прочитать как есть",
+            "next": "s5-father-read"
+          },
+          {
+            "id": "s5-father.choice.soften",
+            "label": "Смягчить",
+            "next": "s5-father-soften"
+          },
+          {
+            "id": "s5-father.choice.later",
+            "label": "Об этом не сегодня",
+            "next": "s5-father-later"
+          }
+        ]
+      }
+    },
+    "s5-father-read": {
+      "type": "story",
+      "title": "Отец",
+      "lines": [
+        {
+          "id": "s5-father-read.l01",
+          "speaker": "you",
+          "text": "Я написал про отца. Он пил. Обещал приехать и не приезжал."
+        },
+        {
+          "id": "s5-father-read.l02",
+          "speaker": "you",
+          "text": "Один раз обещал рыбалку. Я поставил удочки у двери и ждал весь день."
+        },
+        {
+          "id": "s5-father-read.l03",
+          "speaker": "narrator",
+          "text": "Марат убирает руку от сахарницы. Не подсказывает, что читать дальше."
+        },
+        {
+          "id": "s5-father-read.l04",
+          "speaker": "you",
+          "text": "Я написал: никогда не буду как он. А потом вспомнил Тимку. Он ждал меня с тортом.",
+          "depth": {
+            "of": [
+              "step04-resentment-1",
+              "step04-resentment-2",
+              "step04-resentment-3"
+            ],
+            "min": 2,
+            "max": 3
+          }
+        },
+        {
+          "id": "s5-father-read.l05",
+          "speaker": "you",
+          "text": "Когда это рядом на листе, мне уже не хочется читать громко.",
+          "depth": {
+            "of": [
+              "step04-resentment-1",
+              "step04-resentment-2",
+              "step04-resentment-3"
+            ],
+            "min": 2,
+            "max": 3
+          }
+        },
+        {
+          "id": "s5-father-read.l06",
+          "speaker": "you",
+          "text": "Я много лет говорил: с таким отцом чего вы от меня хотите. Это у меня было на любой случай.",
+          "depth": {
+            "of": [
+              "step04-resentment-1",
+              "step04-resentment-2",
+              "step04-resentment-3"
+            ],
+            "min": 3,
+            "max": 3
+          }
+        },
+        {
+          "id": "s5-father-read.l07",
+          "speaker": "you",
+          "text": "И на похороны не поехал. Говорил, что из принципа. А я тогда просто не мог доехать.",
+          "depth": {
+            "of": [
+              "step04-resentment-1",
+              "step04-resentment-2",
+              "step04-resentment-3"
+            ],
+            "min": 3,
+            "max": 3
+          }
+        },
+        {
+          "id": "s5-father-read.l08",
+          "speaker": "you",
+          "text": "Простить я пока не могу. В тетради это тоже есть.",
+          "depth": {
+            "of": [
+              "step04-resentment-1",
+              "step04-resentment-2",
+              "step04-resentment-3"
+            ],
+            "min": 3,
+            "max": 3
+          }
+        },
+        {
+          "id": "s5-father-read.l09",
+          "speaker": "marat",
+          "text": "Я своего отца очень складно описывал. Долго. Человеку напротив слова не оставлял."
+        },
+        {
+          "id": "s5-father-read.l10",
+          "speaker": "marat",
+          "text": "А про себя читал так тихо, что мне чашку пришлось отодвинуть — об неё слова стукались."
+        },
+        {
+          "id": "s5-father-read.l11",
+          "speaker": "you",
+          "text": "И ты простил?"
+        },
+        {
+          "id": "s5-father-read.l12",
+          "speaker": "marat",
+          "text": "Не в тот день. Я тогда впервые сказал, что не простил. До этого рассказывал, какой я выше всего этого."
+        },
+        {
+          "id": "s5-father-read.l13",
+          "speaker": "you",
+          "text": "У меня про него и хорошее было. Только писать не хотелось."
+        },
+        {
+          "id": "s5-father-read.l14",
+          "speaker": "marat",
+          "text": "Я вспоминал хорошее и сам на себя злился. Будто теперь про остальное врать придётся."
+        },
+        {
+          "id": "s5-father-read.l15",
+          "speaker": "narrator",
+          "text": "Марат тянется за чайником и спохватывается: в твоей чашке ещё половина. Ты придерживаешь лист. Он уже не дрожит так сильно."
+        }
+      ],
+      "next": "s5-father-journal"
+    },
+    "s5-father-soften": {
+      "type": "story",
+      "title": "Отец",
+      "lines": [
+        {
+          "id": "s5-father-soften.l01",
+          "speaker": "you",
+          "text": "В общем, у нас с отцом были сложные отношения. Я давно это пережил."
+        },
+        {
+          "id": "s5-father-soften.l02",
+          "speaker": "narrator",
+          "text": "«Пережил» выскакивает легко. Под большим пальцем на листе другое слово: «обижен»."
+        },
+        {
+          "id": "s5-father-soften.l03",
+          "speaker": "marat",
+          "text": "Я про своего тоже говорил «были сложности». Удобная фраза. Можно чаю налить и на этом закончить."
+        },
+        {
+          "id": "s5-father-soften.l04",
+          "speaker": "narrator",
+          "text": "Он и правда доливает чай. Не заглядывает тебе в тетрадь."
+        },
+        {
+          "id": "s5-father-soften.l05",
+          "speaker": "you",
+          "text": "Сейчас я слишком гладко сказал."
+        },
+        {
+          "id": "s5-father-soften.l06",
+          "speaker": "marat",
+          "text": "Я подожду."
+        }
+      ],
+      "choice": {
+        "id": "s5-father.revisit",
+        "prompt": "Как дальше?",
+        "options": [
+          {
+            "id": "s5-father.revisit.read",
+            "label": "Перечитать как есть",
+            "next": "s5-father-read"
+          },
+          {
+            "id": "s5-father.revisit.keep",
+            "label": "Оставить как прозвучало",
+            "next": "s5-father-journal"
+          }
+        ]
+      }
+    },
+    "s5-father-later": {
+      "type": "story",
+      "title": "Отец",
+      "lines": [
+        {
+          "id": "s5-father-later.l01",
+          "speaker": "you",
+          "text": "Про отца сегодня не буду."
+        },
+        {
+          "id": "s5-father-later.l02",
+          "speaker": "marat",
+          "text": "Хорошо."
+        },
+        {
+          "id": "s5-father-later.l03",
+          "speaker": "narrator",
+          "text": "Ты ждёшь продолжения. Марат только сдвигает сахарницу, чтобы на неё не ложилась страница."
+        },
+        {
+          "id": "s5-father-later.l04",
+          "speaker": "you",
+          "text": "Ты не будешь уговаривать?"
+        },
+        {
+          "id": "s5-father-later.l05",
+          "speaker": "marat",
+          "text": "Нет. На столе ещё четыре страницы. Или просто чай."
+        },
+        {
+          "id": "s5-father-later.l06",
+          "speaker": "narrator",
+          "text": "Ты переворачиваешь лист. Уголок остаётся загнутым, если был. Марат его не трогает."
+        }
+      ],
+      "next": "s5-father-journal"
+    },
+    "s5-father-journal": {
+      "type": "journal",
+      "title": "Пара строк для себя",
+      "intro": "Это разговор героя. Здесь можно записать о себе, без подробностей тяжёлого. Можно выбрать другой вопрос или ответить позже.",
+      "questionIds": [
+        "q.step05.father.1",
+        "q.step05.father.2"
+      ],
+      "next": "s5-father-end"
+    },
+    "s5-father-end": {
+      "type": "ending",
+      "title": "Отец",
+      "lines": [
+        {
+          "id": "s5-father-end.l01",
+          "speaker": "narrator",
+          "text": "Лист ложится на стол между чашками. Эти строки уже прозвучали.",
+          "if": "s5-father.choice.read"
+        },
+        {
+          "id": "s5-father-end.l02",
+          "speaker": "narrator",
+          "text": "Ты находишь свои слова со второго захода. Марат дослушивает.",
+          "if": "s5-father.revisit.read"
+        },
+        {
+          "id": "s5-father-end.l03",
+          "speaker": "narrator",
+          "text": "Страница прозвучала не целиком. Можно будет вернуться к ней.",
+          "if": "s5-father.choice.soften",
+          "ifNot": "s5-father.revisit.read"
+        },
+        {
+          "id": "s5-father-end.l04",
+          "speaker": "narrator",
+          "text": "Сегодня эта страница остаётся у тебя. Выбирать следующую не обязательно сразу.",
+          "if": "s5-father.choice.later"
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "id": "q.step05.father.1",
+      "text": "Что помогает мне сказать «об этом пока не хочу говорить»?"
+    },
+    {
+      "id": "q.step05.father.2",
+      "text": "Какую одну фразу о себе я хочу произнести без длинного вступления?"
+    }
+  ]
+}

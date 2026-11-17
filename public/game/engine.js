@@ -117,7 +117,7 @@ export function validateChapter(chapter, vocab) {
   const tokens = new Set(Object.keys(vocab?.tokens || {}));
   const routes = next => Array.isArray(next) ? next.map(route => route.to) : [next];
   const target = (next, where) => {
-    if (Array.isArray(next) && (!next.length || next.at(-1).if || next.at(-1).ifNot)) errors.push(where + ': последний маршрут next должен быть без условия');
+    if (Array.isArray(next) && (!next.length || next.at(-1).if || next.at(-1).ifNot || next.at(-1).ifAny || next.at(-1).ifNone || next.at(-1).depth)) errors.push(where + ': последний маршрут next должен быть без условия');
     for (const id of routes(next)) if (!scenes[id]) errors.push(where + ': нет сцены ' + id);
   };
   for (const [sceneId, scene] of Object.entries(scenes)) {
@@ -127,6 +127,12 @@ export function validateChapter(chapter, vocab) {
       unique(line.id, sceneId + ' реплика');
       if (!chapter.speakers?.[line.speaker]) errors.push(line.id + ': неизвестный speaker');
       if (!line.text) errors.push(line.id + ': пустой текст');
+      for (const key of ['ifAny', 'ifNone']) if (line[key] !== undefined && (!Array.isArray(line[key]) || !line[key].length || line[key].some(id => typeof id !== 'string' || !id))) errors.push(line.id + ': неверное ' + key);
+      if (line.depth !== undefined) {
+        const d = line.depth;
+        if (!d || !Array.isArray(d.of) || !d.of.length || new Set(d.of).size !== d.of.length || d.of.some(id => typeof id !== 'string' || !id) || !Number.isInteger(d.min) || !Number.isInteger(d.max) || d.min < 0 || d.max < d.min || d.max > d.of.length) errors.push(line.id + ': неверная глубина');
+      }
+
       for (const [, key] of String(line.text).matchAll(/\{(\w+)\}/g)) if (vocab && !tokens.has(key)) errors.push(line.id + ': неизвестное слово {' + key + '}');
     }
     if (scene.type === 'story') {
@@ -189,7 +195,10 @@ export function picked(game) {
   return set;
 }
 
-const passes = (item, chosen) => (!item.if || chosen.has(item.if)) && (!item.ifNot || !chosen.has(item.ifNot));
+const passes = (item, chosen) => (!item.if || chosen.has(item.if)) && (!item.ifNot || !chosen.has(item.ifNot))
+  && (!item.ifAny || item.ifAny.some(id => chosen.has(id)))
+  && (!item.ifNone || !item.ifNone.some(id => chosen.has(id)))
+  && (!item.depth || (() => { const count = item.depth.of.filter(id => chosen.has(id)).length; return count >= item.depth.min && count <= item.depth.max; })());
 
 // Реплики сцены с учётом условий if / ifNot (id варианта выбора из любой главы).
 export function linesOf(scene, game) {
@@ -207,6 +216,7 @@ export function resolveNext(next, game) {
 export function isLocked(item, game) {
   const have = picked(game);
   if (item.after && !have.has(item.after)) return true;
+  if (item.allOfAny?.some(group => !group.some(id => have.has(id)))) return true;
   // needs: { count, of: [id, ...] } — открыть, когда пройдено хотя бы count из списка.
   return !!item.needs && item.needs.of.filter(id => have.has(id)).length < item.needs.count;
 }
@@ -365,4 +375,37 @@ export function scaledSkills(skills, index, game) {
     scaled.hint = (scaled.dmg ? scaled.dmg + ' урона' : skill.hint) + ' · слой ' + depth + ' из 3';
     return scaled;
   });
+}
+
+// Conversation uses the ordinary chapter choices, so v1 saves need no new fields.
+export function conversationState(step, index, game) {
+  const have = picked(game);
+  const pages = (step.pages || []).map(page => {
+    const progress = game.chapters[page.chapter], choices = progress?.choices || {};
+    const selected = choices[page.choice];
+    const mode = selected === page.read || (selected === page.soften && choices[page.revisitChoice] === page.reread) ? 'read'
+      : selected === page.soften ? 'soften' : selected === page.later ? 'later' : null;
+    return { ...page, mode, marked: have.has(page.bookmark), depth: depthOf(page.id, index, game) };
+  });
+  const read = pages.filter(page => page.mode === 'read').length;
+  return { pages: [...pages.filter(page => page.marked), ...pages.filter(page => !page.marked)],
+    read, soften: pages.filter(page => page.mode === 'soften').length,
+    later: pages.filter(page => page.mode === 'later').length,
+    decided: pages.filter(page => page.mode).length, secret: pages.length - read };
+}
+
+export function validateConversation(step, index) {
+  const errors = [], pages = step?.pages;
+  if (step?.layout !== 'conversation' || !Array.isArray(pages) || !pages.length) return ['разговор без страниц'];
+  if (new Set(pages.map(page => page?.id)).size !== pages.length || new Set(pages.map(page => page?.chapter)).size !== pages.length) errors.push('повтор страницы разговора');
+  const chapters = index.chapters.filter(item => item.step === step.id);
+  if (!chapters.some(item => item.id === step.intro) || !chapters.some(item => item.id === step.finale)) errors.push('разговор без введения или финала');
+  for (const page of pages) {
+    for (const key of ['id', 'title', 'chapter', 'bookmark', 'choice', 'read', 'soften', 'later', 'revisitChoice', 'reread']) if (typeof page?.[key] !== 'string' || !page[key].trim()) errors.push('страница разговора без ' + key);
+    if (!chapters.some(item => item.id === page?.chapter)) errors.push('нет главы страницы ' + page?.id);
+    if (!index.chapters.some(item => item.page === page?.id)) errors.push('нет страницы тетради ' + page?.id);
+    if (new Set([page?.read, page?.soften, page?.later, page?.reread]).size !== 4) errors.push('повтор решения страницы ' + page?.id);
+  }
+  for (const key of ['secret', 'secretHint', 'suggested', 'depth', 'open', 'resume', 'again', 'pending', 'read', 'soften', 'later', 'decision', 'introHint', 'finaleHint']) if (typeof step.labels?.[key] !== 'string' || !step.labels[key].trim()) errors.push('разговор без подписи ' + key);
+  return errors;
 }

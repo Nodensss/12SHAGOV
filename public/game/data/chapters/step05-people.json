@@ -1,0 +1,311 @@
+{
+  "id": "step05-people",
+  "version": 1,
+  "step": 5,
+  "title": "Люди",
+  "returnLabel": "К разговору",
+  "disclaimer": "Вымышленная история о разговоре героя с Маратом. Это не литература АН и не указание, кому и что рассказывать. Личные записи остаются в этом браузере.",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_05_Пятый.md: разговор с выбранным человеком, право на паузу и свои границы; приложение ничего не отправляет",
+    "public/steps.js → шаг 5: подготовка разговора и договорённостей, без обязательного раскрытия тяжёлого",
+    "public/game/data/chapters/step04-*.json: вымышленная тетрадь героя, пять страниц, глубина и закладки"
+  ],
+  "background": "art/scene-kitchen.webp",
+  "speakers": {
+    "narrator": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "marat": {
+      "name": "Марат",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "start": "s5-people-offer",
+  "scenes": {
+    "s5-people-offer": {
+      "type": "story",
+      "title": "Люди",
+      "lines": [
+        {
+          "id": "s5-people-offer.l01",
+          "speaker": "narrator",
+          "text": "Ты открываешь страницу с именами. Рядом с одним чернила смазаны ладонью."
+        },
+        {
+          "id": "s5-people-offer.l02",
+          "speaker": "marat",
+          "text": "Здесь ты уголок оставил. Можем с этой страницы.",
+          "if": "s4-bond1.choice.mark"
+        },
+        {
+          "id": "s5-people-offer.l03",
+          "speaker": "voice",
+          "text": "Про Катю не надо. Скажи: разошлись."
+        }
+      ],
+      "choice": {
+        "id": "s5-people.choice",
+        "prompt": "Что ты прочитаешь?",
+        "options": [
+          {
+            "id": "s5-people.choice.read",
+            "label": "Прочитать как есть",
+            "next": "s5-people-read"
+          },
+          {
+            "id": "s5-people.choice.soften",
+            "label": "Смягчить",
+            "next": "s5-people-soften"
+          },
+          {
+            "id": "s5-people.choice.later",
+            "label": "Об этом не сегодня",
+            "next": "s5-people-later"
+          }
+        ]
+      }
+    },
+    "s5-people-read": {
+      "type": "story",
+      "title": "Люди",
+      "lines": [
+        {
+          "id": "s5-people-read.l01",
+          "speaker": "you",
+          "text": "Катя ушла. Димон не берёт трубку. Я написал, что жизнь развела. Сейчас так читать не получается."
+        },
+        {
+          "id": "s5-people-read.l02",
+          "speaker": "marat",
+          "text": "Я тоже любил это: разошлись. Как будто на разных остановках вышли."
+        },
+        {
+          "id": "s5-people-read.l03",
+          "speaker": "you",
+          "text": "Катя просила три раза. Я делал из неё контролёра, а потом злился за это. Димон перестал быть другом, когда не дал в долг.",
+          "depth": {
+            "of": [
+              "step04-bonds-1",
+              "step04-bonds-2",
+              "step04-bonds-3"
+            ],
+            "min": 2,
+            "max": 3
+          }
+        },
+        {
+          "id": "s5-people-read.l04",
+          "speaker": "narrator",
+          "text": "Ты проводишь пальцем по Димонову имени. Не вычёркиваешь.",
+          "depth": {
+            "of": [
+              "step04-bonds-1",
+              "step04-bonds-2",
+              "step04-bonds-3"
+            ],
+            "min": 2,
+            "max": 3
+          }
+        },
+        {
+          "id": "s5-people-read.l05",
+          "speaker": "you",
+          "text": "Я хотел, чтобы они меня любили. Но знать меня им не давал. Всё время что-нибудь прятал.",
+          "depth": {
+            "of": [
+              "step04-bonds-1",
+              "step04-bonds-2",
+              "step04-bonds-3"
+            ],
+            "min": 3,
+            "max": 3
+          }
+        },
+        {
+          "id": "s5-people-read.l06",
+          "speaker": "you",
+          "text": "И извиняться собирался так, чтобы меня сразу простили. Иначе зачем стараться — вот что у меня было в голове.",
+          "depth": {
+            "of": [
+              "step04-bonds-1",
+              "step04-bonds-2",
+              "step04-bonds-3"
+            ],
+            "min": 3,
+            "max": 3
+          }
+        },
+        {
+          "id": "s5-people-read.l07",
+          "speaker": "marat",
+          "text": "Я после такого чтения всё ждал: ну скажи, что они тоже хороши. Собеседник промолчал. Меня это ужасно разозлило."
+        },
+        {
+          "id": "s5-people-read.l08",
+          "speaker": "you",
+          "text": "Ты сейчас специально молчишь?"
+        },
+        {
+          "id": "s5-people-read.l09",
+          "speaker": "marat",
+          "text": "Нет. Честно — я про своего друга вспомнил. Задумался."
+        },
+        {
+          "id": "s5-people-read.l10",
+          "speaker": "narrator",
+          "text": "Он возвращает взгляд к тебе."
+        },
+        {
+          "id": "s5-people-read.l11",
+          "speaker": "marat",
+          "text": "Извини. Ты где остановился?"
+        },
+        {
+          "id": "s5-people-read.l12",
+          "speaker": "narrator",
+          "text": "Ты находишь строку. Ещё недавно любой пропущенный ответ был поводом закрыть тетрадь. Сейчас ты дочитываешь."
+        }
+      ],
+      "next": "s5-people-journal"
+    },
+    "s5-people-soften": {
+      "type": "story",
+      "title": "Люди",
+      "lines": [
+        {
+          "id": "s5-people-soften.l01",
+          "speaker": "you",
+          "text": "Мы с Катей просто не подошли. С Димоном разошлись со временем."
+        },
+        {
+          "id": "s5-people-soften.l02",
+          "speaker": "narrator",
+          "text": "Получается почти тот рассказ, который ты уже носил с собой. Тетрадь для него была не нужна."
+        },
+        {
+          "id": "s5-people-soften.l03",
+          "speaker": "marat",
+          "text": "Я могу долго рассказывать, почему перестал общаться с другом. А одну свою фразу в том разговоре до сих пор помню дословно."
+        },
+        {
+          "id": "s5-people-soften.l04",
+          "speaker": "narrator",
+          "text": "Ты переворачиваешь уголок обратно. Строка под ним всё та же."
+        }
+      ],
+      "choice": {
+        "id": "s5-people.revisit",
+        "prompt": "Как дальше?",
+        "options": [
+          {
+            "id": "s5-people.revisit.read",
+            "label": "Перечитать как есть",
+            "next": "s5-people-read"
+          },
+          {
+            "id": "s5-people.revisit.keep",
+            "label": "Оставить как прозвучало",
+            "next": "s5-people-journal"
+          }
+        ]
+      }
+    },
+    "s5-people-later": {
+      "type": "story",
+      "title": "Люди",
+      "lines": [
+        {
+          "id": "s5-people-later.l01",
+          "speaker": "you",
+          "text": "Про этих людей сегодня не хочу."
+        },
+        {
+          "id": "s5-people-later.l02",
+          "speaker": "marat",
+          "text": "Ладно."
+        },
+        {
+          "id": "s5-people-later.l03",
+          "speaker": "narrator",
+          "text": "Он пододвигает блюдце для мокрой ложки."
+        },
+        {
+          "id": "s5-people-later.l04",
+          "speaker": "you",
+          "text": "Можно оставить имена закрытыми?"
+        },
+        {
+          "id": "s5-people-later.l05",
+          "speaker": "marat",
+          "text": "У меня тоже были страницы, которые я не сразу открывал."
+        },
+        {
+          "id": "s5-people-later.l06",
+          "speaker": "narrator",
+          "text": "Ты кладёшь поверх листа ладонь. Марат не пытается прочитать между пальцами."
+        }
+      ],
+      "next": "s5-people-journal"
+    },
+    "s5-people-journal": {
+      "type": "journal",
+      "title": "Пара строк для себя",
+      "intro": "Это разговор героя. Здесь можно записать о себе, без подробностей тяжёлого. Можно выбрать другой вопрос или ответить позже.",
+      "questionIds": [
+        "q.step05.people.1",
+        "q.step05.people.2"
+      ],
+      "next": "s5-people-end"
+    },
+    "s5-people-end": {
+      "type": "ending",
+      "title": "Люди",
+      "lines": [
+        {
+          "id": "s5-people-end.l01",
+          "speaker": "narrator",
+          "text": "Лист ложится на стол между чашками. Эти строки уже прозвучали.",
+          "if": "s5-people.choice.read"
+        },
+        {
+          "id": "s5-people-end.l02",
+          "speaker": "narrator",
+          "text": "Ты находишь свои слова со второго захода. Марат дослушивает.",
+          "if": "s5-people.revisit.read"
+        },
+        {
+          "id": "s5-people-end.l03",
+          "speaker": "narrator",
+          "text": "Страница прозвучала не целиком. Можно будет вернуться к ней.",
+          "if": "s5-people.choice.soften",
+          "ifNot": "s5-people.revisit.read"
+        },
+        {
+          "id": "s5-people-end.l04",
+          "speaker": "narrator",
+          "text": "Сегодня эта страница остаётся у тебя. Выбирать следующую не обязательно сразу.",
+          "if": "s5-people.choice.later"
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "id": "q.step05.people.1",
+      "text": "Какой ответ слушателя помогает мне продолжить, а какой заставляет закрыться?"
+    },
+    {
+      "id": "q.step05.people.2",
+      "text": "Что я хочу заранее сказать о темпе и паузах?"
+    }
+  ]
+}

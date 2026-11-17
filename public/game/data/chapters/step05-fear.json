@@ -1,0 +1,325 @@
+{
+  "id": "step05-fear",
+  "version": 1,
+  "step": 5,
+  "title": "Страхи",
+  "returnLabel": "К разговору",
+  "disclaimer": "Вымышленная история о разговоре героя с Маратом. Это не литература АН и не указание, кому и что рассказывать. Личные записи остаются в этом браузере.",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_05_Пятый.md: разговор с выбранным человеком, право на паузу и свои границы; приложение ничего не отправляет",
+    "public/steps.js → шаг 5: подготовка разговора и договорённостей, без обязательного раскрытия тяжёлого",
+    "public/game/data/chapters/step04-*.json: вымышленная тетрадь героя, пять страниц, глубина и закладки"
+  ],
+  "background": "art/scene-kitchen.webp",
+  "speakers": {
+    "narrator": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "marat": {
+      "name": "Марат",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "start": "s5-fear-offer",
+  "scenes": {
+    "s5-fear-offer": {
+      "type": "story",
+      "title": "Страхи",
+      "lines": [
+        {
+          "id": "s5-fear-offer.l01",
+          "speaker": "narrator",
+          "text": "На странице страхов буквы идут под наклоном. Ты поворачиваешь тетрадь, будто от этого легче прочитать."
+        },
+        {
+          "id": "s5-fear-offer.l02",
+          "speaker": "marat",
+          "text": "Здесь тоже уголок. Можем начать с этой.",
+          "if": "s4-fear1.choice.mark"
+        },
+        {
+          "id": "s5-fear-offer.l03",
+          "speaker": "voice",
+          "text": "Посмеётся. Лучше скажи про работу."
+        }
+      ],
+      "choice": {
+        "id": "s5-fear.choice",
+        "prompt": "Что ты прочитаешь?",
+        "options": [
+          {
+            "id": "s5-fear.choice.read",
+            "label": "Прочитать как есть",
+            "next": "s5-fear-read"
+          },
+          {
+            "id": "s5-fear.choice.soften",
+            "label": "Смягчить",
+            "next": "s5-fear-soften"
+          },
+          {
+            "id": "s5-fear.choice.later",
+            "label": "Об этом не сегодня",
+            "next": "s5-fear-later"
+          }
+        ]
+      }
+    },
+    "s5-fear-read": {
+      "type": "story",
+      "title": "Страхи",
+      "lines": [
+        {
+          "id": "s5-fear-read.l01",
+          "speaker": "you",
+          "text": "Я боюсь, что на работе узнают. Что Лена перестанет пускать. Что опять начну."
+        },
+        {
+          "id": "s5-fear-read.l02",
+          "speaker": "marat",
+          "text": "Я слово «боюсь» первый год заменял на «бесит». Прямо везде."
+        },
+        {
+          "id": "s5-fear-read.l03",
+          "speaker": "you",
+          "text": "Я тоже чаще злюсь, чем говорю."
+        },
+        {
+          "id": "s5-fear-read.l04",
+          "speaker": "you",
+          "text": "Ещё здесь: трезвый я — никто. Я даже не знаю, о чём разговаривать, если больше пяти минут.",
+          "depth": {
+            "of": [
+              "step04-fear-1",
+              "step04-fear-2",
+              "step04-fear-3"
+            ],
+            "min": 2,
+            "max": 3
+          }
+        },
+        {
+          "id": "s5-fear-read.l05",
+          "speaker": "marat",
+          "text": "У меня первые разговоры были про погоду. Я думал, всё, закончился человек. А мне тогда просто было нечего добавить.",
+          "depth": {
+            "of": [
+              "step04-fear-1",
+              "step04-fear-2",
+              "step04-fear-3"
+            ],
+            "min": 2,
+            "max": 3
+          }
+        },
+        {
+          "id": "s5-fear-read.l06",
+          "speaker": "you",
+          "text": "Я боюсь, что меня увидят. Поэтому вру первым и ухожу первым. Это внизу страницы.",
+          "depth": {
+            "of": [
+              "step04-fear-1",
+              "step04-fear-2",
+              "step04-fear-3"
+            ],
+            "min": 3,
+            "max": 3
+          }
+        },
+        {
+          "id": "s5-fear-read.l07",
+          "speaker": "narrator",
+          "text": "Ты не поднимаешь глаз. Слышно, как ложка перекатывается в пустой чашке.",
+          "depth": {
+            "of": [
+              "step04-fear-1",
+              "step04-fear-2",
+              "step04-fear-3"
+            ],
+            "min": 3,
+            "max": 3
+          }
+        },
+        {
+          "id": "s5-fear-read.l08",
+          "speaker": "marat",
+          "text": "Я когда это своё читал, на шнурок у кроссовка смотрел. Он у меня был развязан. До сих пор помню.",
+          "depth": {
+            "of": [
+              "step04-fear-1",
+              "step04-fear-2",
+              "step04-fear-3"
+            ],
+            "min": 3,
+            "max": 3
+          }
+        },
+        {
+          "id": "s5-fear-read.l09",
+          "speaker": "you",
+          "text": "А сейчас?"
+        },
+        {
+          "id": "s5-fear-read.l10",
+          "speaker": "marat",
+          "text": "Сейчас тоже иногда хочется встать и придумать срочное дело."
+        },
+        {
+          "id": "s5-fear-read.l11",
+          "speaker": "narrator",
+          "text": "Ты ждёшь, что он добавит что-нибудь уверенное. Он не добавляет."
+        },
+        {
+          "id": "s5-fear-read.l12",
+          "speaker": "you",
+          "text": "Я ещё тут посижу."
+        },
+        {
+          "id": "s5-fear-read.l13",
+          "speaker": "marat",
+          "text": "Посиди."
+        },
+        {
+          "id": "s5-fear-read.l14",
+          "speaker": "narrator",
+          "text": "Ты дочитываешь последнюю доступную строку. Голос слышно. Кран тоже, но уже не только его."
+        }
+      ],
+      "next": "s5-fear-journal"
+    },
+    "s5-fear-soften": {
+      "type": "story",
+      "title": "Страхи",
+      "lines": [
+        {
+          "id": "s5-fear-soften.l01",
+          "speaker": "you",
+          "text": "Ну, обычные страхи. Деньги, работа. У всех сейчас так."
+        },
+        {
+          "id": "s5-fear-soften.l02",
+          "speaker": "marat",
+          "text": "Я себя часто этим успокаивал: у всех так. Только ночью почему-то не спал я, а не все."
+        },
+        {
+          "id": "s5-fear-soften.l03",
+          "speaker": "narrator",
+          "text": "Ты смотришь на строку, которую пропустил. Она не стала короче."
+        },
+        {
+          "id": "s5-fear-soften.l04",
+          "speaker": "marat",
+          "text": "Я сейчас про себя наговорил. Ты продолжай, если хочешь."
+        }
+      ],
+      "choice": {
+        "id": "s5-fear.revisit",
+        "prompt": "Как дальше?",
+        "options": [
+          {
+            "id": "s5-fear.revisit.read",
+            "label": "Перечитать как есть",
+            "next": "s5-fear-read"
+          },
+          {
+            "id": "s5-fear.revisit.keep",
+            "label": "Оставить как прозвучало",
+            "next": "s5-fear-journal"
+          }
+        ]
+      }
+    },
+    "s5-fear-later": {
+      "type": "story",
+      "title": "Страхи",
+      "lines": [
+        {
+          "id": "s5-fear-later.l01",
+          "speaker": "you",
+          "text": "Эту страницу сегодня не читаю."
+        },
+        {
+          "id": "s5-fear-later.l02",
+          "speaker": "marat",
+          "text": "Ладно. Оставим."
+        },
+        {
+          "id": "s5-fear-later.l03",
+          "speaker": "you",
+          "text": "Я пока сам не понимаю, как это сказать."
+        },
+        {
+          "id": "s5-fear-later.l04",
+          "speaker": "marat",
+          "text": "Я иногда приносил один заголовок. Так и сидел с ним."
+        },
+        {
+          "id": "s5-fear-later.l05",
+          "speaker": "narrator",
+          "text": "Он не просит хотя бы заголовок. Ты закрываешь страницу большим пальцем и выбираешь другую."
+        }
+      ],
+      "next": "s5-fear-journal"
+    },
+    "s5-fear-journal": {
+      "type": "journal",
+      "title": "Пара строк для себя",
+      "intro": "Это разговор героя. Здесь можно записать о себе, без подробностей тяжёлого. Можно выбрать другой вопрос или ответить позже.",
+      "questionIds": [
+        "q.step05.fear.1",
+        "q.step05.fear.2"
+      ],
+      "next": "s5-fear-end"
+    },
+    "s5-fear-end": {
+      "type": "ending",
+      "title": "Страхи",
+      "lines": [
+        {
+          "id": "s5-fear-end.l01",
+          "speaker": "narrator",
+          "text": "Лист ложится на стол между чашками. Эти строки уже прозвучали.",
+          "if": "s5-fear.choice.read"
+        },
+        {
+          "id": "s5-fear-end.l02",
+          "speaker": "narrator",
+          "text": "Ты находишь свои слова со второго захода. Марат дослушивает.",
+          "if": "s5-fear.revisit.read"
+        },
+        {
+          "id": "s5-fear-end.l03",
+          "speaker": "narrator",
+          "text": "Страница прозвучала не целиком. Можно будет вернуться к ней.",
+          "if": "s5-fear.choice.soften",
+          "ifNot": "s5-fear.revisit.read"
+        },
+        {
+          "id": "s5-fear-end.l04",
+          "speaker": "narrator",
+          "text": "Сегодня эта страница остаётся у тебя. Выбирать следующую не обязательно сразу.",
+          "if": "s5-fear.choice.later"
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "id": "q.step05.fear.1",
+      "text": "Какую паузу я хочу заранее оговорить перед разговором?"
+    },
+    {
+      "id": "q.step05.fear.2",
+      "text": "По чему я замечаю, что могу дальше говорить с этим человеком?"
+    }
+  ]
+}

@@ -206,6 +206,22 @@
       "name": "Тетрадь в клетку",
       "text": "Сорок восемь листов. В ней договорились не врать.",
       "when": "step04-notebook"
+    },
+    {
+      "id": "item.turned-phone",
+      "step": 5,
+      "name": "Выключенный телефон",
+      "text": "Марат выключил свой. Твой всё время оставался у тебя.",
+      "when": "step05-arrival",
+      "icon": "art/icons/item-unread.webp"
+    },
+    {
+      "id": "item.tea-ring",
+      "step": 5,
+      "name": "Круг от чашки",
+      "text": "На столе остался круг. Тетрадь не осталась.",
+      "when": "step05-after",
+      "icon": "art/icons/item-mug.webp"
     }
   ]
 }
