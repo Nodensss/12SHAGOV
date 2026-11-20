@@ -557,3 +557,43 @@ textarea::placeholder { color: #8a958a; }
 .g-talk-page .g-btn { min-height: 44px; }
 .g-talk-story .g-scene-window { flex-basis: 5rem; }
 .g-talk-story .g-log { max-height: 44dvh; }
+
+/* Step Six: each static knot remains on the table after its story is complete. */
+.g-loop-instruction { margin: 1.35rem 0 .75rem; color: var(--ink); }
+.g-loops { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
+.g-loop-node { display: flex; min-width: 0; min-height: 44px; padding: .65rem .65rem .9rem; flex-direction: column; align-items: center; border: 1px solid #68715c; border-radius: 1rem; background: #26332a; color: var(--ink); text-align: center; }
+.g-loop-node:disabled { cursor: default; border-style: dashed; }
+.g-loop-node strong { font-family: Georgia, "Times New Roman", serif; font-weight: 500; font-size: 1.1rem; line-height: 1.25; }
+.g-loop-knot { display: block; flex: none; width: 100%; max-width: 8rem; height: 5rem; color: var(--warm); }
+.g-loop-knot path { stroke: currentColor; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
+.g-loop-knot .g-loop-shadow { stroke: #111c15; stroke-width: 8; }
+.g-loop-node.is-complete .g-loop-knot { color: #c3b493; }
+.g-loop-node.is-complete .g-loop-knot path:not(.g-loop-shadow) { stroke-width: 2.5; }
+.g-loop-status { margin-top: .45rem; color: var(--muted); font-size: .85rem; line-height: 1.4; }
+.g-loop-mark { display: block; margin-top: .55rem; padding-top: .5rem; width: 100%; border-top: 1px solid var(--line); color: var(--ink); font-size: .9rem; line-height: 1.4; }
+.g-loop-progress { margin: .85rem 0 1.2rem; color: var(--muted); font-size: .9rem; }
+.g-loop-story { margin-top: .9rem; }
+.g-loop-story .g-btn { min-height: 44px; }
+
+.g-habit-map { padding-bottom: 2rem; }
+.g-habit-map > h2 { font-size: 1.65rem; }
+.g-habit-map > .g-lead { font-size: 1rem; }
+.g-habit-cells { display: grid; gap: 1.15rem; margin-top: 1.4rem; }
+.g-habit-cell { min-width: 0; margin: 0; padding: .75rem .7rem .85rem; border: 1px solid #68715c; border-radius: .9rem; background: var(--panel); scroll-margin: 5rem 0 7rem; }
+.g-habit-cell legend { max-width: 100%; padding: 0 .35rem; color: var(--warm); font-family: Georgia, "Times New Roman", serif; font-size: 1.15rem; line-height: 1.35; }
+.g-habit-options { display: grid; gap: .6rem; }
+.g-habit-choice { min-width: 0; min-height: 44px; justify-content: flex-start; gap: .65rem; padding: .75rem .65rem; background: #202c24; color: var(--ink); border-color: #68715c; border-radius: .7rem; font-size: 1rem; line-height: 1.45; font-weight: 400; text-align: left; scroll-margin: 5rem 0 7rem; }
+.g-habit-choice > span:last-child { min-width: 0; }
+.g-habit-radio { flex: 0 0 1.05rem; width: 1.05rem; height: 1.05rem; border: 1px solid var(--muted); border-radius: 50%; }
+.g-habit-choice[aria-pressed="true"] { border-color: var(--warm); box-shadow: inset 0 0 0 1px var(--warm); }
+.g-habit-choice[aria-pressed="true"] .g-habit-radio { border: .28rem solid var(--warm); background: #202c24; }
+.g-habit-foot { z-index: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .g-habit-choice:active, .g-loop-node:active { transform: none; }
+}
+/* Dialogue scenes share the viewport with their actual header height. Long
+   chapter titles must not push the third choice below a short phone screen. */
+.game:has(> .g-talk-story) { height: 100dvh; min-height: 100dvh; }
+.game:has(> .g-talk-story) > .g-top { flex: 0 0 auto; position: relative; }
+.game > .g-talk-story { height: auto; min-height: 0; flex: 1; }
+.g-talk-plain .g-log { flex: 1; max-height: none; justify-content: flex-start; }

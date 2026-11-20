@@ -122,7 +122,7 @@ export function validateChapter(chapter, vocab) {
   };
   for (const [sceneId, scene] of Object.entries(scenes)) {
     unique(sceneId, 'сцена');
-    if (!['story', 'journal', 'steering', 'ending'].includes(scene.type)) errors.push(sceneId + ': неизвестный type');
+    if (!['story', 'journal', 'steering', 'habit-map', 'ending'].includes(scene.type)) errors.push(sceneId + ': неизвестный type');
     for (const line of scene.lines || []) {
       unique(line.id, sceneId + ' реплика');
       if (!chapter.speakers?.[line.speaker]) errors.push(line.id + ': неизвестный speaker');
@@ -164,6 +164,24 @@ export function validateChapter(chapter, vocab) {
         for (const option of options) {
           unique(option?.id, sceneId + ' решение');
           if (!hasText(option?.text)) errors.push((option?.id || sceneId) + ': нет отклика на решение');
+        }
+      }
+      if (scene.choice) errors.push(sceneId + ': выбор действий должен быть отдельной сюжетной сценой');
+      target(scene.next, sceneId);
+    }
+    if (scene.type === 'habit-map') {
+      const hasText = value => typeof value === 'string' && value.trim().length > 0;
+      if (!hasText(scene.intro) || !hasText(scene.continueLabel)) errors.push(sceneId + ': нет введения или подписи продолжения');
+      const cells = Array.isArray(scene.cells) ? scene.cells : [];
+      if (cells.length !== 4) errors.push(sceneId + ': нужны четыре клетки привычки');
+      for (const cell of cells) {
+        unique(cell?.id, sceneId + ' клетка привычки');
+        if (!hasText(cell?.title)) errors.push(sceneId + ': клетка привычки без названия');
+        const options = Array.isArray(cell?.options) ? cell.options : [];
+        if (options.length !== 2) errors.push((cell?.id || sceneId) + ': нужны два аспекта ситуации');
+        for (const option of options) {
+          unique(option?.id, sceneId + ' аспект ситуации');
+          if (!hasText(option?.text)) errors.push((option?.id || sceneId) + ': аспект ситуации без текста');
         }
       }
       if (scene.choice) errors.push(sceneId + ': выбор действий должен быть отдельной сюжетной сценой');
@@ -246,6 +264,7 @@ export function stage(progress, chapter, game) {
   const scene = chapter.scenes[progress.scene];
   if (scene.type === 'journal') return 'journal';
   if (scene.type === 'steering') return 'steering';
+  if (scene.type === 'habit-map') return 'habit-map';
   if (scene.type === 'ending') return 'ending';
   if (progress.line < linesOf(scene, game).length - 1) return 'line';
   return scene.choice ? 'choice' : 'next';
@@ -300,6 +319,43 @@ export function canLeaveSteering(progress, chapter) {
 
 export function leaveSteering(progress, chapter, game) {
   if (canLeaveSteering(progress, chapter)) enter(progress, chapter, resolveNext(chapter.scenes[progress.scene].next, game));
+  return progress;
+}
+
+// В карте привычки игрок выделяет по одному аспекту каждого звена первого случая.
+// Смена аспекта заменяет прежний обычный выбор; отдельного поля сохранения нет.
+export function habitMapOf(progress, chapter) {
+  const scene = chapter?.scenes?.[progress?.scene];
+  if (scene?.type !== 'habit-map' || !Array.isArray(scene.cells)) return {};
+  const selections = [];
+  for (const cell of scene.cells) {
+    if (!cell || typeof cell.id !== 'string' || !cell.id || !Array.isArray(cell.options) || !Object.hasOwn(progress?.choices || {}, cell.id)) continue;
+    const chosen = cell.options.find(option => option && typeof option.id === 'string' && option.id && option.id === progress.choices[cell.id]);
+    if (chosen) selections.push([cell.id, chosen]);
+  }
+  return Object.fromEntries(selections);
+}
+
+export function assignHabitCell(progress, chapter, cellId, optionId) {
+  const scene = chapter?.scenes?.[progress?.scene];
+  if (scene?.type !== 'habit-map' || !Array.isArray(scene.cells) || typeof cellId !== 'string' || !cellId) return progress;
+  const cell = scene.cells.find(cell => cell?.id === cellId);
+  const option = Array.isArray(cell?.options) && cell.options.find(option => option?.id === optionId);
+  if (!option || typeof option.id !== 'string' || !option.id) return progress;
+  if (!plain(progress.choices)) progress.choices = {};
+  Object.defineProperty(progress.choices, cell.id, { value: option.id, writable: true, enumerable: true, configurable: true });
+  return progress;
+}
+
+export function canLeaveHabitMap(progress, chapter) {
+  const scene = chapter?.scenes?.[progress?.scene];
+  if (scene?.type !== 'habit-map' || !Array.isArray(scene.cells) || scene.cells.length !== 4 || new Set(scene.cells.map(cell => cell?.id)).size !== 4) return false;
+  const selected = habitMapOf(progress, chapter);
+  return scene.cells.every(cell => cell && Array.isArray(cell.options) && cell.options.length === 2 && Object.hasOwn(selected, cell.id));
+}
+
+export function leaveHabitMap(progress, chapter, game) {
+  if (canLeaveHabitMap(progress, chapter)) enter(progress, chapter, resolveNext(chapter.scenes[progress.scene].next, game));
   return progress;
 }
 
@@ -407,5 +463,41 @@ export function validateConversation(step, index) {
     if (new Set([page?.read, page?.soften, page?.later, page?.reread]).size !== 4) errors.push('повтор решения страницы ' + page?.id);
   }
   for (const key of ['secret', 'secretHint', 'suggested', 'depth', 'open', 'resume', 'again', 'pending', 'read', 'soften', 'later', 'decision', 'introHint', 'finaleHint']) if (typeof step.labels?.[key] !== 'string' || !step.labels[key].trim()) errors.push('разговор без подписи ' + key);
+  return errors;
+}
+
+// Петли остаются видимыми после завершения: решение описывает отметку, а done —
+// пройденную историю. Готовность не складывается в баллы или процент.
+export function loopsState(step, index, game) {
+  const have = picked(game);
+  const loops = (step.loops || []).map(loop => {
+    const progress = game?.chapters?.[loop.chapter], selected = progress?.choices?.[loop.choice];
+    const mode = ['try', 'watch', 'hold'].find(mode => selected === loop[mode]) || null;
+    return { ...loop, mode, done: progress?.done === true, started: !!progress && !progress.done && !!(progress.scene || progress.line || Object.keys(progress.choices || {}).length) };
+  });
+  const completed = loops.filter(loop => loop.done).length, arrived = have.has(step.intro);
+  return { loops, completed, arrived, finaleAvailable: arrived && loops.length > 0 && completed === loops.length };
+}
+
+export function validateLoops(step, index) {
+  const errors = [], loops = step?.loops, hasText = value => typeof value === 'string' && value.trim().length > 0;
+  if (step?.layout !== 'loops' || !Array.isArray(loops) || loops.length !== 4) return ['петли: нужны четыре истории'];
+  const chapters = (index?.chapters || []).filter(item => item.step === step.id), ids = new Set();
+  const unique = (id, where) => {
+    if (!hasText(id)) errors.push('петли: нет ' + where);
+    else if (ids.has(id)) errors.push('петли: повтор id ' + id);
+    else ids.add(id);
+  };
+  if (!hasText(step.intro) || !hasText(step.finale) || step.intro === step.finale || !chapters.some(item => item.id === step.intro) || !chapters.some(item => item.id === step.finale)) errors.push('петли: нет введения или финала');
+  const chapterIds = new Set([step.intro, step.finale]);
+  for (const loop of loops) {
+    for (const key of ['id', 'title', 'chapter', 'notebookPage', 'choice', 'try', 'watch', 'hold']) if (!hasText(loop?.[key])) errors.push('петля без ' + key);
+    for (const key of ['id', 'choice', 'try', 'watch', 'hold']) unique(loop?.[key], key);
+    if (chapterIds.has(loop?.chapter)) errors.push('петли: повтор главы ' + loop?.chapter);
+    chapterIds.add(loop?.chapter);
+    if (!chapters.some(item => item.id === loop?.chapter)) errors.push('нет главы петли ' + loop?.id);
+    if (!(index?.chapters || []).some(item => item.page === loop?.notebookPage)) errors.push('нет страницы тетради ' + loop?.notebookPage);
+  }
+  for (const key of ['intro', 'finale', 'locked', 'inProgress', 'completed', 'chooseLoop', 'progress', 'try', 'watch', 'hold', 'open', 'unavailable', 'resume', 'again']) if (!hasText(step.labels?.[key])) errors.push('петли без подписи ' + key);
   return errors;
 }

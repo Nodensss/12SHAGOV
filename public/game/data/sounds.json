@@ -44,7 +44,13 @@
       "step05-box": "kitchen",
       "step05-people": "kitchen",
       "step05-worth": "kitchen",
-      "step05-after": "night"
+      "step05-after": "night",
+      "step06-week": "kitchen",
+      "step06-lie": "room",
+      "step06-strike": "kitchen",
+      "step06-control": "room",
+      "step06-leave": "kitchen",
+      "step06-ask": "night"
     },
     "scenes": {
       "step01-only-once": {

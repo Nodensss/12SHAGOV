@@ -6,6 +6,7 @@ import {
   saveEntry, setDraft, stage, validateChapter, validateVocab,
   itemsOf, levelOf, markDone, recordFight, assignSteering, leaveSteering, restartChapter,
   depthOf, scaledSkills, conversationState, validateConversation,
+  habitMapOf, assignHabitCell, canLeaveHabitMap, leaveHabitMap, loopsState, validateLoops,
 } from '../public/game/engine.js';
 import { canUse, playTurn, restoreBattle, skillsOf, startBattle, validateFight } from '../public/game/battle.js';
 
@@ -115,6 +116,9 @@ function playThrough(game, chapter, pick, placements = []) {
       const scene = chapter.scenes[progress.scene];
       scene.parts.forEach((part, index) => assignSteering(progress, chapter, part.id, placements[index] || scene.zones[pick].id));
       leaveSteering(progress, chapter, game);
+    } else if (now === 'habit-map') {
+      for (const cell of chapter.scenes[progress.scene].cells) assignHabitCell(progress, chapter, cell.id, cell.options[pick % cell.options.length].id);
+      leaveHabitMap(progress, chapter, game);
     } else advance(progress, chapter, game);
   }
   assert.fail('глава не закончилась');
@@ -139,6 +143,7 @@ test('эпизоды открываются по порядку, а услови
   for (const chapter of chapters) for (const scene of Object.values(chapter.scenes)) {
     for (const o of scene.choice?.options || []) options.push(o.id);
     for (const part of scene.parts || []) for (const option of part.options || []) options.push(option.id);
+    for (const cell of scene.cells || []) for (const option of cell.options || []) options.push(option.id);
   }
   assert.equal(new Set(options).size, options.length, 'id вариантов выбора уникальны во всей игре');
   options.push(...index.chapters.map(item => item.id));
@@ -279,7 +284,7 @@ test('третий шаг открывается после Ночи, содер
   assert.equal(isLocked(thirdItems[0], game), true);
   markDone(game, 'step02-night');
   assert.equal(isLocked(thirdItems[0], game), false);
-  assert.equal(index.nextStep.title, 'Шаг шестой');
+  assert.equal(index.nextStep.title, 'Шаг седьмой');
   for (const chapter of thirdChapters) {
     assert.ok(chapter.disclaimer && chapter.basedOn.some(source => source.includes('docs/step03.md')), chapter.id);
     assert.ok(chapter.questions.length >= 2 && chapter.questions.length <= 3, chapter.id);
@@ -336,6 +341,7 @@ test('новый сюжет связан с прошлыми шагами, вс�
   for (const chapter of chapters) for (const scene of Object.values(chapter.scenes)) {
     for (const option of scene.choice?.options || []) ids.add(option.id);
     for (const part of scene.parts || []) for (const option of part.options || []) ids.add(option.id);
+    for (const cell of scene.cells || []) for (const option of cell.options || []) ids.add(option.id);
   }
   const references = [];
   function inspect(value, owner) {
@@ -564,4 +570,146 @@ test('условия глубины и наборов решений прове�
   assert.ok(validateChapter(c,vocab).some(e=>e.includes('ifAny')));
   const game=freshGame();markDone(game,'a');
   assert.deepEqual(linesOf({lines:[{id:'a',ifAny:['a','b']},{id:'b',ifNone:['a']},{id:'c',depth:{of:['a','b'],min:1,max:1}}]},game).map(l=>l.id),['a','c']);
+});
+
+function runLoop(game, chapter, mode, action = 'new', facet = 0) {
+  const progress = progressOf(game, chapter), visited = [];
+  for (let turn = 0; turn < 500; turn += 1) {
+    const now = stage(progress, chapter, game), scene = chapter.scenes[progress.scene];
+    if (visited.at(-1) !== progress.scene) visited.push(progress.scene);
+    if (now === 'ending') return { progress, visited };
+    if (now === 'habit-map') {
+      for (const cell of scene.cells) assignHabitCell(progress, chapter, cell.id, cell.options[facet].id);
+      leaveHabitMap(progress, chapter, game);
+    } else if (now === 'choice') {
+      const isMark = scene.choice.options.some(option => option.id.endsWith('.watch'));
+      const option = scene.choice.options.find(option => option.id.endsWith('.' + (isMark ? mode : action)));
+      assert.ok(option, chapter.id + ': ' + mode + '/' + action);
+      choose(progress, chapter, option.id, game);
+    } else if (now === 'journal') leaveJournal(progress, chapter, game);
+    else advance(progress, chapter, game);
+  }
+  assert.fail('петля не завершилась: ' + chapter.id);
+}
+
+function loopHistory(loop, depth, reading = 'read') {
+  const game = freshGame(), previous = index.steps.find(s => s.id === 5).pages.find(p => p.id === loop.notebookPage);
+  for (const item of index.chapters.filter(i => i.page === loop.notebookPage && i.depth <= depth)) markDone(game, item.id);
+  markDone(game, previous.chapter);
+  game.chapters[previous.chapter].choices[previous.choice] = reading === 'reread' ? previous.soften : previous[reading];
+  if (reading === 'reread') game.chapters[previous.chapter].choices[previous.revisitChoice] = previous.reread;
+  return game;
+}
+
+test('шестой шаг: четыре свободные петли, новый layout и финал только после завершения всех', () => {
+  const step = index.steps.find(s => s.id === 6), final = index.chapters.find(i => i.id === step.finale);
+  assert.deepEqual(validateLoops(step,index),[]);
+  assert.equal(step.after,'step05-after');
+  assert.equal(step.loops.length,4);
+  assert.deepEqual(step.loops.map(l=>l.id).sort(),['control','leave','lie','strike']);
+  const game=freshGame();markDone(game,step.after);markDone(game,step.intro);
+  for(const loop of step.loops){
+    const item=index.chapters.find(i=>i.id===loop.chapter);
+    assert.equal(item.after,step.intro);assert.equal(item.page,undefined);
+    assert.equal(isLocked(item,game),false);
+    const c=chapters.find(c=>c.id===loop.chapter), map=Object.values(c.scenes).find(s=>s.type==='habit-map');
+    assert.ok(map);assert.equal(map.cells.length,4);
+    assert.equal(c.scenes[map.next].choice.id,loop.choice);
+    assert.deepEqual(c.scenes[map.next].choice.options.map(o=>o.id),[loop.try,loop.watch,loop.hold]);
+    assert.equal(isLocked(final,game),true);
+    runLoop(game,c,'hold');
+  }
+  assert.equal(isLocked(final,game),false);assert.equal(loopsState(step,index,game).completed,4);
+  assert.equal(loopsState(step,index,game).finaleAvailable,true);
+  assert.equal(levelOf(game),1);assert.deepEqual(game.fights,{});
+  assert.ok(validateLoops({...step,loops:[step.loops[0],step.loops[0]]},index).length);
+});
+
+test('карта петли: четыре действительных выбора, переназначение и защита от чужих вариантов', () => {
+  const step=index.steps.find(s=>s.id===6), c=chapters.find(c=>c.id===step.loops[0].chapter), game=freshGame();
+  const [sid,scene]=Object.entries(c.scenes).find(([,s])=>s.type==='habit-map');
+  const progress=progressOf(game,c);progress.scene=sid;
+  const first=scene.cells[0],second=scene.cells[1];
+  assert.equal(stage(progress,c,game),'habit-map');assert.equal(canLeaveHabitMap(progress,c),false);
+  assignHabitCell(progress,c,first.id,second.options[0].id);
+  assert.deepEqual(habitMapOf(progress,c),{});
+  for(const cell of scene.cells.slice(0,3))assignHabitCell(progress,c,cell.id,cell.options[0].id);
+  leaveHabitMap(progress,c,game);assert.equal(progress.scene,sid);
+  assignHabitCell(progress,c,scene.cells[3].id,scene.cells[3].options[1].id);
+  assert.equal(canLeaveHabitMap(progress,c),true);
+  assignHabitCell(progress,c,first.id,first.options[1].id);
+  assert.deepEqual(linesOf({lines:[{id:'old',if:first.options[0].id},{id:'new',if:first.options[1].id}]},game).map(l=>l.id),['new']);
+  const reopened=normalizeGame(JSON.parse(JSON.stringify(game)));
+  assert.deepEqual(habitMapOf(reopened.chapters[c.id],c),habitMapOf(progress,c));
+  leaveHabitMap(progress,c,game);assert.equal(progress.scene,scene.next);
+});
+
+
+test('петли: три отметки и оба действия попытки у каждой ведут через дневник к концу', () => {
+  const step=index.steps.find(s=>s.id===6);
+  for(const loop of step.loops){
+    const c=chapters.find(c=>c.id===loop.chapter), paths=[];
+    for(const [mode,action] of [['try','new'],['try','old'],['watch','new'],['hold','new']]){
+      const game=loopHistory(loop,3),result=runLoop(game,c,mode,action);
+      assert.equal(result.progress.done,true);assert.equal(loopsState(step,index,game).loops.find(l=>l.id===loop.id).mode,mode);
+      assert.ok(result.visited.some(id=>c.scenes[id].type==='journal'));
+      assert.equal(depthOf(loop.notebookPage,index,game),3);
+      assert.deepEqual(game.fights,{});paths.push(result.visited);
+    }
+    assert.equal(new Set(paths.map(p=>JSON.stringify(p))).size,4,loop.id);
+  }
+});
+
+test('петли: отметки без завершённой истории не открывают финал и не считаются развязанными', () => {
+  const step=index.steps.find(s=>s.id===6),game=freshGame(),final=index.chapters.find(i=>i.id===step.finale);
+  markDone(game,step.intro);
+  for(const l of step.loops)game.chapters[l.chapter]={scene:null,line:0,choices:{[l.choice]:l.try},done:false};
+  const state=loopsState(step,index,game);assert.equal(state.completed,0);assert.equal(state.finaleAvailable,false);
+  assert.equal(isLocked(final,game),true);
+  for(const l of step.loops.slice(0,3))markDone(game,l.chapter);
+  assert.equal(isLocked(final,game),true);
+});
+
+test('петли: строки различают слои и честное чтение, перечитывание равно чтению', () => {
+  const step=index.steps.find(s=>s.id===6);
+  for(const loop of step.loops){
+    const c=chapters.find(c=>c.id===loop.chapter), render=g=>Object.values(c.scenes).flatMap(s=>linesOf(s,g).map(l=>l.id));
+    const shallow=loopHistory(loop,1),deep=loopHistory(loop,3),soft=loopHistory(loop,3,'soften'),reread=loopHistory(loop,3,'reread'),later=loopHistory(loop,3,'later');
+    assert.notDeepEqual(render(shallow),render(deep),loop.id+': нет глубины');
+    assert.notDeepEqual(render(deep),render(soft),loop.id+': нет отсылки к разговору');
+    assert.deepEqual(render(deep),render(reread),loop.id+': перечитанное забыто');
+    assert.deepEqual(render(soft),render(later),loop.id+': нечитанное не должно считаться прочитанным');
+  }
+});
+
+test('петли: финал различает отметки и фактическое действие, старые записи остаются прежними', () => {
+  const step=index.steps.find(s=>s.id===6),c=chapters.find(c=>c.id===step.finale), variants=[];
+  for(const [mode,action] of [['try','new'],['try','old'],['watch','new'],['hold','new']]){
+    const game=freshGame();game.variant='drugs';markDone(game,step.intro);
+    game.journal.legacy={text:'Старая запись',draft:'Старый черновик',savedAt:null,later:false,chapter:'step01-only-once'};
+    const original=structuredClone(game.journal);
+    for(const l of step.loops)runLoop(game,chapters.find(c=>c.id===l.chapter),mode,action);
+    variants.push(Object.values(c.scenes).flatMap(s=>linesOf(s,game).map(l=>l.id)));
+    playThrough(game,c,0);assert.equal(game.chapters[c.id].done,true);
+    assert.deepEqual(normalizeGame(JSON.parse(JSON.stringify(game))).journal.legacy,original.legacy);
+  }
+  assert.equal(new Set(variants.map(v=>JSON.stringify(v))).size,4);
+});
+
+test('карта петли: схема отклоняет пустые клетки, повтор вариантов и недостижимое продолжение', () => {
+  const original=chapters.find(c=>c.id==='step06-lie'), sid=Object.keys(original.scenes).find(id=>original.scenes[id].type==='habit-map');
+  for(const change of [s=>s.cells.pop(),s=>{s.cells[0].options[1].id=s.cells[0].options[0].id},s=>{s.cells[0].options[0].text=''},s=>{s.next='missing'}]){
+    const c=structuredClone(original);change(c.scenes[sid]);assert.ok(validateChapter(c,vocab).length);
+  }
+});
+
+test('шестой шаг не приписывает чтение человеку с пятью отложенными страницами', () => {
+  const c=chapters.find(c=>c.id==='step06-week'),talk=index.steps.find(s=>s.id===5),g=freshGame();
+  for(const p of talk.pages){markDone(g,p.chapter);g.chapters[p.chapter].choices[p.choice]=p.later;}
+  const text=()=>linesOf(c.scenes[c.start],g).map(l=>l.text).join('\n');
+  assert.ok(!text().includes('Ты прочитал, что делал.'));
+  assert.ok(text().includes('Ты записал, что делал.'));
+  const p=talk.pages[0];g.chapters[p.chapter].choices[p.choice]=p.read;
+  assert.ok(text().includes('Ты прочитал, что делал.'));
+  assert.ok(!text().includes('Ты записал, что делал.'));
 });

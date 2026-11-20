@@ -493,6 +493,70 @@
         ]
       ],
       "final": true
+    },
+    {
+      "id": "step06-week",
+      "step": 6,
+      "title": "После субботы",
+      "teaser": "Тетрадь дома. Впереди обычная неделя.",
+      "minutes": "2 минуты",
+      "file": "chapters/step06-week.json",
+      "after": "step05-after"
+    },
+    {
+      "id": "step06-lie",
+      "step": 6,
+      "title": "Соврать, чтобы не увидели",
+      "teaser": "На складе спрашивают, кто сверял коробку.",
+      "minutes": "3–4 минуты",
+      "file": "chapters/step06-lie.json",
+      "after": "step06-week"
+    },
+    {
+      "id": "step06-strike",
+      "step": 6,
+      "title": "Ударить первым, чтобы не задели",
+      "teaser": "Лене нужен точный ответ. Ты уже слышишь упрёк.",
+      "minutes": "3–4 минуты",
+      "file": "chapters/step06-strike.json",
+      "after": "step06-week"
+    },
+    {
+      "id": "step06-control",
+      "step": 6,
+      "title": "Взять всё под контроль",
+      "teaser": "Комната группы открыта. Все дела оказываются у тебя.",
+      "minutes": "3–4 минуты",
+      "file": "chapters/step06-control.json",
+      "after": "step06-week"
+    },
+    {
+      "id": "step06-leave",
+      "step": 6,
+      "title": "Уйти первым, пока не ушли",
+      "teaser": "Тимка занят. Ты уже берёшь куртку.",
+      "minutes": "3–4 минуты",
+      "file": "chapters/step06-leave.json",
+      "after": "step06-week"
+    },
+    {
+      "id": "step06-ask",
+      "step": 6,
+      "title": "Одна просьба",
+      "teaser": "Четыре петли на столе и номер в телефоне.",
+      "minutes": "3 минуты",
+      "file": "chapters/step06-ask.json",
+      "after": "step06-week",
+      "needs": {
+        "count": 4,
+        "of": [
+          "step06-lie",
+          "step06-strike",
+          "step06-control",
+          "step06-leave"
+        ]
+      },
+      "final": true
     }
   ],
   "steps": [
@@ -684,10 +748,80 @@
         "finaleHint": "Сначала выбери, как быть с каждой страницей. Читать всё как есть не обязательно."
       },
       "cover": "art/scene-kitchen.webp"
+    },
+    {
+      "id": 6,
+      "title": "Шаг шестой",
+      "name": "Готовность",
+      "layout": "loops",
+      "after": "step05-after",
+      "lockedText": "Откроется после пятого шага «После чая».",
+      "lead": "Неделя трезвой жизни. Четыре знакомых способа: что запускает каждый, что он даёт и чего стоит. Порядок выбираешь ты.",
+      "intro": "step06-week",
+      "finale": "step06-ask",
+      "loops": [
+        {
+          "id": "lie",
+          "title": "Соврать, чтобы не увидели",
+          "chapter": "step06-lie",
+          "notebookPage": "fear",
+          "choice": "s6-lie.ready",
+          "try": "s6-lie.ready.try",
+          "watch": "s6-lie.ready.watch",
+          "hold": "s6-lie.ready.hold"
+        },
+        {
+          "id": "strike",
+          "title": "Ударить первым, чтобы не задели",
+          "chapter": "step06-strike",
+          "notebookPage": "resentment",
+          "choice": "s6-strike.ready",
+          "try": "s6-strike.ready.try",
+          "watch": "s6-strike.ready.watch",
+          "hold": "s6-strike.ready.hold"
+        },
+        {
+          "id": "control",
+          "title": "Взять всё под контроль",
+          "chapter": "step06-control",
+          "notebookPage": "deeds",
+          "choice": "s6-control.ready",
+          "try": "s6-control.ready.try",
+          "watch": "s6-control.ready.watch",
+          "hold": "s6-control.ready.hold"
+        },
+        {
+          "id": "leave",
+          "title": "Уйти первым, пока не ушли",
+          "chapter": "step06-leave",
+          "notebookPage": "bonds",
+          "choice": "s6-leave.ready",
+          "try": "s6-leave.ready.try",
+          "watch": "s6-leave.ready.watch",
+          "hold": "s6-leave.ready.hold"
+        }
+      ],
+      "labels": {
+        "lead": "Начать можно с любой петли. Три отметки готовности равноправны; закончить неделю можно с любой из них.",
+        "intro": "Начало недели",
+        "finale": "К концу недели",
+        "locked": "Финал откроется после четырёх петель. Какая отметка стоит у каждой — не важно.",
+        "inProgress": "В процессе",
+        "completed": "Рассмотрено",
+        "chooseLoop": "Выбери петлю",
+        "progress": "Петель рассмотрено",
+        "try": "Готов попробовать иначе",
+        "watch": "Хочу понаблюдать",
+        "hold": "Пока держусь за это",
+        "open": "Открыть",
+        "unavailable": "Сначала пройди начало недели.",
+        "resume": "Продолжить",
+        "again": "Вернуться"
+      }
     }
   ],
   "nextStep": {
-    "title": "Шаг шестой",
-    "teaser": "В работе. Готовность заметить, что хочется менять, а за что пока держишься."
+    "title": "Шаг седьмой",
+    "teaser": "В работе. Найти свои слова для просьбы о помощи, без готовой формулы и обещания стать другим за один день."
   }
 }

@@ -222,6 +222,38 @@
       "text": "На столе остался круг. Тетрадь не осталась.",
       "when": "step05-after",
       "icon": "art/icons/item-mug.webp"
+    },
+    {
+      "id": "item.loop-sheet",
+      "step": 6,
+      "name": "Рабочий лист",
+      "text": "На сгибе остаётся клей от этикетки. На этой неделе к коробке добавляется накладная.",
+      "when": "step06-lie",
+      "icon": "art/icons/item-receipt.webp"
+    },
+    {
+      "id": "item.loop-message",
+      "step": 6,
+      "name": "Сообщение Лены",
+      "text": "Вопрос про семь остаётся в телефоне. Рядом в тетради — твои первые слова в ответ.",
+      "when": "step06-strike",
+      "icon": "art/icons/item-unread.webp"
+    },
+    {
+      "id": "item.loop-keys",
+      "step": 6,
+      "name": "Ключи на крючке",
+      "text": "Ключи остаются у двери. В кармане ещё чувствуется их вес.",
+      "when": "step06-control",
+      "icon": "art/icons/item-key-tag.webp"
+    },
+    {
+      "id": "item.loop-coat",
+      "step": 6,
+      "name": "Строчка про куртку",
+      "text": "В ней есть момент, когда рука уже тянется к рукаву, а дверь ещё закрыта.",
+      "when": "step06-leave",
+      "icon": "art/icons/item-notebook.webp"
     }
   ]
 }

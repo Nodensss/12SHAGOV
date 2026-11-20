@@ -34,6 +34,7 @@ jobs:
           python tests/game-map-flow.py
           python tests/game-step04-flow.py
           python tests/game-step05-flow.py
+          python tests/game-step06-flow.py
       - name: Третий шаг
         run: python tests/game-step03-flow.py
         env:

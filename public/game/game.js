@@ -1,8 +1,9 @@
 import {
   advance, answerLater, choose, deleteEntry, fill, freshGame, GAME_KEY, depthOf, isLocked, itemsOf, leaveJournal, linesOf, loadGame, markDone, picked, scaledSkills,
   progressOf, restartChapter, saveEntry, saveGame, setDraft, stage, validateChapter, validateVocab,
-  levelOf, recordFight, conversationState, validateConversation,
+  levelOf, recordFight, conversationState, validateConversation, loopsState, validateLoops,
   assignSteering, canLeaveSteering, leaveSteering, steeringOf,
+  assignHabitCell, canLeaveHabitMap, habitMapOf, leaveHabitMap,
 } from './engine.js';
 import { canUse, playTurn, restoreBattle, skillsOf, startBattle, validateFight } from './battle.js';
 import { createSound } from './sound.js';
@@ -45,7 +46,7 @@ function go(next) {
   view = next; journalIndex = null;
   render();
   window.scrollTo(0, 0);
-  const section = next.section && root.querySelector('[data-talk-step="' + CSS.escape(String(next.section)) + '"]');
+  const section = next.section && root.querySelector('[data-step-section="' + CSS.escape(String(next.section)) + '"]');
   if (section) {
     window.scrollTo(0, section.getBoundingClientRect().top + scrollY - (root.querySelector('.g-top')?.offsetHeight || 0));
     const heading = section.querySelector('h2');
@@ -151,9 +152,40 @@ function conversationSection(step, head, fresh) {
       '<strong>' + h(page.title) + '</strong><small>' + h(labels.depth) + ': ' + page.depth + '</small>' +
       '<p class="g-talk-status">' + h(labels[page.mode || 'pending']) + '</p><div class="g-row"><button class="g-btn g-secondary" data-act="' + (started || !page.mode ? 'play' : 'restart') + '" data-id="' + h(page.chapter) + '"' + (chapter ? '' : ' disabled') + '>' + h(started ? labels.resume : page.mode ? labels.again : labels.open) + '</button></div></article>';
   }).join('');
-  return '<section class="g-section g-section-conversation" data-talk-step="' + h(step.id) + '">' + head + fresh + table + '<p class="g-lead g-section-lead">' + h(step.lead) + '</p>' + secret +
+  return '<section class="g-section g-section-conversation" data-talk-step="' + h(step.id) + '" data-step-section="' + h(step.id) + '">' + head + fresh + table + '<p class="g-lead g-section-lead">' + h(step.lead) + '</p>' + secret +
     (!arrived ? '<p class="g-note">' + h(labels.introHint) + '</p>' + episodeCard(intro) : '<div class="g-talk-count">' + h(labels.decision) + ': ' + state.decided + ' / ' + state.pages.length + '</div><div class="g-list g-talk-pages">' + pages + '</div>' +
       (isLocked(finale, game) ? '<div class="g-card g-card-off g-talk-finale"><strong>' + h(finale.title) + '</strong><small>' + h(labels.finaleHint) + '</small></div>' : episodeCard(finale))) + '</section>';
+}
+
+// A small static rope drawing belongs to each story, including stories already told.
+function loopKnot(loose = false) {
+  const thread = loose
+    ? 'M8 65 C25 65 30 19 58 20 C91 21 110 63 87 70 C62 79 30 45 33 27 C36 8 66 14 67 38 C68 57 89 77 112 73'
+    : 'M8 65 C28 65 39 20 59 22 C83 24 96 59 79 64 C61 70 39 48 42 32 C45 15 69 20 67 40 C65 56 88 68 112 65';
+  return '<svg class="g-loop-knot" viewBox="0 0 120 88" aria-hidden="true" focusable="false" fill="none"><path class="g-loop-shadow" d="' + thread + '"/><path d="' + thread + '"/></svg>';
+}
+
+function loopsSection(step, head, fresh) {
+  const list = index.chapters.filter(item => item.step === step.id);
+  if (validateLoops(step, index).length) return '<section class="g-section">' + head + '<div class="g-list">' + list.map(episodeCard).join('') + '</div></section>';
+  const state = loopsState(step, index, game), labels = step.labels;
+  const storyCard = (item, role, blocked = false) => {
+    const chapter = chapterOf(item.id), saved = game.chapters[item.id];
+    const started = saved && chapter && chapter.scenes[saved.scene] && chapter.scenes[saved.scene].type !== 'ending' && (saved.scene !== chapter.start || saved.line > 0 || Object.keys(saved.choices || {}).length > 0);
+    return '<article class="g-card g-loop-story' + (blocked ? ' g-card-off' : '') + '"><span class="g-step">' + h(labels[role]) + '</span><strong>' + h(item.title) + '</strong><small>' + h(blocked ? labels.locked : item.teaser) + '</small>' +
+      (!blocked ? '<div class="g-row"><button class="g-btn g-secondary" data-act="' + (saved?.done && !started ? 'restart' : 'play') + '" data-id="' + h(item.id) + '"' + (chapter ? '' : ' disabled') + '>' + h(started ? labels.resume : saved?.done ? labels.again : labels.open) + '</button></div>' : '') + '</article>';
+  };
+  const loops = state.loops.map(loop => {
+    const chapter = chapterOf(loop.chapter), saved = game.chapters[loop.chapter];
+    const started = saved && chapter && chapter.scenes[saved.scene] && chapter.scenes[saved.scene].type !== 'ending' && (saved.scene !== chapter.start || saved.line > 0 || Object.keys(saved.choices || {}).length > 0);
+    const status = loop.done ? labels.completed : started ? labels.inProgress : labels.open;
+    return '<button type="button" class="g-loop-node' + (loop.done ? ' is-complete' : '') + '" data-loop="' + h(loop.id) + '" data-mode="' + h(loop.mode || '') + '" data-act="' + (loop.done && !started ? 'restart' : 'play') + '" data-id="' + h(loop.chapter) + '"' + (state.arrived && chapter ? '' : ' disabled') + '>' + loopKnot(loop.done) +
+      '<strong>' + h(loop.title) + '</strong><span class="g-loop-status">' + h(state.arrived ? status : labels.unavailable) + '</span>' + (loop.mode ? '<span class="g-loop-mark">' + h(labels[loop.mode]) + '</span>' : '') + '</button>';
+  }).join('');
+  return '<section class="g-section g-section-loops" data-step-section="' + h(step.id) + '">' + head + fresh + '<p class="g-lead g-section-lead">' + h(step.lead || labels.lead) + '</p>' +
+    (!state.arrived ? storyCard(list.find(item => item.id === step.intro), 'intro') : '') +
+    '<p class="g-loop-instruction">' + h(labels.chooseLoop) + '</p><div class="g-loops" role="group" aria-label="' + h(labels.chooseLoop) + '">' + loops + '</div><p class="g-loop-progress">' + h(labels.progress) + ': ' + state.completed + ' / ' + state.loops.length + '</p>' +
+    storyCard(list.find(item => item.id === step.finale), 'finale', !state.arrived || !state.finaleAvailable || isLocked(list.find(item => item.id === step.finale), game)) + '</section>';
 }
 
 function stepSection(step) {
@@ -167,6 +199,7 @@ function stepSection(step) {
   const fresh = step.after && !done ? '<p class="g-unlocked">Открыт новый шаг</p>' : '';
   if (step.layout === 'notebook') return notebookSection(step, head, fresh);
   if (step.layout === 'conversation') return conversationSection(step, head, fresh);
+  if (step.layout === 'loops') return loopsSection(step, head, fresh);
   if (step.layout !== 'map') return '<section class="g-section' + (step.layout === 'wheel' ? ' g-section-wheel' : '') + '">' + head + fresh + (folded ? '<details class="g-fold"><summary>Шаг пройден. Показать эпизоды и бои</summary>' : (step.layout === 'wheel' ? '<div class="g-wheel g-wheel-menu" aria-hidden="true"><i></i><b></b></div>' : '') + '<p class="g-lead g-section-lead">' + h(step.lead || '') + '</p>') + '<div class="g-list">' + list.map(item => item.type === 'fight' ? fightCard(item) : item.type === 'trial' ? trialCard(item) : episodeCard(item)).join('') + '</div>' + (folded ? '</details>' : '') + '</section>';
   const supports = itemsOf(items, game).filter(i => i.kind === 'support' && i.step === step.id), places = list.filter(item => !item.final), finals = list.filter(item => item.final);
   return '<section class="g-section g-section-map">' + head + fresh + '<p class="g-lead g-section-lead">' + h(step.lead || '') + '</p>' +
@@ -310,6 +343,7 @@ function play() {
   const top = '<header class="g-top"><button class="g-back" data-act="menu">← ' + h(chapter.returnLabel || 'Главы') + '</button><span class="g-scene">' + h(sceneHeading(chapter, scene)) + '</span></header>';
   if (now === 'journal') return top + journal(chapter, scene);
   if (now === 'steering') return top + steering(chapter, scene, progress);
+  if (now === 'habit-map') return top + habitMap(chapter, scene, progress);
   if (now === 'ending') {
     return top + '<main class="g-main g-ending"><div class="g-door" aria-hidden="true"><i></i></div><h2 tabindex="-1">' + h(scene.title) + '</h2>' +
       linesOf(scene, game).map(line => '<p>' + say(line.text) + '</p>').join('') + '<p class="g-note">' + h(chapter.disclaimer || '') + '</p></main>' +
@@ -323,8 +357,11 @@ function play() {
   // Optional artwork is local data; chapters without it keep the original scene markup.
   const background = scene.background ?? chapter.background;
   if (typeof background === 'string' && /^art\/[a-z0-9-]+\.webp$/.test(background)) {
-    return top + '<section class="g-story-art' + ((index.steps || []).find(step => step.id === chapter.step)?.layout === 'conversation' ? ' g-talk-story' : '') + '"><img class="g-scene-art" src="' + h(background) + '" alt="" aria-hidden="true">' +
+    return top + '<section class="g-story-art' + (['conversation', 'loops'].includes((index.steps || []).find(step => step.id === chapter.step)?.layout) ? ' g-talk-story' : '') + '"><img class="g-scene-art" src="' + h(background) + '" alt="" aria-hidden="true">' +
       '<div class="g-scene-window" aria-hidden="true"></div>' + log + foot + '</section>';
+  }
+  if (['conversation', 'loops'].includes((index.steps || []).find(step => step.id === chapter.step)?.layout)) {
+    return top + '<section class="g-story-art g-talk-story g-talk-plain">' + log + foot + '</section>';
   }
   return top + log + foot;
 }
@@ -343,6 +380,15 @@ function steering(chapter, scene, progress) {
         (selection ? '<p class="g-steering-response" id="' + h(responseId) + '" role="status">' + say(selection.text) + '</p>' : '') + '</fieldset>';
     }).join('') + '</div></main>' +
     '<footer class="g-foot"><button class="g-btn g-primary" data-act="steering-next"' + (canLeaveSteering(progress, chapter) ? '' : ' disabled') + '>' + h(scene.continueLabel) + '</button></footer>';
+}
+
+function habitMap(chapter, scene, progress) {
+  const selections = habitMapOf(progress, chapter);
+  return '<main class="g-main g-habit-map"><h2 tabindex="-1">' + h(scene.title) + '</h2><p class="g-lead">' + say(scene.intro) + '</p><div class="g-habit-cells">' + scene.cells.map(cell =>
+    '<fieldset class="g-habit-cell" data-cell="' + h(cell.id) + '"><legend>' + say(cell.title) + '</legend><div class="g-habit-options">' + cell.options.map(option =>
+      '<button class="g-btn g-habit-choice" type="button" data-act="habit-assign" data-id="' + h(cell.id) + '" data-option="' + h(option.id) + '" aria-pressed="' + (selections[cell.id]?.id === option.id) + '"><span class="g-habit-radio" aria-hidden="true"></span><span>' + say(option.text) + '</span></button>'
+    ).join('') + '</div></fieldset>'
+  ).join('') + '</div></main><footer class="g-foot g-habit-foot"><button class="g-btn g-primary" data-act="habit-next"' + (canLeaveHabitMap(progress, chapter) ? '' : ' disabled') + '>' + h(scene.continueLabel) + '</button></footer>';
 }
 
 function pickQuestion(chapter, scene) {
@@ -449,7 +495,7 @@ function soundAfter(act, id, before) {
   if (act === 'sound') return;
   const now = soundSnapshot();
   if (act === 'skill') { if (now.battle && now.battle !== before.battle) battleSounds(id, before.battle, now.battle); return; }
-  if (['choose', 'steering-assign', 'trial-answer', 'set-variant'].includes(act)) return void sound.play('choice');
+  if (['choose', 'steering-assign', 'habit-assign', 'trial-answer', 'set-variant'].includes(act)) return void sound.play('choice');
   if (act === 'journal-save') { if (now.scene !== before.scene) sound.play('write'); return; }
   if (act === 'trial-next' && now.view === 'trial' && now.card >= (trials.get(now.id)?.cards.length ?? Infinity)) return void sound.play('unlock');
   if (now.view !== before.view || now.id !== before.id || now.scene !== before.scene || now.card !== before.card || (now.battle && !before.battle)) sound.play('scene');
@@ -497,7 +543,7 @@ const actions = {
   },
   menu: () => {
     const step = (index.steps || []).find(step => step.id === chapterOf(view.id)?.step);
-    dropBattle(); go({ name: 'menu', ...(step?.layout === 'conversation' ? { section: step.id } : {}) });
+    dropBattle(); go({ name: 'menu', ...(['conversation', 'loops'].includes(step?.layout) ? { section: step.id } : {}) });
   },
   bag: () => go({ name: 'bag' }),
   trial: id => go({ name: 'trial', id, card: null, answer: null }),
@@ -529,9 +575,9 @@ const actions = {
   next: () => {
     const chapter = chapterOf(view.id), progress = progressOf(game, chapter);
     advance(progress, chapter, game); persist(); render();
-    if (stage(progress, chapter, game) === 'steering') {
+    if (['steering', 'habit-map'].includes(stage(progress, chapter, game))) {
       window.scrollTo(0, 0);
-      root.querySelector('.g-steering h2')?.focus({ preventScroll: true });
+      root.querySelector('.g-steering h2, .g-habit-map h2')?.focus({ preventScroll: true });
     }
   },
   choose: id => { const chapter = chapterOf(view.id); choose(progressOf(game, chapter), chapter, id, game); persist(); render(); window.scrollTo(0, 0); },
@@ -548,6 +594,19 @@ const actions = {
     const chapter = chapterOf(view.id), progress = chapter && progressOf(game, chapter);
     if (!chapter || !canLeaveSteering(progress, chapter)) return;
     leaveSteering(progress, chapter, game); persist(); render(); window.scrollTo(0, 0);
+    root.querySelector('.g-next, .g-choice, h2')?.focus({ preventScroll: true });
+  },
+  'habit-assign': (id, target) => {
+    const chapter = chapterOf(view.id), option = target.dataset.option;
+    if (!chapter) return;
+    assignHabitCell(progressOf(game, chapter), chapter, id, option);
+    persist(); render();
+    Array.from(root.querySelectorAll('[data-act="habit-assign"]')).find(button => button.dataset.id === id && button.dataset.option === option)?.focus({ preventScroll: true });
+  },
+  'habit-next': () => {
+    const chapter = chapterOf(view.id), progress = chapter && progressOf(game, chapter);
+    if (!chapter || !canLeaveHabitMap(progress, chapter)) return;
+    leaveHabitMap(progress, chapter, game); persist(); render(); window.scrollTo(0, 0);
     root.querySelector('.g-next, .g-choice, h2')?.focus({ preventScroll: true });
   },
   'other-question': () => { flushDraft(); journalIndex += 1; render(); root.querySelector('#g-answer')?.focus(); },
@@ -612,6 +671,7 @@ async function boot() {
     sound.configure(soundMap);
     const problems = validateVocab(vocab);
     for (const step of index.steps || []) if (step.layout === 'conversation') problems.push(...validateConversation(step, index));
+    for (const step of index.steps || []) if (step.layout === 'loops') problems.push(...validateLoops(step, index));
     await Promise.all(index.chapters.map(async item => {
       try {
         if (item.type === 'trial') {

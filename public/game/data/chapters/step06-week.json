@@ -1,0 +1,134 @@
+{
+  "id": "step06-week",
+  "version": 1,
+  "step": 6,
+  "title": "После субботы",
+  "returnLabel": "К петлям",
+  "disclaimer": "Вымышленная неделя трезвой жизни героя. Все сцены и реплики придуманы; это не литература АН, не диагноз и не оценка готовности игрока. На личные вопросы можно ответить позже.",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_06_Шестой.md: ситуация, действие, настоящая польза и цена привычного способа; три равноценных отметки готовности",
+    "public/steps.js → шаг 6: привычный способ когда-то помогал; сомнение и право пока ничего не менять",
+    "public/game/data/chapters/step04-*.json и step05-*.json: вымышленная тетрадь и разговор героя; готовность проверяется в обычной жизни"
+  ],
+  "speakers": {
+    "narrator": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "marat": {
+      "name": "Марат",
+      "role": "character"
+    }
+  },
+  "start": "s6-week-start",
+  "scenes": {
+    "s6-week-start": {
+      "type": "story",
+      "title": "Воскресенье",
+      "lines": [
+        {
+          "id": "s6-week-start.l01",
+          "speaker": "narrator",
+          "text": "Тетрадь лежит дома. Ты идёшь за хлебом без рюкзака и всё время трогаешь плечо: где лямка?"
+        },
+        {
+          "id": "s6-week-start.l02",
+          "speaker": "you",
+          "text": "Ну всё. Самое тяжёлое позади."
+        },
+        {
+          "id": "s6-week-start.l03",
+          "speaker": "narrator",
+          "text": "Вечером у подъезда ты встречаешь Марата. У него под мышкой дверной доводчик, на рукаве белая пыль."
+        },
+        {
+          "id": "s6-week-start.l04",
+          "speaker": "you",
+          "text": "Я после вчерашнего как будто сдал что-то. Теперь просто жить."
+        },
+        {
+          "id": "s6-week-start.l05",
+          "speaker": "marat",
+          "text": "Ты прочитал, что делал. Теперь посмотри, как ты это делаешь — оно никуда не делось.",
+          "ifAny": [
+            "s5-father.choice.read",
+            "s5-father.revisit.read",
+            "s5-fear.choice.read",
+            "s5-fear.revisit.read",
+            "s5-box.choice.read",
+            "s5-box.revisit.read",
+            "s5-people.choice.read",
+            "s5-people.revisit.read",
+            "s5-worth.choice.read",
+            "s5-worth.revisit.read"
+          ]
+        },
+        {
+          "id": "s6-week-start.l05-unread",
+          "speaker": "marat",
+          "text": "Ты записал, что делал. Теперь посмотри, как ты это делаешь — оно никуда не делось.",
+          "ifNone": [
+            "s5-father.choice.read",
+            "s5-father.revisit.read",
+            "s5-fear.choice.read",
+            "s5-fear.revisit.read",
+            "s5-box.choice.read",
+            "s5-box.revisit.read",
+            "s5-people.choice.read",
+            "s5-people.revisit.read",
+            "s5-worth.choice.read",
+            "s5-worth.revisit.read"
+          ]
+        },
+        {
+          "id": "s6-week-start.l06",
+          "speaker": "you",
+          "text": "Да я помню, что там написано."
+        },
+        {
+          "id": "s6-week-start.l07",
+          "speaker": "marat",
+          "text": "Я тоже помнил. Ладно, подержи дверь, у меня тут пружина."
+        },
+        {
+          "id": "s6-week-start.l08",
+          "speaker": "narrator",
+          "text": "Ты придерживаешь дверь. Марат протискивается боком, задевает доводчиком косяк и ругается себе под нос."
+        },
+        {
+          "id": "s6-week-start.l09",
+          "speaker": "narrator",
+          "text": "Впереди неделя: склад, Лена, комната группы, Тимкин стол у окна. Те же места, куда ты ходишь трезвым уже не первый день."
+        },
+        {
+          "id": "s6-week-start.l10",
+          "speaker": "narrator",
+          "text": "Вечерами ты достаёшь тетрадь. Иногда видишь знакомый способ только тогда, когда разговор уже кончился."
+        }
+      ],
+      "next": "s6-week-end"
+    },
+    "s6-week-end": {
+      "type": "ending",
+      "title": "Четыре петли",
+      "lines": [
+        {
+          "id": "s6-week-end.l01",
+          "speaker": "narrator",
+          "text": "На свободном листе ты пишешь: соврать, ударить словом, всё забрать себе, уйти первым. Рядом пока пусто."
+        },
+        {
+          "id": "s6-week-end.l02",
+          "speaker": "narrator",
+          "text": "Эти способы выручали тебя задолго до тетради. На этой неделе можно посмотреть на каждый — в любом порядке. Что пробовать менять, решишь на месте."
+        }
+      ]
+    }
+  },
+  "questions": [],
+  "background": "art/scene-yard.webp"
+}
