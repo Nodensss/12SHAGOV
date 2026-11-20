@@ -44,6 +44,15 @@ export function normalizeGame(raw) {
       chapter: typeof value.chapter === 'string' ? value.chapter : null,
     };
   }
+  if (plain(raw.ownWords)) {
+    const drafts = {};
+    for (const [id,d] of Object.entries(plain(raw.ownWords.drafts) ? raw.ownWords.drafts : {})) {
+      if (!plain(d)) continue;
+      drafts[id] = { parts: Array.isArray(d.parts) ? [...new Set(d.parts.filter(v=>typeof v==='string').map(v=>v.slice(0,80)))].slice(0,4) : [], silent:d.silent===true, format:text(d.format,80), feeling:text(d.feeling,80), complete:d.complete===true };
+    }
+    game.ownWords={drafts};
+    if (typeof raw.ownWords.final === 'string' && drafts[raw.ownWords.final]?.complete) game.ownWords.final=raw.ownWords.final;
+  }
   return game;
 }
 
@@ -122,7 +131,7 @@ export function validateChapter(chapter, vocab) {
   };
   for (const [sceneId, scene] of Object.entries(scenes)) {
     unique(sceneId, 'сцена');
-    if (!['story', 'journal', 'steering', 'habit-map', 'ending'].includes(scene.type)) errors.push(sceneId + ': неизвестный type');
+    if (!['story', 'journal', 'steering', 'habit-map', 'own-words', 'ending'].includes(scene.type)) errors.push(sceneId + ': неизвестный type');
     for (const line of scene.lines || []) {
       unique(line.id, sceneId + ' реплика');
       if (!chapter.speakers?.[line.speaker]) errors.push(line.id + ': неизвестный speaker');
@@ -167,6 +176,10 @@ export function validateChapter(chapter, vocab) {
         }
       }
       if (scene.choice) errors.push(sceneId + ': выбор действий должен быть отдельной сюжетной сценой');
+      target(scene.next, sceneId);
+    }
+    if (scene.type === 'own-words') {
+      if (!Number.isInteger(scene.minParts) || !Number.isInteger(scene.maxParts) || scene.minParts < 1 || scene.maxParts < scene.minParts || scene.maxParts > 4 || typeof scene.final !== 'boolean' || !scene.intro) errors.push(sceneId + ': неверная сборка просьбы');
       target(scene.next, sceneId);
     }
     if (scene.type === 'habit-map') {
@@ -265,6 +278,7 @@ export function stage(progress, chapter, game) {
   if (scene.type === 'journal') return 'journal';
   if (scene.type === 'steering') return 'steering';
   if (scene.type === 'habit-map') return 'habit-map';
+  if (scene.type === 'own-words') return 'own-words';
   if (scene.type === 'ending') return 'ending';
   if (progress.line < linesOf(scene, game).length - 1) return 'line';
   return scene.choice ? 'choice' : 'next';
@@ -500,4 +514,43 @@ export function validateLoops(step, index) {
   }
   for (const key of ['intro', 'finale', 'locked', 'inProgress', 'completed', 'chooseLoop', 'progress', 'try', 'watch', 'hold', 'open', 'unavailable', 'resume', 'again']) if (!hasText(step.labels?.[key])) errors.push('петли без подписи ' + key);
   return errors;
+}
+
+// Own words: optional save subtree, no migration or spirituality score.
+export function wordsOf(game, step) {
+  const have=picked(game);
+  return (step?.words || []).filter(w=>w.whenAny.some(id=>have.has(id)));
+}
+export function requestDraft(game, sceneId) {
+  return game.ownWords?.drafts?.[sceneId] || {parts:[],silent:false,format:'',feeling:'',complete:false};
+}
+export function changeRequest(game, step, scene, sceneId, action, id) {
+  const draft={...requestDraft(game,sceneId),parts:[...requestDraft(game,sceneId).parts],complete:false};
+  const available=wordsOf(game,step).map(w=>w.id);
+  draft.parts=draft.parts.filter(id=>available.includes(id)).slice(0,scene.maxParts);
+  if(action==='add' && available.includes(id) && !draft.parts.includes(id) && draft.parts.length<scene.maxParts) {draft.parts.push(id);draft.silent=false;}
+  else if(action==='remove') draft.parts=draft.parts.filter(p=>p!==id);
+  else if(action==='clear') {draft.parts=[];draft.silent=false;}
+  else if(action==='silent') {draft.parts=[];draft.silent=true;draft.format=step.silenceFormat;}
+  else if(action==='up'||action==='down') {const i=draft.parts.indexOf(id),j=i+(action==='up'?-1:1);if(i>=0&&j>=0&&j<draft.parts.length)[draft.parts[i],draft.parts[j]]=[draft.parts[j],draft.parts[i]];}
+  else if(action==='format' && step.formats.some(f=>f.id===id)) draft.format=id;
+  else if(action==='feeling' && step.feelings.some(f=>f.id===id)) draft.feeling=id;
+  game.ownWords ||= {drafts:{}};game.ownWords.drafts[sceneId]=draft;
+  if(game.ownWords.final===sceneId)delete game.ownWords.final;
+  return draft;
+}
+export function canLeaveRequest(game,step,scene,sceneId) {
+  const d=requestDraft(game,sceneId),available=wordsOf(game,step).map(w=>w.id);
+  return (d.silent || (d.parts.length>=scene.minParts && d.parts.length<=scene.maxParts && new Set(d.parts).size===d.parts.length && d.parts.every(id=>available.includes(id)))) && (!scene.final || (step.formats.some(f=>f.id===d.format) && (!d.silent || d.format===step.silenceFormat) && step.feelings.some(f=>f.id===d.feeling)));
+}
+export function leaveRequest(progress,chapter,game,step) {
+  const scene=chapter.scenes[progress.scene],sid=progress.scene;
+  if(scene.type!=='own-words'||!canLeaveRequest(game,step,scene,sid))return progress;
+  game.ownWords.drafts[sid].complete=true;
+  if(scene.final)game.ownWords.final=sid;
+  enter(progress,chapter,resolveNext(scene.next,game));return progress;
+}
+export function requestText(game,step,sceneId=game.ownWords?.final) {
+  const d=requestDraft(game,sceneId);
+  return d.silent?step.labels.silent:d.parts.map(id=>step.words.find(w=>w.id===id)?.text || '').filter(Boolean).join(' · ');
 }

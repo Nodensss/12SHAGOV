@@ -1,0 +1,254 @@
+{
+  "id": "step07-stepan",
+  "version": 1,
+  "step": 7,
+  "title": "Степаныч на группе",
+  "returnLabel": "К словам",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_07_Седьмой.md: собственный язык просьбы, свободный формат, чувство без оценки",
+    "public/steps.js: шаг 7; оригинальная история героя"
+  ],
+  "disclaimer": "Вымышленная история. Это не литература АН и не образец молитвы. Личные ответы можно оставить пустыми.",
+  "speakers": {
+    "n": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "marat": {
+      "name": "Марат",
+      "role": "character"
+    },
+    "stepan": {
+      "name": "Степаныч",
+      "role": "character"
+    },
+    "tamara": {
+      "name": "Тамара",
+      "role": "character"
+    },
+    "lena": {
+      "name": "Лена",
+      "role": "character"
+    },
+    "tim": {
+      "name": "Тимка",
+      "role": "character"
+    },
+    "other": {
+      "name": "Сосед",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "start": "s7-stepan-start",
+  "scenes": {
+    "s7-stepan-start": {
+      "type": "story",
+      "title": "Степаныч на группе",
+      "lines": [
+        {
+          "id": "s7-stepan.start.0",
+          "speaker": "n",
+          "text": "Степаныч после группы ищет очки. Они висят у него на шее, под воротником."
+        },
+        {
+          "id": "s7-stepan.start.1",
+          "speaker": "you",
+          "text": "Ты когда говоришь «попросил» — что именно говоришь?"
+        },
+        {
+          "id": "s7-stepan.start.2",
+          "speaker": "stepan",
+          "text": "Сегодня? «Боже, помоги не врать». Утром внуку обещал приехать. А самому лень собираться."
+        },
+        {
+          "id": "s7-stepan.start.3",
+          "speaker": "you",
+          "text": "И приехал?"
+        },
+        {
+          "id": "s7-stepan.start.4",
+          "speaker": "stepan",
+          "text": "Опоздал. Но позвонил заранее. Обычно я бы начал про пробки, а сам ещё дома."
+        },
+        {
+          "id": "s7-stepan.start.5",
+          "speaker": "n",
+          "text": "Он находит очки и протирает дужку краем рубашки."
+        },
+        {
+          "id": "s7-stepan.start.6",
+          "speaker": "you",
+          "text": "А если я не могу сказать «Боже»?"
+        },
+        {
+          "id": "s7-stepan.start.7",
+          "speaker": "stepan",
+          "text": "Я не знаю, как тебе сказать. У меня это слово от бабушки осталось. У неё над кроватью лампочка была, всё время перегорала."
+        },
+        {
+          "id": "s7-stepan.start.8",
+          "speaker": "you",
+          "text": "Ты ей говорил, что молишься?"
+        },
+        {
+          "id": "s7-stepan.start.9",
+          "speaker": "stepan",
+          "text": "Не успел. Очки вот её футляр до сих пор таскаю."
+        },
+        {
+          "id": "s7-stepan.start.10",
+          "speaker": "n",
+          "text": "Он щёлкает потёртой застёжкой. Ты не ищешь другой вопрос."
+        }
+      ],
+      "choice": {
+        "id": "s7-stepan.take",
+        "prompt": "Что останется от встречи?",
+        "options": [
+          {
+            "id": "s7-stepan.take.remember",
+            "label": "Запомнить",
+            "next": "s7-stepan-loop"
+          },
+          {
+            "id": "s7-stepan.take.write",
+            "label": "Записать в тетрадь",
+            "next": "s7-stepan-loop"
+          }
+        ]
+      }
+    },
+    "s7-stepan-journal": {
+      "type": "journal",
+      "intro": "Здесь можно оставить одну строку или ответить позже.",
+      "questionIds": [
+        "q.s7-stepan.1",
+        "q.s7-stepan.2"
+      ],
+      "next": "s7-stepan-end"
+    },
+    "s7-stepan-end": {
+      "type": "ending",
+      "title": "Слова остаются",
+      "lines": [
+        {
+          "id": "s7-stepan.end.0",
+          "speaker": "n",
+          "text": "Ты находишь в кармане складской карандаш и оставляешь его в тетради."
+        }
+      ]
+    },
+    "s7-stepan-loop": {
+      "type": "story",
+      "title": "Петля",
+      "lines": [
+        {
+          "id": "s7-stepan.loop.0",
+          "speaker": "n",
+          "text": "На складе бригадир спрашивает, кто оставил коробки у прохода. Ты уже набираешь воздух, чтобы назвать ночную смену."
+        },
+        {
+          "id": "s7-stepan.loop.1",
+          "speaker": "voice",
+          "text": "Они тоже оставляют. Почему опять ты?"
+        },
+        {
+          "id": "s7-stepan.callback.try",
+          "speaker": "n",
+          "text": "В тетради у этой петли стоит «попробовать». Сейчас ты вспоминаешь строчку, но рука уже движется по-старому.",
+          "if": "s6-lie.ready.try"
+        },
+        {
+          "id": "s7-stepan.callback.watch",
+          "speaker": "n",
+          "text": "У этой петли стоит «понаблюдать». Вот она: ты замечаешь знакомое движение до того, как оно заканчивается.",
+          "if": "s6-lie.ready.watch"
+        },
+        {
+          "id": "s7-stepan.callback.hold",
+          "speaker": "n",
+          "text": "У этой петли стоит «пока держусь». Оставаться без неё сейчас особенно страшно. Ты не обещал, что будет иначе.",
+          "if": "s6-lie.ready.hold"
+        }
+      ],
+      "choice": {
+        "id": "s7-stepan.loop",
+        "prompt": "Сейчас можно остановиться на секунду.",
+        "options": [
+          {
+            "id": "s7-stepan.loop.pause",
+            "label": "Пауза и короткая просьба",
+            "next": "s7-stepan-request"
+          },
+          {
+            "id": "s7-stepan.loop.pass",
+            "label": "Пройти мимо",
+            "next": "s7-stepan-pass"
+          }
+        ]
+      }
+    },
+    "s7-stepan-request": {
+      "type": "own-words",
+      "title": "На секунду",
+      "intro": "Можно взять уже найденные слова или помолчать. Они не обязаны помочь.",
+      "minParts": 1,
+      "maxParts": 2,
+      "final": false,
+      "next": "s7-stepan-pause"
+    },
+    "s7-stepan-pause": {
+      "type": "story",
+      "title": "После",
+      "lines": [
+        {
+          "id": "s7-stepan.pause.0",
+          "speaker": "you",
+          "text": "Я. Сейчас уберу."
+        },
+        {
+          "id": "s7-stepan.pause.1",
+          "speaker": "n",
+          "text": "Бригадир просит освободить проход до разгрузки. Ты несёшь коробки по одной. От просьбы они легче не становятся, но придумывать ночную смену уже не нужно."
+        }
+      ],
+      "next": "s7-stepan-journal"
+    },
+    "s7-stepan-pass": {
+      "type": "story",
+      "title": "После",
+      "lines": [
+        {
+          "id": "s7-stepan.pass.0",
+          "speaker": "you",
+          "text": "Наверное, ночные."
+        },
+        {
+          "id": "s7-stepan.pass.1",
+          "speaker": "n",
+          "text": "Бригадир идёт проверять сменный лист. Ты поднимаешь первую коробку и слышишь, что успел сказать. Записанные слова остаются в кармане."
+        }
+      ],
+      "next": "s7-stepan-journal"
+    }
+  },
+  "questions": [
+    {
+      "id": "q.s7-stepan.1",
+      "text": "Какие слова мне хочется оставить без объяснений?"
+    },
+    {
+      "id": "q.s7-stepan.2",
+      "text": "Что мешает попросить до того, как придётся оправдываться?"
+    }
+  ],
+  "background": "art/scene-group.webp"
+}

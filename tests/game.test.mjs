@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { access, readFile, readdir, stat } from 'node:fs/promises';
 import {
+  wordsOf, requestDraft, changeRequest, canLeaveRequest, leaveRequest, requestText,
   advance, answerLater, choose, fill, freshGame, isLocked, leaveJournal, linesOf, normalizeGame, progressOf,
   saveEntry, setDraft, stage, validateChapter, validateVocab,
   itemsOf, levelOf, markDone, recordFight, assignSteering, leaveSteering, restartChapter,
@@ -119,6 +120,12 @@ function playThrough(game, chapter, pick, placements = []) {
     } else if (now === 'habit-map') {
       for (const cell of chapter.scenes[progress.scene].cells) assignHabitCell(progress, chapter, cell.id, cell.options[pick % cell.options.length].id);
       leaveHabitMap(progress, chapter, game);
+    } else if (now === 'own-words') {
+      const scene=chapter.scenes[progress.scene],step=index.steps.find(s=>s.id===7);
+      changeRequest(game,step,scene,progress.scene,'silent','');
+      changeRequest(game,step,scene,progress.scene,'format','quiet');
+      changeRequest(game,step,scene,progress.scene,'feeling','nothing');
+      leaveRequest(progress,chapter,game,step);
     } else advance(progress, chapter, game);
   }
   assert.fail('глава не закончилась');
@@ -284,7 +291,7 @@ test('третий шаг открывается после Ночи, содер
   assert.equal(isLocked(thirdItems[0], game), true);
   markDone(game, 'step02-night');
   assert.equal(isLocked(thirdItems[0], game), false);
-  assert.equal(index.nextStep.title, 'Шаг седьмой');
+  assert.equal(index.nextStep.title, 'Шаг восьмой');
   for (const chapter of thirdChapters) {
     assert.ok(chapter.disclaimer && chapter.basedOn.some(source => source.includes('docs/step03.md')), chapter.id);
     assert.ok(chapter.questions.length >= 2 && chapter.questions.length <= 3, chapter.id);
@@ -712,4 +719,39 @@ test('шестой шаг не приписывает чтение челове�
   const p=talk.pages[0];g.chapters[p.chapter].choices[p.choice]=p.read;
   assert.ok(text().includes('Ты прочитал, что делал.'));
   assert.ok(!text().includes('Ты записал, что делал.'));
+});
+
+
+test('седьмой шаг: пять свободных встреч, копилка открывается сразу после разговора',()=>{
+ const step=index.steps.find(s=>s.id===7),meetings=index.chapters.filter(c=>c.step===7&&!['step07-meeting','step07-own'].includes(c.id));
+ assert.equal(step.layout,'words');assert.equal(meetings.length,5);assert.equal(step.words.length,5);
+ const g=freshGame();assert.deepEqual(wordsOf(g,step),[]);markDone(g,step.intro);
+ for(const m of meetings)assert.equal(isLocked(m,g),false);
+ const c=chapters.find(c=>c.id===meetings[0].id),p=progressOf(g,c),scene=c.scenes[c.start];p.line=scene.lines.length-1;
+ choose(p,c,scene.choice.options[0].id,g);assert.equal(wordsOf(g,step).length,1);assert.equal(g.chapters[c.id].done,false);
+ assert.equal(isLocked(index.chapters.find(c=>c.id===step.finale),g),true);
+ for(const m of meetings)markDone(g,m.id);
+ assert.equal(isLocked(index.chapters.find(c=>c.id===step.finale),g),false);
+});
+test('свои слова: порядок, ограничение частей, сохранение черновика и три формата без оценки',()=>{
+ const step=index.steps.find(s=>s.id===7),c=chapters.find(c=>c.id===step.finale),sid='s7-own-request',scene=c.scenes[sid];
+ for(const format of step.formats){
+  const g=freshGame();for(const w of step.words){g.chapters[w.id]={scene:null,line:0,done:false,choices:{take:w.whenAny[0]}};}
+  const p=progressOf(g,c);p.scene=sid;
+  changeRequest(g,step,scene,sid,'add','unknown');assert.equal(requestDraft(g,sid).parts.length,0);
+  for(const w of step.words)changeRequest(g,step,scene,sid,'add',w.id);
+  assert.equal(requestDraft(g,sid).parts.length,scene.maxParts);
+  changeRequest(g,step,scene,sid,'up',step.words[1].id);assert.equal(requestDraft(g,sid).parts[0],step.words[1].id);
+  changeRequest(g,step,scene,sid,'format',format.id);assert.equal(canLeaveRequest(g,step,scene,sid),false);
+  changeRequest(g,step,scene,sid,'feeling','afraid');assert.equal(canLeaveRequest(g,step,scene,sid),true);
+  const restored=normalizeGame(JSON.parse(JSON.stringify(g)));assert.deepEqual(restored.ownWords,g.ownWords);
+  leaveRequest(p,c,g,step);assert.equal(g.ownWords.final,sid);assert.ok(requestText(g,step).length);assert.ok(normalizeGame(g).ownWords.final);
+ }
+ const g=freshGame();assert.equal(Object.hasOwn(normalizeGame(g),'ownWords'),false);
+ const p=progressOf(g,c);p.scene=sid;changeRequest(g,step,scene,sid,'silent','');changeRequest(g,step,scene,sid,'format','quiet');changeRequest(g,step,scene,sid,'feeling','nothing');leaveRequest(p,c,g,step);assert.equal(requestText(g,step),step.labels.silent);
+});
+test('петли седьмого шага помнят все три отметки шестого',()=>{
+ for(const c of chapters.filter(c=>c.step===7))for(const scene of Object.values(c.scenes).filter(s=>s.title==='Петля')){
+  for(const mode of ['try','watch','hold']){const line=scene.lines.find(l=>l.id.endsWith('.callback.'+mode));assert.ok(line);const g=freshGame();g.chapters.fixture={choices:{mark:line.if},done:false};const visible=linesOf(scene,g);assert.ok(visible.includes(line));assert.equal(visible.filter(l=>l.id.includes('.callback.')).length,1);}
+ }
 });

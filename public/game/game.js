@@ -1,4 +1,5 @@
 import {
+  wordsOf, requestDraft, changeRequest, canLeaveRequest, leaveRequest, requestText,
   advance, answerLater, choose, deleteEntry, fill, freshGame, GAME_KEY, depthOf, isLocked, itemsOf, leaveJournal, linesOf, loadGame, markDone, picked, scaledSkills,
   progressOf, restartChapter, saveEntry, saveGame, setDraft, stage, validateChapter, validateVocab,
   levelOf, recordFight, conversationState, validateConversation, loopsState, validateLoops,
@@ -188,6 +189,25 @@ function loopsSection(step, head, fresh) {
     storyCard(list.find(item => item.id === step.finale), 'finale', !state.arrived || !state.finaleAvailable || isLocked(list.find(item => item.id === step.finale), game)) + '</section>';
 }
 
+function wordBank(step) {
+  const words=wordsOf(game,step);
+  return '<aside class="g-word-bank"><h3>'+h(step.labels.bank)+'</h3>'+(words.length ? words.map(w=>'<span class="g-word-chip">'+h(w.text)+'<small>'+h(w.register)+'</small></span>').join('') : '<p>'+h(step.labels.empty)+'</p>')+'</aside>';
+}
+function requestSummary(step) {
+  if(!game.ownWords?.final)return '';
+  const d=requestDraft(game,game.ownWords.final);
+  return '<aside class="g-word-bank"><h3>'+h(step.labels.saved)+'</h3><p>'+h(requestText(game,step))+'</p><p>'+h(step.formats.find(f=>f.id===d.format)?.text)+' · '+h(step.feelings.find(f=>f.id===d.feeling)?.text)+'</p></aside>';
+}
+function wordsSection(step,head,fresh) {
+  const list=index.chapters.filter(c=>c.step===step.id);
+  return '<section class="g-section g-section-words" data-step-section="'+step.id+'">'+head+fresh+'<p class="g-lead">'+h(step.lead)+'</p>'+wordBank(step)+requestSummary(step)+'<div class="g-list">'+list.map(item=>isLocked(item,game)?'<article class="g-card g-card-off"><strong>'+h(item.title)+'</strong><small>'+h(step.labels.locked)+'</small></article>':episodeCard(item)).join('')+'</div></section>';
+}
+function ownWords(chapter,scene,progress) {
+  const step=index.steps.find(s=>s.id===chapter.step),labels=step.labels,d=requestDraft(game,progress.scene),available=wordsOf(game,step);
+  const button=(action,id,label,extra='')=>'<button type="button" class="g-btn g-secondary" data-act="word-change" data-action="'+action+'" data-id="'+h(id)+'" '+extra+'>'+h(label)+'</button>';
+  return '<main class="g-main g-own-words"><h2 tabindex="-1">'+h(scene.title)+'</h2><p class="g-lead">'+h(scene.intro)+'</p><h3>'+h(labels.selected)+'</h3><p class="g-request-preview" aria-live="polite">'+h(requestText(game,step,progress.scene))+'</p><ol class="g-word-order">'+d.parts.map(id=>'<li><strong>'+h(step.words.find(w=>w.id===id)?.text)+'</strong><div class="g-row">'+button('up',id,labels.up,d.parts.indexOf(id)===0?'disabled':'')+button('down',id,labels.down,d.parts.indexOf(id)===d.parts.length-1?'disabled':'')+button('remove',id,labels.remove)+'</div></li>').join('')+'</ol><div class="g-word-options">'+available.map(w=>button('add',w.id,w.text,d.parts.includes(w.id)||d.parts.length>=scene.maxParts?'disabled':'')).join('')+'</div><div class="g-row">'+button('silent','',labels.silent,'aria-pressed="'+d.silent+'"')+button('clear','',labels.clear)+'</div>'+(scene.final ? '<fieldset><legend>'+h(labels.format)+'</legend>'+step.formats.map(f=>button('format',f.id,f.text,'aria-pressed="'+(d.format===f.id)+'" '+(d.silent&&f.id!==step.silenceFormat?'disabled':'' ))).join('')+'</fieldset><fieldset><legend>'+h(labels.feeling)+'</legend>'+step.feelings.map(f=>button('feeling',f.id,f.text,'aria-pressed="'+(d.feeling===f.id)+'"')).join('')+'</fieldset>' : '')+'<button class="g-btn g-primary" data-act="word-next" '+(canLeaveRequest(game,step,scene,progress.scene)?'':'disabled')+'>'+h(labels.next)+'</button></main>';
+}
+
 function stepSection(step) {
   const list = index.chapters.filter(item => item.step === step.id), done = list.filter(item => picked(game).has(item.id)).length;
   const head = '<div class="g-section-head"><div><span class="g-step">' + h(step.title) + '</span><h2>' + h(step.name) + '</h2></div><span class="g-count">' + done + ' / ' + list.length + '</span></div>';
@@ -200,6 +220,7 @@ function stepSection(step) {
   if (step.layout === 'notebook') return notebookSection(step, head, fresh);
   if (step.layout === 'conversation') return conversationSection(step, head, fresh);
   if (step.layout === 'loops') return loopsSection(step, head, fresh);
+  if (step.layout === 'words') return wordsSection(step, head, fresh);
   if (step.layout !== 'map') return '<section class="g-section' + (step.layout === 'wheel' ? ' g-section-wheel' : '') + '">' + head + fresh + (folded ? '<details class="g-fold"><summary>Шаг пройден. Показать эпизоды и бои</summary>' : (step.layout === 'wheel' ? '<div class="g-wheel g-wheel-menu" aria-hidden="true"><i></i><b></b></div>' : '') + '<p class="g-lead g-section-lead">' + h(step.lead || '') + '</p>') + '<div class="g-list">' + list.map(item => item.type === 'fight' ? fightCard(item) : item.type === 'trial' ? trialCard(item) : episodeCard(item)).join('') + '</div>' + (folded ? '</details>' : '') + '</section>';
   const supports = itemsOf(items, game).filter(i => i.kind === 'support' && i.step === step.id), places = list.filter(item => !item.final), finals = list.filter(item => item.final);
   return '<section class="g-section g-section-map">' + head + fresh + '<p class="g-lead g-section-lead">' + h(step.lead || '') + '</p>' +
@@ -344,23 +365,24 @@ function play() {
   if (now === 'journal') return top + journal(chapter, scene);
   if (now === 'steering') return top + steering(chapter, scene, progress);
   if (now === 'habit-map') return top + habitMap(chapter, scene, progress);
+  if (now === 'own-words') return top + ownWords(chapter, scene, progress);
   if (now === 'ending') {
     return top + '<main class="g-main g-ending"><div class="g-door" aria-hidden="true"><i></i></div><h2 tabindex="-1">' + h(scene.title) + '</h2>' +
-      linesOf(scene, game).map(line => '<p>' + say(line.text) + '</p>').join('') + '<p class="g-note">' + h(chapter.disclaimer || '') + '</p></main>' +
+      linesOf(scene, game).map(line => '<p>' + say(line.text) + '</p>').join('') + (chapter.step === 7 ? requestSummary(index.steps.find(s=>s.id===7)) : '') + '<p class="g-note">' + h(chapter.disclaimer || '') + '</p></main>' +
       '<footer class="g-foot"><button class="g-btn g-primary" data-act="menu">' + h(chapter.returnLabel || 'К главам') + '</button><button class="g-btn g-secondary" data-act="diary">Открыть дневник</button><button class="g-btn g-quiet" data-act="restart" data-id="' + h(chapter.id) + '">Пройти иначе</button></footer>';
   }
   const shown = linesOf(scene, game).slice(0, progress.line + 1);
-  const log = '<main class="g-main g-log" data-act="' + (now === 'choice' ? '' : 'next') + '" aria-live="polite">' + shown.map((line, i) => lineHtml(chapter, line, i === shown.length - 1)).join('') + '</main>';
+  const log = '<main class="g-main g-log" data-act="' + (now === 'choice' ? '' : 'next') + '" aria-live="polite">' + (chapter.id === 'step07-own' && game.ownWords?.final ? requestSummary(index.steps.find(s=>s.id===7)) : '') + shown.map((line, i) => lineHtml(chapter, line, i === shown.length - 1)).join('') + '</main>';
   const foot = now === 'choice'
     ? '<footer class="g-foot"><p class="g-prompt">' + h(scene.choice.prompt || 'Что дальше?') + '</p>' + scene.choice.options.map(o => '<button class="g-btn g-choice" data-act="choose" data-id="' + h(o.id) + '">' + say(o.label) + '</button>').join('') + '</footer>'
     : '<footer class="g-foot"><button class="g-btn g-primary g-next" data-act="next">Дальше</button></footer>';
   // Optional artwork is local data; chapters without it keep the original scene markup.
   const background = scene.background ?? chapter.background;
   if (typeof background === 'string' && /^art\/[a-z0-9-]+\.webp$/.test(background)) {
-    return top + '<section class="g-story-art' + (['conversation', 'loops'].includes((index.steps || []).find(step => step.id === chapter.step)?.layout) ? ' g-talk-story' : '') + '"><img class="g-scene-art" src="' + h(background) + '" alt="" aria-hidden="true">' +
+    return top + '<section class="g-story-art' + (['conversation', 'loops', 'words'].includes((index.steps || []).find(step => step.id === chapter.step)?.layout) ? ' g-talk-story' : '') + '"><img class="g-scene-art" src="' + h(background) + '" alt="" aria-hidden="true">' +
       '<div class="g-scene-window" aria-hidden="true"></div>' + log + foot + '</section>';
   }
-  if (['conversation', 'loops'].includes((index.steps || []).find(step => step.id === chapter.step)?.layout)) {
+  if (['conversation', 'loops', 'words'].includes((index.steps || []).find(step => step.id === chapter.step)?.layout)) {
     return top + '<section class="g-story-art g-talk-story g-talk-plain">' + log + foot + '</section>';
   }
   return top + log + foot;
@@ -543,7 +565,7 @@ const actions = {
   },
   menu: () => {
     const step = (index.steps || []).find(step => step.id === chapterOf(view.id)?.step);
-    dropBattle(); go({ name: 'menu', ...(['conversation', 'loops'].includes(step?.layout) ? { section: step.id } : {}) });
+    dropBattle(); go({ name: 'menu', ...(['conversation', 'loops', 'words'].includes(step?.layout) ? { section: step.id } : {}) });
   },
   bag: () => go({ name: 'bag' }),
   trial: id => go({ name: 'trial', id, card: null, answer: null }),
@@ -575,9 +597,9 @@ const actions = {
   next: () => {
     const chapter = chapterOf(view.id), progress = progressOf(game, chapter);
     advance(progress, chapter, game); persist(); render();
-    if (['steering', 'habit-map'].includes(stage(progress, chapter, game))) {
+    if (['steering', 'habit-map', 'own-words'].includes(stage(progress, chapter, game))) {
       window.scrollTo(0, 0);
-      root.querySelector('.g-steering h2, .g-habit-map h2')?.focus({ preventScroll: true });
+      root.querySelector('.g-steering h2, .g-habit-map h2, .g-own-words h2')?.focus({ preventScroll: true });
     }
   },
   choose: id => { const chapter = chapterOf(view.id); choose(progressOf(game, chapter), chapter, id, game); persist(); render(); window.scrollTo(0, 0); },
@@ -595,6 +617,15 @@ const actions = {
     if (!chapter || !canLeaveSteering(progress, chapter)) return;
     leaveSteering(progress, chapter, game); persist(); render(); window.scrollTo(0, 0);
     root.querySelector('.g-next, .g-choice, h2')?.focus({ preventScroll: true });
+  },
+  'word-change': (id,target) => {
+    const chapter=chapterOf(view.id),progress=progressOf(game,chapter),scene=chapter.scenes[progress.scene],step=index.steps.find(s=>s.id===chapter.step),action=target.dataset.action;
+    changeRequest(game,step,scene,progress.scene,action,id);persist();const y=scrollY;render();window.scrollTo(0,y);
+    Array.from(root.querySelectorAll('[data-act="word-change"]')).find(b=>b.dataset.action===action&&b.dataset.id===id&&!b.disabled)?.focus({preventScroll:true});
+  },
+  'word-next': () => {
+    const chapter=chapterOf(view.id),progress=progressOf(game,chapter),step=index.steps.find(s=>s.id===chapter.step);
+    leaveRequest(progress,chapter,game,step);persist();render();window.scrollTo(0,0);
   },
   'habit-assign': (id, target) => {
     const chapter = chapterOf(view.id), option = target.dataset.option;

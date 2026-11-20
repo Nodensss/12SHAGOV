@@ -1,0 +1,239 @@
+{
+  "id": "step07-tamara",
+  "version": 1,
+  "step": 7,
+  "title": "Тамара у воды",
+  "returnLabel": "К словам",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_07_Седьмой.md: собственный язык просьбы, свободный формат, чувство без оценки",
+    "public/steps.js: шаг 7; оригинальная история героя"
+  ],
+  "disclaimer": "Вымышленная история. Это не литература АН и не образец молитвы. Личные ответы можно оставить пустыми.",
+  "speakers": {
+    "n": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "marat": {
+      "name": "Марат",
+      "role": "character"
+    },
+    "stepan": {
+      "name": "Степаныч",
+      "role": "character"
+    },
+    "tamara": {
+      "name": "Тамара",
+      "role": "character"
+    },
+    "lena": {
+      "name": "Лена",
+      "role": "character"
+    },
+    "tim": {
+      "name": "Тимка",
+      "role": "character"
+    },
+    "other": {
+      "name": "Сосед",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "start": "s7-tamara-start",
+  "scenes": {
+    "s7-tamara-start": {
+      "type": "story",
+      "title": "Тамара у воды",
+      "lines": [
+        {
+          "id": "s7-tamara.start.0",
+          "speaker": "n",
+          "text": "Тамара держит бумажный стакан двумя руками. По воде плывёт ветка, крутится возле опоры."
+        },
+        {
+          "id": "s7-tamara.start.1",
+          "speaker": "you",
+          "text": "Ты просишь у кого-то, когда всё пытаешься сама?"
+        },
+        {
+          "id": "s7-tamara.start.2",
+          "speaker": "tamara",
+          "text": "Сегодня сказала: «Помоги мне не решать за дочь». Не дочери. Просто сказала."
+        },
+        {
+          "id": "s7-tamara.start.3",
+          "speaker": "you",
+          "text": "И не решаешь?"
+        },
+        {
+          "id": "s7-tamara.start.4",
+          "speaker": "tamara",
+          "text": "Уже отправила ей три квартиры. Она ни одну не просила."
+        },
+        {
+          "id": "s7-tamara.start.5",
+          "speaker": "n",
+          "text": "Телефон шевелится в её кармане. Тамара не достаёт его."
+        },
+        {
+          "id": "s7-tamara.start.6",
+          "speaker": "tamara",
+          "text": "Я сейчас хотя бы могу здесь постоять. Пока кофе не кончится."
+        },
+        {
+          "id": "s7-tamara.start.7",
+          "speaker": "n",
+          "text": "Ветка отлипает от опоры. Тамара провожает её глазами, потом рассказывает, что стакан протекает."
+        }
+      ],
+      "choice": {
+        "id": "s7-tamara.take",
+        "prompt": "Что останется от встречи?",
+        "options": [
+          {
+            "id": "s7-tamara.take.remember",
+            "label": "Запомнить",
+            "next": "s7-tamara-loop"
+          },
+          {
+            "id": "s7-tamara.take.write",
+            "label": "Записать в тетрадь",
+            "next": "s7-tamara-loop"
+          }
+        ]
+      }
+    },
+    "s7-tamara-journal": {
+      "type": "journal",
+      "intro": "Здесь можно оставить одну строку или ответить позже.",
+      "questionIds": [
+        "q.s7-tamara.1",
+        "q.s7-tamara.2"
+      ],
+      "next": "s7-tamara-end"
+    },
+    "s7-tamara-end": {
+      "type": "ending",
+      "title": "Слова остаются",
+      "lines": [
+        {
+          "id": "s7-tamara.end.0",
+          "speaker": "n",
+          "text": "На листе остаётся след от протёкшего стакана."
+        }
+      ]
+    },
+    "s7-tamara-loop": {
+      "type": "story",
+      "title": "Петля",
+      "lines": [
+        {
+          "id": "s7-tamara.loop.0",
+          "speaker": "n",
+          "text": "Перед группой ты видишь стулья неровным кругом. Тамара раскладывает чашки. Ты тянешься переставить стол, пока она отвернулась."
+        },
+        {
+          "id": "s7-tamara.loop.1",
+          "speaker": "voice",
+          "text": "Иначе все будут толкаться. Дай сюда."
+        },
+        {
+          "id": "s7-tamara.callback.try",
+          "speaker": "n",
+          "text": "В тетради у этой петли стоит «попробовать». Сейчас ты вспоминаешь строчку, но рука уже движется по-старому.",
+          "if": "s6-control.ready.try"
+        },
+        {
+          "id": "s7-tamara.callback.watch",
+          "speaker": "n",
+          "text": "У этой петли стоит «понаблюдать». Вот она: ты замечаешь знакомое движение до того, как оно заканчивается.",
+          "if": "s6-control.ready.watch"
+        },
+        {
+          "id": "s7-tamara.callback.hold",
+          "speaker": "n",
+          "text": "У этой петли стоит «пока держусь». Оставаться без неё сейчас особенно страшно. Ты не обещал, что будет иначе.",
+          "if": "s6-control.ready.hold"
+        }
+      ],
+      "choice": {
+        "id": "s7-tamara.loop",
+        "prompt": "Сейчас можно остановиться на секунду.",
+        "options": [
+          {
+            "id": "s7-tamara.loop.pause",
+            "label": "Пауза и короткая просьба",
+            "next": "s7-tamara-request"
+          },
+          {
+            "id": "s7-tamara.loop.pass",
+            "label": "Пройти мимо",
+            "next": "s7-tamara-pass"
+          }
+        ]
+      }
+    },
+    "s7-tamara-request": {
+      "type": "own-words",
+      "title": "На секунду",
+      "intro": "Можно взять уже найденные слова или помолчать. Они не обязаны помочь.",
+      "minParts": 1,
+      "maxParts": 2,
+      "final": false,
+      "next": "s7-tamara-pause"
+    },
+    "s7-tamara-pause": {
+      "type": "story",
+      "title": "После",
+      "lines": [
+        {
+          "id": "s7-tamara.pause.0",
+          "speaker": "you",
+          "text": "Тамара, стол здесь оставить?"
+        },
+        {
+          "id": "s7-tamara.pause.1",
+          "speaker": "tamara",
+          "text": "Мне так до розетки хватает."
+        },
+        {
+          "id": "s7-tamara.pause.2",
+          "speaker": "n",
+          "text": "Ты убираешь руку. Садишься ближе к двери; оттуда стола почти не видно. Всё ещё хочется встать."
+        }
+      ],
+      "next": "s7-tamara-journal"
+    },
+    "s7-tamara-pass": {
+      "type": "story",
+      "title": "После",
+      "lines": [
+        {
+          "id": "s7-tamara.pass.0",
+          "speaker": "n",
+          "text": "Ты передвигаешь стол. Тамара разматывает удлинитель заново. Он оказывается коротким, и вы вместе двигаете стол обратно."
+        }
+      ],
+      "next": "s7-tamara-journal"
+    }
+  },
+  "questions": [
+    {
+      "id": "q.s7-tamara.1",
+      "text": "Что мне трудно оставить в чужих руках?"
+    },
+    {
+      "id": "q.s7-tamara.2",
+      "text": "Какая просьба даст мне минуту, прежде чем вмешаться?"
+    }
+  ],
+  "background": "art/scene-river.webp"
+}

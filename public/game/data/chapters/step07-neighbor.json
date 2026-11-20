@@ -1,0 +1,239 @@
+{
+  "id": "step07-neighbor",
+  "version": 1,
+  "step": 7,
+  "title": "Сосед на лестнице",
+  "returnLabel": "К словам",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_07_Седьмой.md: собственный язык просьбы, свободный формат, чувство без оценки",
+    "public/steps.js: шаг 7; оригинальная история героя"
+  ],
+  "disclaimer": "Вымышленная история. Это не литература АН и не образец молитвы. Личные ответы можно оставить пустыми.",
+  "speakers": {
+    "n": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "marat": {
+      "name": "Марат",
+      "role": "character"
+    },
+    "stepan": {
+      "name": "Степаныч",
+      "role": "character"
+    },
+    "tamara": {
+      "name": "Тамара",
+      "role": "character"
+    },
+    "lena": {
+      "name": "Лена",
+      "role": "character"
+    },
+    "tim": {
+      "name": "Тимка",
+      "role": "character"
+    },
+    "other": {
+      "name": "Сосед",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "start": "s7-neighbor-start",
+  "scenes": {
+    "s7-neighbor-start": {
+      "type": "story",
+      "title": "Сосед на лестнице",
+      "lines": [
+        {
+          "id": "s7-neighbor.start.0",
+          "speaker": "n",
+          "text": "Сосед сидит на подоконнике между этажами. Рядом разобранный замок. Ты придерживаешь дверь подъезда ногой."
+        },
+        {
+          "id": "s7-neighbor.start.1",
+          "speaker": "other",
+          "text": "Сейчас. Не закрывай пока."
+        },
+        {
+          "id": "s7-neighbor.start.2",
+          "speaker": "n",
+          "text": "Он кладёт отвёртку, вытирает ладони о колени и молчит."
+        },
+        {
+          "id": "s7-neighbor.start.3",
+          "speaker": "you",
+          "text": "Заклинило?"
+        },
+        {
+          "id": "s7-neighbor.start.4",
+          "speaker": "other",
+          "text": "Да. Я когда злюсь, винты срываю. Сижу вот."
+        },
+        {
+          "id": "s7-neighbor.start.5",
+          "speaker": "you",
+          "text": "И что говоришь себе?"
+        },
+        {
+          "id": "s7-neighbor.start.6",
+          "speaker": "other",
+          "text": "Ничего. Руки положил — сижу. Потом иногда проще бывает."
+        },
+        {
+          "id": "s7-neighbor.start.7",
+          "speaker": "n",
+          "text": "Ты тоже садишься, на ступеньку. Сквозняк тянет по щиколоткам."
+        },
+        {
+          "id": "s7-neighbor.start.8",
+          "speaker": "other",
+          "text": "Всё, давай ещё раз. Только дверь подержи."
+        },
+        {
+          "id": "s7-neighbor.start.9",
+          "speaker": "n",
+          "text": "Ты берёшься за ручку. На этот раз он крутит медленно."
+        }
+      ],
+      "choice": {
+        "id": "s7-neighbor.take",
+        "prompt": "Что останется от встречи?",
+        "options": [
+          {
+            "id": "s7-neighbor.take.remember",
+            "label": "Запомнить",
+            "next": "s7-neighbor-loop"
+          },
+          {
+            "id": "s7-neighbor.take.write",
+            "label": "Записать в тетрадь",
+            "next": "s7-neighbor-loop"
+          }
+        ]
+      }
+    },
+    "s7-neighbor-journal": {
+      "type": "journal",
+      "intro": "Здесь можно оставить одну строку или ответить позже.",
+      "questionIds": [
+        "q.s7-neighbor.1",
+        "q.s7-neighbor.2"
+      ],
+      "next": "s7-neighbor-end"
+    },
+    "s7-neighbor-end": {
+      "type": "ending",
+      "title": "Слова остаются",
+      "lines": [
+        {
+          "id": "s7-neighbor.end.0",
+          "speaker": "n",
+          "text": "На ладони остаётся холод от дверной ручки."
+        }
+      ]
+    },
+    "s7-neighbor-loop": {
+      "type": "story",
+      "title": "Петля",
+      "lines": [
+        {
+          "id": "s7-neighbor.loop.0",
+          "speaker": "n",
+          "text": "Через день у двери группы заедает ключ. Ты пробуешь сильнее, чувствуешь, как металл гнётся. За спиной ждут двое."
+        },
+        {
+          "id": "s7-neighbor.loop.1",
+          "speaker": "voice",
+          "text": "Сейчас сам. Только не мешайте."
+        },
+        {
+          "id": "s7-neighbor.callback.try",
+          "speaker": "n",
+          "text": "В тетради у этой петли стоит «попробовать». Сейчас ты вспоминаешь строчку, но рука уже движется по-старому.",
+          "if": "s6-control.ready.try"
+        },
+        {
+          "id": "s7-neighbor.callback.watch",
+          "speaker": "n",
+          "text": "У этой петли стоит «понаблюдать». Вот она: ты замечаешь знакомое движение до того, как оно заканчивается.",
+          "if": "s6-control.ready.watch"
+        },
+        {
+          "id": "s7-neighbor.callback.hold",
+          "speaker": "n",
+          "text": "У этой петли стоит «пока держусь». Оставаться без неё сейчас особенно страшно. Ты не обещал, что будет иначе.",
+          "if": "s6-control.ready.hold"
+        }
+      ],
+      "choice": {
+        "id": "s7-neighbor.loop",
+        "prompt": "Сейчас можно остановиться на секунду.",
+        "options": [
+          {
+            "id": "s7-neighbor.loop.pause",
+            "label": "Пауза и короткая просьба",
+            "next": "s7-neighbor-request"
+          },
+          {
+            "id": "s7-neighbor.loop.pass",
+            "label": "Пройти мимо",
+            "next": "s7-neighbor-pass"
+          }
+        ]
+      }
+    },
+    "s7-neighbor-request": {
+      "type": "own-words",
+      "title": "На секунду",
+      "intro": "Можно взять уже найденные слова или помолчать. Они не обязаны помочь.",
+      "minParts": 1,
+      "maxParts": 2,
+      "final": false,
+      "next": "s7-neighbor-pause"
+    },
+    "s7-neighbor-pause": {
+      "type": "story",
+      "title": "После",
+      "lines": [
+        {
+          "id": "s7-neighbor.pause.0",
+          "speaker": "n",
+          "text": "Ты опускаешь руку. Один из стоящих говорит: «Там надо дверь на себя». Пробуешь. Ключ поворачивается не сразу, но целым."
+        }
+      ],
+      "next": "s7-neighbor-journal"
+    },
+    "s7-neighbor-pass": {
+      "type": "story",
+      "title": "После",
+      "lines": [
+        {
+          "id": "s7-neighbor.pass.0",
+          "speaker": "n",
+          "text": "Ты пробуешь ещё раз сам. Потом отдаёшь ключ Тамаре. Палец красный от кольца; вы молча ждёте, пока она откроет."
+        }
+      ],
+      "next": "s7-neighbor-journal"
+    }
+  },
+  "questions": [
+    {
+      "id": "q.s7-neighbor.1",
+      "text": "Как я замечаю, что пора опустить руки и остановиться?"
+    },
+    {
+      "id": "q.s7-neighbor.2",
+      "text": "Что меняется за короткую паузу без слов?"
+    }
+  ],
+  "background": "art/scene-porch.webp"
+}

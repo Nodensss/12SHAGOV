@@ -557,6 +557,72 @@
         ]
       },
       "final": true
+    },
+    {
+      "id": "step07-meeting",
+      "step": 7,
+      "title": "В полвосьмого",
+      "teaser": "Встреча в полвосьмого.",
+      "file": "chapters/step07-meeting.json",
+      "after": "step06-ask"
+    },
+    {
+      "id": "step07-stepan",
+      "step": 7,
+      "title": "Степаныч на группе",
+      "teaser": "Встреча, свои слова и одна петля.",
+      "file": "chapters/step07-stepan.json",
+      "after": "step07-meeting"
+    },
+    {
+      "id": "step07-tamara",
+      "step": 7,
+      "title": "Тамара у воды",
+      "teaser": "Встреча, свои слова и одна петля.",
+      "file": "chapters/step07-tamara.json",
+      "after": "step07-meeting"
+    },
+    {
+      "id": "step07-lena",
+      "step": 7,
+      "title": "Лена на кухне",
+      "teaser": "Встреча, свои слова и одна петля.",
+      "file": "chapters/step07-lena.json",
+      "after": "step07-meeting"
+    },
+    {
+      "id": "step07-tim",
+      "step": 7,
+      "title": "Тимка и мост",
+      "teaser": "Встреча, свои слова и одна петля.",
+      "file": "chapters/step07-tim.json",
+      "after": "step07-meeting"
+    },
+    {
+      "id": "step07-neighbor",
+      "step": 7,
+      "title": "Сосед на лестнице",
+      "teaser": "Встреча, свои слова и одна петля.",
+      "file": "chapters/step07-neighbor.json",
+      "after": "step07-meeting"
+    },
+    {
+      "id": "step07-own",
+      "step": 7,
+      "title": "Свои слова",
+      "teaser": "Одна просьба и одно чувство.",
+      "file": "chapters/step07-own.json",
+      "after": "step07-meeting",
+      "needs": {
+        "count": 5,
+        "of": [
+          "step07-stepan",
+          "step07-tamara",
+          "step07-lena",
+          "step07-tim",
+          "step07-neighbor"
+        ]
+      }
     }
   ],
   "steps": [
@@ -818,10 +884,120 @@
         "resume": "Продолжить",
         "again": "Вернуться"
       }
+    },
+    {
+      "id": 7,
+      "title": "Шаг седьмой",
+      "name": "Просьба",
+      "layout": "words",
+      "after": "step06-ask",
+      "intro": "step07-meeting",
+      "finale": "step07-own",
+      "lead": "Пять встреч. Чужие слова можно примерить, переставить или оставить. Свою просьбу не нужно заслуживать.",
+      "words": [
+        {
+          "id": "word.stepan",
+          "text": "Боже",
+          "register": "Религиозные слова",
+          "whenAny": [
+            "s7-stepan.take.remember",
+            "s7-stepan.take.write"
+          ]
+        },
+        {
+          "id": "word.tamara",
+          "text": "помоги",
+          "register": "Простая просьба",
+          "whenAny": [
+            "s7-tamara.take.remember",
+            "s7-tamara.take.write"
+          ]
+        },
+        {
+          "id": "word.lena",
+          "text": "дай мне минуту",
+          "register": "Бытовые слова",
+          "whenAny": [
+            "s7-lena.take.remember",
+            "s7-lena.take.write"
+          ]
+        },
+        {
+          "id": "word.tim",
+          "text": "побудь рядом",
+          "register": "Детские слова",
+          "whenAny": [
+            "s7-tim.take.remember",
+            "s7-tim.take.write"
+          ]
+        },
+        {
+          "id": "word.neighbor",
+          "text": "…",
+          "register": "Молчание",
+          "whenAny": [
+            "s7-neighbor.take.remember",
+            "s7-neighbor.take.write"
+          ]
+        }
+      ],
+      "labels": {
+        "bank": "Копилка слов",
+        "empty": "Слова появятся после встреч.",
+        "compose": "Свои слова",
+        "silent": "Полное молчание",
+        "clear": "Начать фразу заново",
+        "selected": "Моя фраза",
+        "remove": "Убрать",
+        "up": "Раньше",
+        "down": "Позже",
+        "format": "Как произнести",
+        "feeling": "Что я сейчас чувствую",
+        "next": "Оставить так",
+        "saved": "Слова, которые остаются",
+        "locked": "Финал откроется после пяти встреч."
+      },
+      "formats": [
+        {
+          "id": "aloud",
+          "text": "Вслух"
+        },
+        {
+          "id": "written",
+          "text": "Записать"
+        },
+        {
+          "id": "quiet",
+          "text": "Молча"
+        }
+      ],
+      "feelings": [
+        {
+          "id": "awkward",
+          "text": "Неловко"
+        },
+        {
+          "id": "afraid",
+          "text": "Страшно"
+        },
+        {
+          "id": "calm",
+          "text": "Тише внутри"
+        },
+        {
+          "id": "angry",
+          "text": "Сержусь"
+        },
+        {
+          "id": "nothing",
+          "text": "Пока ничего не замечаю"
+        }
+      ],
+      "silenceFormat": "quiet"
     }
   ],
   "nextStep": {
-    "title": "Шаг седьмой",
-    "teaser": "В работе. Найти свои слова для просьбы о помощи, без готовой формулы и обещания стать другим за один день."
+    "title": "Шаг восьмой",
+    "teaser": "В работе. Вернуться к именам и посмотреть, что остаётся между вами."
   }
 }

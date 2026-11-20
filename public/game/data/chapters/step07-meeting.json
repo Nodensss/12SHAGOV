@@ -1,0 +1,151 @@
+{
+  "id": "step07-meeting",
+  "version": 1,
+  "step": 7,
+  "title": "В полвосьмого",
+  "returnLabel": "К словам",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_07_Седьмой.md: собственный язык просьбы, свободный формат, чувство без оценки",
+    "public/steps.js: шаг 7; оригинальная история героя"
+  ],
+  "disclaimer": "Вымышленная история. Это не литература АН и не образец молитвы. Личные ответы можно оставить пустыми.",
+  "speakers": {
+    "n": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "marat": {
+      "name": "Марат",
+      "role": "character"
+    },
+    "stepan": {
+      "name": "Степаныч",
+      "role": "character"
+    },
+    "tamara": {
+      "name": "Тамара",
+      "role": "character"
+    },
+    "lena": {
+      "name": "Лена",
+      "role": "character"
+    },
+    "tim": {
+      "name": "Тимка",
+      "role": "character"
+    },
+    "other": {
+      "name": "Сосед",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "start": "s7-meeting-start",
+  "scenes": {
+    "s7-meeting-start": {
+      "type": "story",
+      "title": "В полвосьмого",
+      "lines": [
+        {
+          "id": "s7-meeting.start.0",
+          "speaker": "n",
+          "text": "На кухонных часах половина восьмого. Марат отодвигает сушилку, чтобы поставить вторую чашку."
+        },
+        {
+          "id": "s7-meeting.start.1",
+          "speaker": "you",
+          "text": "Сам я это не выпрямлю. Это я сказал. А дальше-то как?"
+        },
+        {
+          "id": "s7-meeting.start.2",
+          "speaker": "you",
+          "text": "И как просить? Я молиться не умею."
+        },
+        {
+          "id": "s7-meeting.start.3",
+          "speaker": "marat",
+          "text": "Я тоже не умел. Собирал по словам."
+        },
+        {
+          "id": "s7-meeting.start.4",
+          "speaker": "n",
+          "text": "Он открывает пакет с сушками. Одна ломается пополам у него в руке."
+        },
+        {
+          "id": "s7-meeting.start.5",
+          "speaker": "you",
+          "text": "У тебя есть какие-нибудь готовые?"
+        },
+        {
+          "id": "s7-meeting.start.6",
+          "speaker": "marat",
+          "text": "Есть. Но я иногда за ними прячусь. Рот говорит, а я уже про автобус думаю."
+        },
+        {
+          "id": "s7-meeting.start.7",
+          "speaker": "you",
+          "text": "А если я вообще не знаю, к кому?"
+        },
+        {
+          "id": "s7-meeting.start.8",
+          "speaker": "marat",
+          "text": "Я начинал с «не знаю». Так и сидел. Иногда вслух, иногда нет."
+        },
+        {
+          "id": "s7-meeting.start.9",
+          "speaker": "n",
+          "text": "Ты берёшь обломок сушки. На столе лежит твоя тетрадь, закрытая резинкой."
+        },
+        {
+          "id": "s7-meeting.start.10",
+          "speaker": "you",
+          "text": "Попробую послушать, как люди говорят."
+        },
+        {
+          "id": "s7-meeting.start.11",
+          "speaker": "marat",
+          "text": "В субботу я здесь. Можно опять чай."
+        }
+      ],
+      "next": "s7-meeting-journal"
+    },
+    "s7-meeting-journal": {
+      "type": "journal",
+      "intro": "Здесь можно оставить одну строку или ответить позже.",
+      "questionIds": [
+        "q.s7-meeting.1",
+        "q.s7-meeting.2"
+      ],
+      "next": "s7-meeting-end"
+    },
+    "s7-meeting-end": {
+      "type": "ending",
+      "title": "Слова остаются",
+      "lines": [
+        {
+          "id": "s7-meeting.end.0",
+          "speaker": "n",
+          "text": "Ты убираешь ручку. Можно вернуться к этой странице позже."
+        }
+      ]
+    }
+  },
+  "questions": [
+    {
+      "id": "q.s7-meeting.1",
+      "text": "Какие слова мне сейчас близки?"
+    },
+    {
+      "id": "q.s7-meeting.2",
+      "text": "Что я замечаю во время паузы?"
+    }
+  ],
+  "background": "art/scene-kitchen.webp"
+}

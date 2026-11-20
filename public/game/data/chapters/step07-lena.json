@@ -1,0 +1,244 @@
+{
+  "id": "step07-lena",
+  "version": 1,
+  "step": 7,
+  "title": "Лена на кухне",
+  "returnLabel": "К словам",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_07_Седьмой.md: собственный язык просьбы, свободный формат, чувство без оценки",
+    "public/steps.js: шаг 7; оригинальная история героя"
+  ],
+  "disclaimer": "Вымышленная история. Это не литература АН и не образец молитвы. Личные ответы можно оставить пустыми.",
+  "speakers": {
+    "n": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "marat": {
+      "name": "Марат",
+      "role": "character"
+    },
+    "stepan": {
+      "name": "Степаныч",
+      "role": "character"
+    },
+    "tamara": {
+      "name": "Тамара",
+      "role": "character"
+    },
+    "lena": {
+      "name": "Лена",
+      "role": "character"
+    },
+    "tim": {
+      "name": "Тимка",
+      "role": "character"
+    },
+    "other": {
+      "name": "Сосед",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "start": "s7-lena-start",
+  "scenes": {
+    "s7-lena-start": {
+      "type": "story",
+      "title": "Лена на кухне",
+      "lines": [
+        {
+          "id": "s7-lena.start.0",
+          "speaker": "n",
+          "text": "Лена срезает с хлеба подгоревший край. Тимка в комнате строит гараж."
+        },
+        {
+          "id": "s7-lena.start.1",
+          "speaker": "you",
+          "text": "Ты когда-нибудь просишь, но не у человека?"
+        },
+        {
+          "id": "s7-lena.start.2",
+          "speaker": "lena",
+          "text": "Не знаю. Я говорю «дай мне минуту». Иногда вообще пустой кухне."
+        },
+        {
+          "id": "s7-lena.start.3",
+          "speaker": "you",
+          "text": "И что за минуту меняется?"
+        },
+        {
+          "id": "s7-lena.start.4",
+          "speaker": "lena",
+          "text": "Вчера перестала кричать на чайник. Он всё равно не мог быстрее."
+        },
+        {
+          "id": "s7-lena.start.5",
+          "speaker": "n",
+          "text": "Она складывает чёрные крошки на ладонь."
+        },
+        {
+          "id": "s7-lena.start.6",
+          "speaker": "lena",
+          "text": "Бывает, ничего. Тогда звоню подруге. Мне трудно одной остановиться."
+        },
+        {
+          "id": "s7-lena.start.7",
+          "speaker": "you",
+          "text": "Я думал, у тебя это само."
+        },
+        {
+          "id": "s7-lena.start.8",
+          "speaker": "lena",
+          "text": "Нет. Хлеб будешь?"
+        }
+      ],
+      "choice": {
+        "id": "s7-lena.take",
+        "prompt": "Что останется от встречи?",
+        "options": [
+          {
+            "id": "s7-lena.take.remember",
+            "label": "Запомнить",
+            "next": "s7-lena-loop"
+          },
+          {
+            "id": "s7-lena.take.write",
+            "label": "Записать в тетрадь",
+            "next": "s7-lena-loop"
+          }
+        ]
+      }
+    },
+    "s7-lena-journal": {
+      "type": "journal",
+      "intro": "Здесь можно оставить одну строку или ответить позже.",
+      "questionIds": [
+        "q.s7-lena.1",
+        "q.s7-lena.2"
+      ],
+      "next": "s7-lena-end"
+    },
+    "s7-lena-end": {
+      "type": "ending",
+      "title": "Слова остаются",
+      "lines": [
+        {
+          "id": "s7-lena.end.0",
+          "speaker": "n",
+          "text": "Дома ты вытряхиваешь из пакета несколько хлебных крошек."
+        }
+      ]
+    },
+    "s7-lena-loop": {
+      "type": "story",
+      "title": "Петля",
+      "lines": [
+        {
+          "id": "s7-lena.loop.0",
+          "speaker": "n",
+          "text": "Лена спрашивает, получится ли забрать Тимку в четверг. Внутри уже готов ответ: «Опять тебе что-то надо». Она ещё не договорила про время."
+        },
+        {
+          "id": "s7-lena.loop.1",
+          "speaker": "voice",
+          "text": "Сразу скажи, что ты не запасной водитель."
+        },
+        {
+          "id": "s7-lena.callback.try",
+          "speaker": "n",
+          "text": "В тетради у этой петли стоит «попробовать». Сейчас ты вспоминаешь строчку, но рука уже движется по-старому.",
+          "if": "s6-strike.ready.try"
+        },
+        {
+          "id": "s7-lena.callback.watch",
+          "speaker": "n",
+          "text": "У этой петли стоит «понаблюдать». Вот она: ты замечаешь знакомое движение до того, как оно заканчивается.",
+          "if": "s6-strike.ready.watch"
+        },
+        {
+          "id": "s7-lena.callback.hold",
+          "speaker": "n",
+          "text": "У этой петли стоит «пока держусь». Оставаться без неё сейчас особенно страшно. Ты не обещал, что будет иначе.",
+          "if": "s6-strike.ready.hold"
+        }
+      ],
+      "choice": {
+        "id": "s7-lena.loop",
+        "prompt": "Сейчас можно остановиться на секунду.",
+        "options": [
+          {
+            "id": "s7-lena.loop.pause",
+            "label": "Пауза и короткая просьба",
+            "next": "s7-lena-request"
+          },
+          {
+            "id": "s7-lena.loop.pass",
+            "label": "Пройти мимо",
+            "next": "s7-lena-pass"
+          }
+        ]
+      }
+    },
+    "s7-lena-request": {
+      "type": "own-words",
+      "title": "На секунду",
+      "intro": "Можно взять уже найденные слова или помолчать. Они не обязаны помочь.",
+      "minParts": 1,
+      "maxParts": 2,
+      "final": false,
+      "next": "s7-lena-pause"
+    },
+    "s7-lena-pause": {
+      "type": "story",
+      "title": "После",
+      "lines": [
+        {
+          "id": "s7-lena.pause.0",
+          "speaker": "you",
+          "text": "Дай мне минуту. Я смены посмотрю."
+        },
+        {
+          "id": "s7-lena.pause.1",
+          "speaker": "n",
+          "text": "Лена ждёт. Ты открываешь расписание. В четверг не получается; ты называешь пятницу. Лена говорит, что нужна именно четверг. Вы ещё не договорились, но и не кричите."
+        }
+      ],
+      "next": "s7-lena-journal"
+    },
+    "s7-lena-pass": {
+      "type": "story",
+      "title": "После",
+      "lines": [
+        {
+          "id": "s7-lena.pass.0",
+          "speaker": "you",
+          "text": "Я тебе не водитель."
+        },
+        {
+          "id": "s7-lena.pass.1",
+          "speaker": "n",
+          "text": "Лена кладёт хлеб в пакет. «Я спросила, можешь ли». Ты слышишь вопрос только теперь. Пакет она оставляет тебе."
+        }
+      ],
+      "next": "s7-lena-journal"
+    }
+  },
+  "questions": [
+    {
+      "id": "q.s7-lena.1",
+      "text": "Как звучит моя просьба, когда мне нужно время?"
+    },
+    {
+      "id": "q.s7-lena.2",
+      "text": "Что я слышу в чужом вопросе до того, как отвечаю?"
+    }
+  ],
+  "background": "art/scene-kitchen.webp"
+}

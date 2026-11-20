@@ -1,0 +1,157 @@
+{
+  "id": "step07-own",
+  "version": 1,
+  "step": 7,
+  "title": "Свои слова",
+  "returnLabel": "К словам",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_07_Седьмой.md: собственный язык просьбы, свободный формат, чувство без оценки",
+    "public/steps.js: шаг 7; оригинальная история героя"
+  ],
+  "disclaimer": "Вымышленная история. Это не литература АН и не образец молитвы. Личные ответы можно оставить пустыми.",
+  "speakers": {
+    "n": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "marat": {
+      "name": "Марат",
+      "role": "character"
+    },
+    "stepan": {
+      "name": "Степаныч",
+      "role": "character"
+    },
+    "tamara": {
+      "name": "Тамара",
+      "role": "character"
+    },
+    "lena": {
+      "name": "Лена",
+      "role": "character"
+    },
+    "tim": {
+      "name": "Тимка",
+      "role": "character"
+    },
+    "other": {
+      "name": "Сосед",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "start": "s7-own-start",
+  "scenes": {
+    "s7-own-start": {
+      "type": "story",
+      "title": "Свои слова",
+      "lines": [
+        {
+          "id": "s7-own.start.0",
+          "speaker": "n",
+          "text": "Суббота. Марат ставит чай на тот же стол. Ты открываешь тетрадь на странице с пятью обрывками."
+        },
+        {
+          "id": "s7-own.start.1",
+          "speaker": "marat",
+          "text": "Что остаётся, если не стараться красиво?"
+        },
+        {
+          "id": "s7-own.start.2",
+          "speaker": "you",
+          "text": "Сейчас попробую."
+        }
+      ],
+      "next": "s7-own-request"
+    },
+    "s7-own-journal": {
+      "type": "journal",
+      "intro": "Здесь можно оставить одну строку или ответить позже.",
+      "questionIds": [
+        "q.s7-own.1",
+        "q.s7-own.2"
+      ],
+      "next": "s7-own-end"
+    },
+    "s7-own-end": {
+      "type": "ending",
+      "title": "Страница с именами",
+      "lines": [
+        {
+          "id": "s7-own.end.0",
+          "speaker": "n",
+          "text": "Тетрадь остаётся открытой. Внизу страницы ещё есть место."
+        }
+      ]
+    },
+    "s7-own-request": {
+      "type": "own-words",
+      "title": "Свои слова",
+      "intro": "Сложи короткую просьбу в своём порядке. Можно выбрать полное молчание.",
+      "minParts": 2,
+      "maxParts": 4,
+      "final": true,
+      "next": "s7-own-after"
+    },
+    "s7-own-after": {
+      "type": "story",
+      "title": "После просьбы",
+      "lines": [
+        {
+          "id": "s7-own.after.0",
+          "speaker": "n",
+          "text": "Марат сидит напротив. Чай в твоей чашке ещё горячий."
+        },
+        {
+          "id": "s7-own.after.1",
+          "speaker": "marat",
+          "text": "Я иногда после просьбы всё ещё сержусь. Не сразу понимаю даже, на кого."
+        },
+        {
+          "id": "s7-own.after.2",
+          "speaker": "you",
+          "text": "У меня нет ощущения, что всё изменилось."
+        },
+        {
+          "id": "s7-own.after.3",
+          "speaker": "marat",
+          "text": "Я после первой просьбы домой пошёл и с соседом поругался. Вечером опять звонил."
+        },
+        {
+          "id": "s7-own.after.4",
+          "speaker": "n",
+          "text": "Он встаёт долить воды. Ты листаешь назад. Мама. Лена. Тимка. Бригадир. Имена лежат в тетради уже не первую неделю."
+        },
+        {
+          "id": "s7-own.after.5",
+          "speaker": "you",
+          "text": "С ними ещё ничего не сделано."
+        },
+        {
+          "id": "s7-own.after.6",
+          "speaker": "n",
+          "text": "Ты не звонишь всем сразу. Ставишь чашку на свободный угол стола и оставляешь страницу открытой."
+        }
+      ],
+      "next": "s7-own-journal"
+    }
+  },
+  "questions": [
+    {
+      "id": "q.s7-own.1",
+      "text": "Что мне хочется оставить в своей просьбе?"
+    },
+    {
+      "id": "q.s7-own.2",
+      "text": "Какое чувство остаётся после этих слов или молчания?"
+    }
+  ],
+  "background": "art/scene-kitchen.webp"
+}

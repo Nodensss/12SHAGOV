@@ -1,0 +1,259 @@
+{
+  "id": "step07-tim",
+  "version": 1,
+  "step": 7,
+  "title": "Тимка и мост",
+  "returnLabel": "К словам",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_07_Седьмой.md: собственный язык просьбы, свободный формат, чувство без оценки",
+    "public/steps.js: шаг 7; оригинальная история героя"
+  ],
+  "disclaimer": "Вымышленная история. Это не литература АН и не образец молитвы. Личные ответы можно оставить пустыми.",
+  "speakers": {
+    "n": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "marat": {
+      "name": "Марат",
+      "role": "character"
+    },
+    "stepan": {
+      "name": "Степаныч",
+      "role": "character"
+    },
+    "tamara": {
+      "name": "Тамара",
+      "role": "character"
+    },
+    "lena": {
+      "name": "Лена",
+      "role": "character"
+    },
+    "tim": {
+      "name": "Тимка",
+      "role": "character"
+    },
+    "other": {
+      "name": "Сосед",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "start": "s7-tim-start",
+  "scenes": {
+    "s7-tim-start": {
+      "type": "story",
+      "title": "Тимка и мост",
+      "lines": [
+        {
+          "id": "s7-tim.start.0",
+          "speaker": "n",
+          "text": "Тимка строит мост между двумя табуретками. Лена сидит рядом с бельём, ищет пару маленькому носку."
+        },
+        {
+          "id": "s7-tim.start.1",
+          "speaker": "tim",
+          "text": "Не держи. Я сам."
+        },
+        {
+          "id": "s7-tim.start.2",
+          "speaker": "n",
+          "text": "Ты убираешь руку. Картон сгибается, машинка падает на ковёр."
+        },
+        {
+          "id": "s7-tim.start.3",
+          "speaker": "tim",
+          "text": "Побудь рядом."
+        },
+        {
+          "id": "s7-tim.start.4",
+          "speaker": "you",
+          "text": "Так держать или нет?"
+        },
+        {
+          "id": "s7-tim.start.5",
+          "speaker": "tim",
+          "text": "Нет. Рядом просто."
+        },
+        {
+          "id": "s7-tim.start.6",
+          "speaker": "n",
+          "text": "Ты садишься на край дивана. Тимка подкладывает под картон коробку от чая."
+        },
+        {
+          "id": "s7-tim.start.7",
+          "speaker": "you",
+          "text": "А зачем я тогда?"
+        },
+        {
+          "id": "s7-tim.start.8",
+          "speaker": "tim",
+          "text": "Чтоб ты видел. А то я один злюсь."
+        },
+        {
+          "id": "s7-tim.start.9",
+          "speaker": "n",
+          "text": "Лена находит второй носок под подушкой. Машинка переезжает мост, задним колесом цепляет край. Тимка ловит её сам."
+        },
+        {
+          "id": "s7-tim.start.10",
+          "speaker": "tim",
+          "text": "Ещё раз. Смотри."
+        }
+      ],
+      "choice": {
+        "id": "s7-tim.take",
+        "prompt": "Что останется от встречи?",
+        "options": [
+          {
+            "id": "s7-tim.take.remember",
+            "label": "Запомнить",
+            "next": "s7-tim-loop"
+          },
+          {
+            "id": "s7-tim.take.write",
+            "label": "Записать в тетрадь",
+            "next": "s7-tim-loop"
+          }
+        ]
+      }
+    },
+    "s7-tim-journal": {
+      "type": "journal",
+      "intro": "Здесь можно оставить одну строку или ответить позже.",
+      "questionIds": [
+        "q.s7-tim.1",
+        "q.s7-tim.2"
+      ],
+      "next": "s7-tim-end"
+    },
+    "s7-tim-end": {
+      "type": "ending",
+      "title": "Слова остаются",
+      "lines": [
+        {
+          "id": "s7-tim.end.0",
+          "speaker": "n",
+          "text": "В прихожей ты ставишь ботинки рядом, носками к двери."
+        }
+      ]
+    },
+    "s7-tim-loop": {
+      "type": "story",
+      "title": "Петля",
+      "lines": [
+        {
+          "id": "s7-tim.loop.0",
+          "speaker": "n",
+          "text": "В другой вечер Тимка убирает рисунок под книгу. «Не показываю пока». Ты встаёшь за курткой. Лена на кухне режет яблоки."
+        },
+        {
+          "id": "s7-tim.loop.1",
+          "speaker": "voice",
+          "text": "Ну и не надо. Сам напрашиваться не будешь."
+        },
+        {
+          "id": "s7-tim.callback.try",
+          "speaker": "n",
+          "text": "В тетради у этой петли стоит «попробовать». Сейчас ты вспоминаешь строчку, но рука уже движется по-старому.",
+          "if": "s6-leave.ready.try"
+        },
+        {
+          "id": "s7-tim.callback.watch",
+          "speaker": "n",
+          "text": "У этой петли стоит «понаблюдать». Вот она: ты замечаешь знакомое движение до того, как оно заканчивается.",
+          "if": "s6-leave.ready.watch"
+        },
+        {
+          "id": "s7-tim.callback.hold",
+          "speaker": "n",
+          "text": "У этой петли стоит «пока держусь». Оставаться без неё сейчас особенно страшно. Ты не обещал, что будет иначе.",
+          "if": "s6-leave.ready.hold"
+        }
+      ],
+      "choice": {
+        "id": "s7-tim.loop",
+        "prompt": "Сейчас можно остановиться на секунду.",
+        "options": [
+          {
+            "id": "s7-tim.loop.pause",
+            "label": "Пауза и короткая просьба",
+            "next": "s7-tim-request"
+          },
+          {
+            "id": "s7-tim.loop.pass",
+            "label": "Пройти мимо",
+            "next": "s7-tim-pass"
+          }
+        ]
+      }
+    },
+    "s7-tim-request": {
+      "type": "own-words",
+      "title": "На секунду",
+      "intro": "Можно взять уже найденные слова или помолчать. Они не обязаны помочь.",
+      "minParts": 1,
+      "maxParts": 2,
+      "final": false,
+      "next": "s7-tim-pause"
+    },
+    "s7-tim-pause": {
+      "type": "story",
+      "title": "После",
+      "lines": [
+        {
+          "id": "s7-tim.pause.0",
+          "speaker": "you",
+          "text": "Можно я тут чай попью?"
+        },
+        {
+          "id": "s7-tim.pause.1",
+          "speaker": "lena",
+          "text": "Кружка у чайника."
+        },
+        {
+          "id": "s7-tim.pause.2",
+          "speaker": "n",
+          "text": "Ты садишься. Тимка рисунок не приносит. Ешь дольку яблока; куртка остаётся на спинке стула."
+        }
+      ],
+      "next": "s7-tim-journal"
+    },
+    "s7-tim-pass": {
+      "type": "story",
+      "title": "После",
+      "lines": [
+        {
+          "id": "s7-tim.pass.0",
+          "speaker": "you",
+          "text": "Я пойду."
+        },
+        {
+          "id": "s7-tim.pass.1",
+          "speaker": "n",
+          "text": "Лена кивает и заворачивает тебе яблоко в салфетку. На лестнице ты ещё можешь вернуться. Сегодня идёшь вниз."
+        }
+      ],
+      "next": "s7-tim-journal"
+    }
+  },
+  "questions": [
+    {
+      "id": "q.s7-tim.1",
+      "text": "Когда мне достаточно, чтобы кто-то просто побыл рядом?"
+    },
+    {
+      "id": "q.s7-tim.2",
+      "text": "Как попросить о присутствии, не требуя ответа?"
+    }
+  ],
+  "background": "art/scene-kitchen.webp"
+}

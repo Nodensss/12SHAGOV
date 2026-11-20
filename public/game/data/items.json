@@ -254,6 +254,46 @@
       "text": "В ней есть момент, когда рука уже тянется к рукаву, а дверь ещё закрыта.",
       "when": "step06-leave",
       "icon": "art/icons/item-notebook.webp"
+    },
+    {
+      "id": "item.word-stepan",
+      "step": 7,
+      "name": "Боже",
+      "text": "Религиозные слова. Слова остаются в отдельной копилке седьмого шага.",
+      "when": "step07-stepan",
+      "icon": "art/icons/item-notebook.webp"
+    },
+    {
+      "id": "item.word-tamara",
+      "step": 7,
+      "name": "помоги",
+      "text": "Простая просьба. Слова остаются в отдельной копилке седьмого шага.",
+      "when": "step07-tamara",
+      "icon": "art/icons/item-notebook.webp"
+    },
+    {
+      "id": "item.word-lena",
+      "step": 7,
+      "name": "дай мне минуту",
+      "text": "Бытовые слова. Слова остаются в отдельной копилке седьмого шага.",
+      "when": "step07-lena",
+      "icon": "art/icons/item-notebook.webp"
+    },
+    {
+      "id": "item.word-tim",
+      "step": 7,
+      "name": "побудь рядом",
+      "text": "Детские слова. Слова остаются в отдельной копилке седьмого шага.",
+      "when": "step07-tim",
+      "icon": "art/icons/item-notebook.webp"
+    },
+    {
+      "id": "item.word-neighbor",
+      "step": 7,
+      "name": "…",
+      "text": "Молчание. Слова остаются в отдельной копилке седьмого шага.",
+      "when": "step07-neighbor",
+      "icon": "art/icons/item-notebook.webp"
     }
   ]
 }

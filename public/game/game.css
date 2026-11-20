@@ -597,3 +597,16 @@ textarea::placeholder { color: #8a958a; }
 .game:has(> .g-talk-story) > .g-top { flex: 0 0 auto; position: relative; }
 .game > .g-talk-story { height: auto; min-height: 0; flex: 1; }
 .g-talk-plain .g-log { flex: 1; max-height: none; justify-content: flex-start; }
+
+/* Step Seven: pieces of a request can be read and reordered without dragging. */
+.g-word-bank {margin:1rem 0;padding:1rem;border:1px solid var(--line);border-radius:1rem;background:var(--panel);}
+.g-word-bank h3,.g-own-words h3 {font-weight:500;font-size:1rem;}
+.g-word-chip {display:inline-block;margin:.25rem;padding:.4rem .6rem;border:1px solid #68715c;border-radius:.6rem;color:var(--warm);}
+.g-word-chip small {display:block;color:var(--muted);font-size:.8rem;}
+.g-request-preview {min-height:3rem;padding:1rem;border-left:2px solid var(--warm);font-family:Georgia,serif;font-size:1.2rem;}
+.g-word-order {padding-left:1.2rem;}.g-word-order li {padding:.6rem 0;}.g-word-order .g-row {flex-wrap:wrap;}.g-word-order button {min-width:5rem;font-size:.85rem;min-height:44px;padding:.5rem;}
+.g-word-options {display:grid;gap:.6rem;grid-template-columns:repeat(2,minmax(0,1fr));}
+.g-own-words fieldset {margin:1.3rem 0;border:1px solid #68715c;border-radius:.7rem;padding:.6rem;display:grid;gap:.6rem;min-width:0;}
+.g-own-words button[aria-pressed="true"] {border-color:var(--warm);box-shadow:inset 0 0 0 1px var(--warm);}
+.g-own-words button:disabled {opacity:.5;cursor:default;}.g-own-words .g-row {flex-wrap:wrap;}
+.g-log > .g-word-bank { flex-shrink: 0; }

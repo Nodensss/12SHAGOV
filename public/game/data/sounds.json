@@ -50,7 +50,14 @@
       "step06-strike": "kitchen",
       "step06-control": "room",
       "step06-leave": "kitchen",
-      "step06-ask": "night"
+      "step06-ask": "night",
+      "step07-stepan": "room",
+      "step07-tamara": "river",
+      "step07-lena": "kitchen",
+      "step07-tim": "kitchen",
+      "step07-neighbor": "yard",
+      "step07-meeting": "kitchen",
+      "step07-own": "night"
     },
     "scenes": {
       "step01-only-once": {
