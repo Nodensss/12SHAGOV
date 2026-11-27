@@ -57,7 +57,17 @@
       "step07-tim": "kitchen",
       "step07-neighbor": "yard",
       "step07-meeting": "kitchen",
-      "step07-own": "night"
+      "step07-own": "night",
+      "step08-yard": "yard",
+      "step08-lena": "yard",
+      "step08-tim": "yard",
+      "step08-mother": "yard",
+      "step08-work": "yard",
+      "step08-neighbor": "yard",
+      "step08-siply": "night",
+      "step08-self": "night",
+      "step08-own": "yard",
+      "step08-questions": "room"
     },
     "scenes": {
       "step01-only-once": {

@@ -1,0 +1,180 @@
+{
+  "id": "step08-work",
+  "version": 1,
+  "step": 8,
+  "title": "Окно бытовки",
+  "returnLabel": "К окнам",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_08_Восьмой.md: приватный список, готовность без контакта, вопросы спонсору",
+    "public/steps.js: шаг 8; оригинальная история героя"
+  ],
+  "disclaimer": "Вымышленная история. Это не литература АН. Список личный: имена не нужны, писать людям и что-то возмещать игра не предлагает. Любой вопрос можно пропустить.",
+  "background": "art/scene-yard.webp",
+  "speakers": {
+    "n": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "marat": {
+      "name": "Марат",
+      "role": "character"
+    },
+    "stepan": {
+      "name": "Степаныч",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "questions": [
+    {
+      "id": "q.s8-work.name",
+      "text": "Как я подпишу это окно в списке? Можно буквой или псевдонимом."
+    },
+    {
+      "id": "q.s8-work.what",
+      "text": "Что я сделал на работе? Можно пропустить."
+    },
+    {
+      "id": "q.s8-work.understand",
+      "text": "Что мне нужно понять, прежде чем что-то делать?"
+    }
+  ],
+  "start": "s8-work-start",
+  "scenes": {
+    "s8-work-start": {
+      "type": "story",
+      "title": "Окно бытовки",
+      "lines": [
+        {
+          "id": "s8-work.start.0",
+          "speaker": "n",
+          "text": "За гаражами светится бытовка склада. Сегодня на смене Колян."
+        },
+        {
+          "id": "s8-work.start.1",
+          "speaker": "you",
+          "text": "Он закрывал за меня смены. Врал начальнику, что я на больничном."
+        },
+        {
+          "id": "s8-work.start.2",
+          "speaker": "n",
+          "text": "На неделе ты уже попробовал не врать про коробку. Получилось неловко, но получилось.",
+          "if": "s6-lie.ready.try"
+        },
+        {
+          "id": "s8-work.start.3",
+          "speaker": "n",
+          "text": "На странице «Поступки» ты это отметил.",
+          "if": "s4-deed1.choice.mark"
+        },
+        {
+          "id": "s8-work.start.4",
+          "speaker": "voice",
+          "text": "Колян сам виноват. Мог не прикрывать."
+        },
+        {
+          "id": "s8-work.start.5",
+          "speaker": "marat",
+          "text": "Его выбор — его. Твой — твой. В списке только твой."
+        }
+      ],
+      "next": "s8-work-card"
+    },
+    "s8-work-card": {
+      "type": "journal",
+      "intro": "Карточка окна. Отвечай на что хочешь, остальное — потом или никогда.",
+      "questionIds": [
+        "q.s8-work.name",
+        "q.s8-work.what",
+        "q.s8-work.understand"
+      ],
+      "next": "s8-work-light"
+    },
+    "s8-work-light": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-work.light.0",
+          "speaker": "n",
+          "text": "Какой свет оставить в этом окне? Все три отметки равноправны."
+        }
+      ],
+      "choice": {
+        "id": "s8-work.ready",
+        "prompt": "Отметка готовности",
+        "options": [
+          {
+            "id": "s8-work.ready.ready",
+            "label": "Готов, когда придёт время",
+            "next": "s8-work-ready"
+          },
+          {
+            "id": "s8-work.ready.notyet",
+            "label": "Пока не готов",
+            "next": "s8-work-notyet"
+          },
+          {
+            "id": "s8-work.ready.unsure",
+            "label": "Не знаю. Обсужу со Степанычем",
+            "next": "s8-work-unsure"
+          }
+        ]
+      }
+    },
+    "s8-work-end": {
+      "type": "ending",
+      "title": "Строка в списке",
+      "lines": [
+        {
+          "id": "s8-work.end.0",
+          "speaker": "n",
+          "text": "Из бытовки выходит Колян, курит. Ты не подходишь. В тетради строка."
+        }
+      ]
+    },
+    "s8-work-ready": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-work.ready.0",
+          "speaker": "n",
+          "text": "Окно бытовки светит по-прежнему. Ты не идёшь туда сегодня — и не обязан."
+        }
+      ],
+      "next": "s8-work-end"
+    },
+    "s8-work-notyet": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-work.notyet.0",
+          "speaker": "n",
+          "text": "Работа нужна. Ты боишься её потерять. Это тоже можно написать."
+        }
+      ],
+      "next": "s8-work-end"
+    },
+    "s8-work-unsure": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-work.unsure.0",
+          "speaker": "you",
+          "text": "Если расскажу, могу подставить Коляна. Нужно понять, как не навредить ему ещё раз."
+        }
+      ],
+      "next": "s8-work-end"
+    }
+  }
+}

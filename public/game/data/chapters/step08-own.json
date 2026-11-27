@@ -1,0 +1,163 @@
+{
+  "id": "step08-own",
+  "version": 1,
+  "step": 8,
+  "title": "Своё окно",
+  "returnLabel": "К окнам",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_08_Восьмой.md: приватный список, готовность без контакта, вопросы спонсору",
+    "public/steps.js: шаг 8; оригинальная история героя"
+  ],
+  "disclaimer": "Вымышленная история. Это не литература АН. Список личный: имена не нужны, писать людям и что-то возмещать игра не предлагает. Любой вопрос можно пропустить.",
+  "background": "art/scene-yard.webp",
+  "speakers": {
+    "n": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "marat": {
+      "name": "Марат",
+      "role": "character"
+    },
+    "stepan": {
+      "name": "Степаныч",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "questions": [
+    {
+      "id": "q.s8-own.name",
+      "text": "Как я подпишу это окно? Буква, псевдоним или пусто."
+    },
+    {
+      "id": "q.s8-own.what",
+      "text": "Что произошло? Можно пропустить."
+    },
+    {
+      "id": "q.s8-own.understand",
+      "text": "Что мне нужно понять, прежде чем что-то делать?"
+    }
+  ],
+  "start": "s8-own-start",
+  "scenes": {
+    "s8-own-start": {
+      "type": "story",
+      "title": "Своё окно",
+      "lines": [
+        {
+          "id": "s8-own.start.0",
+          "speaker": "n",
+          "text": "В доме напротив есть окно, за которым ты никого не знаешь. Но оно почему-то горит для тебя."
+        },
+        {
+          "id": "s8-own.start.1",
+          "speaker": "marat",
+          "text": "Бывает, в списке есть человек, про которого никто, кроме тебя, не знает. Или целая группа людей."
+        },
+        {
+          "id": "s8-own.start.2",
+          "speaker": "marat",
+          "text": "Подпиши как хочешь. Буквой, кличкой, «те, с работы». Имя не обязательно."
+        }
+      ],
+      "next": "s8-own-card"
+    },
+    "s8-own-card": {
+      "type": "journal",
+      "intro": "Карточка окна. Отвечай на что хочешь, остальное — потом или никогда.",
+      "questionIds": [
+        "q.s8-own.name",
+        "q.s8-own.what",
+        "q.s8-own.understand"
+      ],
+      "next": "s8-own-light"
+    },
+    "s8-own-light": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-own.light.0",
+          "speaker": "n",
+          "text": "Какой свет оставить в этом окне? Все три отметки равноправны."
+        }
+      ],
+      "choice": {
+        "id": "s8-own.ready",
+        "prompt": "Отметка готовности",
+        "options": [
+          {
+            "id": "s8-own.ready.ready",
+            "label": "Готов, когда придёт время",
+            "next": "s8-own-ready"
+          },
+          {
+            "id": "s8-own.ready.notyet",
+            "label": "Пока не готов",
+            "next": "s8-own-notyet"
+          },
+          {
+            "id": "s8-own.ready.unsure",
+            "label": "Не знаю. Обсужу со Степанычем",
+            "next": "s8-own-unsure"
+          }
+        ]
+      }
+    },
+    "s8-own-end": {
+      "type": "ending",
+      "title": "Строка в списке",
+      "lines": [
+        {
+          "id": "s8-own.end.0",
+          "speaker": "n",
+          "text": "Окно напротив остаётся твоей тайной столько, сколько нужно."
+        }
+      ]
+    },
+    "s8-own-ready": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-own.ready.0",
+          "speaker": "n",
+          "text": "Окно напротив светится ровно. Никто, кроме тебя, не знает, чьё оно."
+        }
+      ],
+      "next": "s8-own-end"
+    },
+    "s8-own-notyet": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-own.notyet.0",
+          "speaker": "n",
+          "text": "Ты оставляешь окно без света. Подпись сохранится."
+        }
+      ],
+      "next": "s8-own-end"
+    },
+    "s8-own-unsure": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-own.unsure.0",
+          "speaker": "you",
+          "text": "Про это окно я пока даже Степанычу не уверен, что скажу. Но подумаю."
+        }
+      ],
+      "next": "s8-own-end"
+    }
+  }
+}

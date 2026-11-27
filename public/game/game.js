@@ -2,7 +2,7 @@ import {
   wordsOf, requestDraft, changeRequest, canLeaveRequest, leaveRequest, requestText,
   advance, answerLater, choose, deleteEntry, fill, freshGame, GAME_KEY, depthOf, isLocked, itemsOf, leaveJournal, linesOf, loadGame, markDone, picked, scaledSkills,
   progressOf, restartChapter, saveEntry, saveGame, setDraft, stage, validateChapter, validateVocab,
-  levelOf, recordFight, conversationState, validateConversation, loopsState, validateLoops,
+  levelOf, recordFight, conversationState, validateConversation, loopsState, validateLoops, windowsState, validateWindows,
   assignSteering, canLeaveSteering, leaveSteering, steeringOf,
   assignHabitCell, canLeaveHabitMap, habitMapOf, leaveHabitMap,
 } from './engine.js';
@@ -208,6 +208,34 @@ function ownWords(chapter,scene,progress) {
   return '<main class="g-main g-own-words"><h2 tabindex="-1">'+h(scene.title)+'</h2><p class="g-lead">'+h(scene.intro)+'</p><h3>'+h(labels.selected)+'</h3><p class="g-request-preview" aria-live="polite">'+h(requestText(game,step,progress.scene))+'</p><ol class="g-word-order">'+d.parts.map(id=>'<li><strong>'+h(step.words.find(w=>w.id===id)?.text)+'</strong><div class="g-row">'+button('up',id,labels.up,d.parts.indexOf(id)===0?'disabled':'')+button('down',id,labels.down,d.parts.indexOf(id)===d.parts.length-1?'disabled':'')+button('remove',id,labels.remove)+'</div></li>').join('')+'</ol><div class="g-word-options">'+available.map(w=>button('add',w.id,w.text,d.parts.includes(w.id)||d.parts.length>=scene.maxParts?'disabled':'')).join('')+'</div><div class="g-row">'+button('silent','',labels.silent,'aria-pressed="'+d.silent+'"')+button('clear','',labels.clear)+'</div>'+(scene.final ? '<fieldset><legend>'+h(labels.format)+'</legend>'+step.formats.map(f=>button('format',f.id,f.text,'aria-pressed="'+(d.format===f.id)+'" '+(d.silent&&f.id!==step.silenceFormat?'disabled':'' ))).join('')+'</fieldset><fieldset><legend>'+h(labels.feeling)+'</legend>'+step.feelings.map(f=>button('feeling',f.id,f.text,'aria-pressed="'+(d.feeling===f.id)+'"')).join('')+'</fieldset>' : '')+'<button class="g-btn g-primary" data-act="word-next" '+(canLeaveRequest(game,step,scene,progress.scene)?'':'disabled')+'>'+h(labels.next)+'</button></main>';
 }
 
+// Восьмой шаг: фасад дома, каждое окно — глава. Свет окна показывает отметку
+// готовности; цвет не означает «лучше» или «хуже», а финал открывается по числу окон.
+function windowsSection(step, head, fresh) {
+  const list = index.chapters.filter(item => item.step === step.id);
+  if (validateWindows(step, index).length) return '<section class="g-section">' + head + '<div class="g-list">' + list.map(episodeCard).join('') + '</div></section>';
+  const state = windowsState(step, index, game), labels = step.labels;
+  const startedOf = id => {
+    const chapter = chapterOf(id), saved = game.chapters[id];
+    return !!(saved && chapter && chapter.scenes[saved.scene] && chapter.scenes[saved.scene].type !== 'ending' && (saved.scene !== chapter.start || saved.line > 0 || Object.keys(saved.choices || {}).length > 0));
+  };
+  const storyCard = (item, role, blocked = false) => {
+    const saved = game.chapters[item.id], started = startedOf(item.id);
+    return '<article class="g-card g-loop-story' + (blocked ? ' g-card-off' : '') + '"><span class="g-step">' + h(labels[role]) + '</span><strong>' + h(item.title) + '</strong><small>' + h(blocked ? labels.locked : item.teaser) + '</small>' +
+      (!blocked ? '<div class="g-row"><button class="g-btn g-secondary" data-act="' + (saved?.done && !started ? 'restart' : 'play') + '" data-id="' + h(item.id) + '"' + (chapterOf(item.id) ? '' : ' disabled') + '>' + h(started ? labels.resume : saved?.done ? labels.again : labels.open) + '</button></div>' : '') + '</article>';
+  };
+  const windows = state.windows.map(win => {
+    const started = startedOf(win.chapter);
+    const status = win.mode ? labels[win.mode] : started ? labels.inProgress : labels.dark;
+    return '<button type="button" class="g-window" data-window="' + h(win.id) + '" data-mode="' + h(win.mode || '') + '" data-act="' + (win.done && !started ? 'restart' : 'play') + '" data-id="' + h(win.chapter) + '"' + (state.arrived && chapterOf(win.chapter) ? '' : ' disabled') + '>' +
+      '<span class="g-window-pane" aria-hidden="true"><i></i><i></i><i></i><i></i></span><strong>' + h(win.title) + '</strong><span class="g-window-status">' + h(state.arrived ? status : labels.unavailable) + '</span></button>';
+  }).join('');
+  return '<section class="g-section g-section-windows" data-step-section="' + h(step.id) + '">' + head + fresh + '<p class="g-lead g-section-lead">' + h(step.lead) + '</p>' +
+    (!state.arrived ? storyCard(list.find(item => item.id === step.intro), 'intro') : '') +
+    '<p class="g-loop-instruction">' + h(labels.chooseWindow) + '</p><div class="g-facade" role="group" aria-label="' + h(labels.chooseWindow) + '">' + windows + '</div>' +
+    '<p class="g-loop-progress">' + h(labels.progress) + ': ' + state.completed + ' / ' + state.windows.length + '</p><p class="g-note">' + h(labels.privacy) + '</p>' +
+    storyCard(list.find(item => item.id === step.finale), 'finale', !state.finaleAvailable) + '</section>';
+}
+
 function stepSection(step) {
   const list = index.chapters.filter(item => item.step === step.id), done = list.filter(item => picked(game).has(item.id)).length;
   const head = '<div class="g-section-head"><div><span class="g-step">' + h(step.title) + '</span><h2>' + h(step.name) + '</h2></div><span class="g-count">' + done + ' / ' + list.length + '</span></div>';
@@ -221,6 +249,7 @@ function stepSection(step) {
   if (step.layout === 'conversation') return conversationSection(step, head, fresh);
   if (step.layout === 'loops') return loopsSection(step, head, fresh);
   if (step.layout === 'words') return wordsSection(step, head, fresh);
+  if (step.layout === 'windows') return windowsSection(step, head, fresh);
   if (step.layout !== 'map') return '<section class="g-section' + (step.layout === 'wheel' ? ' g-section-wheel' : '') + '">' + head + fresh + (folded ? '<details class="g-fold"><summary>Шаг пройден. Показать эпизоды и бои</summary>' : (step.layout === 'wheel' ? '<div class="g-wheel g-wheel-menu" aria-hidden="true"><i></i><b></b></div>' : '') + '<p class="g-lead g-section-lead">' + h(step.lead || '') + '</p>') + '<div class="g-list">' + list.map(item => item.type === 'fight' ? fightCard(item) : item.type === 'trial' ? trialCard(item) : episodeCard(item)).join('') + '</div>' + (folded ? '</details>' : '') + '</section>';
   const supports = itemsOf(items, game).filter(i => i.kind === 'support' && i.step === step.id), places = list.filter(item => !item.final), finals = list.filter(item => item.final);
   return '<section class="g-section g-section-map">' + head + fresh + '<p class="g-lead g-section-lead">' + h(step.lead || '') + '</p>' +
@@ -379,10 +408,10 @@ function play() {
   // Optional artwork is local data; chapters without it keep the original scene markup.
   const background = scene.background ?? chapter.background;
   if (typeof background === 'string' && /^art\/[a-z0-9-]+\.webp$/.test(background)) {
-    return top + '<section class="g-story-art' + (['conversation', 'loops', 'words'].includes((index.steps || []).find(step => step.id === chapter.step)?.layout) ? ' g-talk-story' : '') + '"><img class="g-scene-art" src="' + h(background) + '" alt="" aria-hidden="true">' +
+    return top + '<section class="g-story-art' + (['conversation', 'loops', 'words', 'windows'].includes((index.steps || []).find(step => step.id === chapter.step)?.layout) ? ' g-talk-story' : '') + '"><img class="g-scene-art" src="' + h(background) + '" alt="" aria-hidden="true">' +
       '<div class="g-scene-window" aria-hidden="true"></div>' + log + foot + '</section>';
   }
-  if (['conversation', 'loops', 'words'].includes((index.steps || []).find(step => step.id === chapter.step)?.layout)) {
+  if (['conversation', 'loops', 'words', 'windows'].includes((index.steps || []).find(step => step.id === chapter.step)?.layout)) {
     return top + '<section class="g-story-art g-talk-story g-talk-plain">' + log + foot + '</section>';
   }
   return top + log + foot;
@@ -565,7 +594,7 @@ const actions = {
   },
   menu: () => {
     const step = (index.steps || []).find(step => step.id === chapterOf(view.id)?.step);
-    dropBattle(); go({ name: 'menu', ...(['conversation', 'loops', 'words'].includes(step?.layout) ? { section: step.id } : {}) });
+    dropBattle(); go({ name: 'menu', ...(['conversation', 'loops', 'words', 'windows'].includes(step?.layout) ? { section: step.id } : {}) });
   },
   bag: () => go({ name: 'bag' }),
   trial: id => go({ name: 'trial', id, card: null, answer: null }),
@@ -703,6 +732,7 @@ async function boot() {
     const problems = validateVocab(vocab);
     for (const step of index.steps || []) if (step.layout === 'conversation') problems.push(...validateConversation(step, index));
     for (const step of index.steps || []) if (step.layout === 'loops') problems.push(...validateLoops(step, index));
+    for (const step of index.steps || []) if (step.layout === 'windows') problems.push(...validateWindows(step, index));
     await Promise.all(index.chapters.map(async item => {
       try {
         if (item.type === 'trial') {

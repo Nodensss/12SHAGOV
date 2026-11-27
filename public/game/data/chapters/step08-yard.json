@@ -1,0 +1,117 @@
+{
+  "id": "step08-yard",
+  "version": 1,
+  "step": 8,
+  "title": "Пока только список",
+  "returnLabel": "К окнам",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_08_Восьмой.md: приватный список, готовность без контакта, вопросы спонсору",
+    "public/steps.js: шаг 8; оригинальная история героя"
+  ],
+  "disclaimer": "Вымышленная история. Это не литература АН. Список личный: имена не нужны, писать людям и что-то возмещать игра не предлагает. Любой вопрос можно пропустить.",
+  "background": "art/scene-yard.webp",
+  "speakers": {
+    "n": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "marat": {
+      "name": "Марат",
+      "role": "character"
+    },
+    "stepan": {
+      "name": "Степаныч",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "questions": [
+    {
+      "id": "q.s8-yard.1",
+      "text": "С каким чувством я сажусь за этот список?"
+    }
+  ],
+  "start": "s8-yard-start",
+  "scenes": {
+    "s8-yard-start": {
+      "type": "story",
+      "title": "Двор вечером",
+      "lines": [
+        {
+          "id": "s8-yard.start.0",
+          "speaker": "n",
+          "text": "После группы Марат не спешит домой. Вы сидите на скамейке, во дворе зажигаются окна."
+        },
+        {
+          "id": "s8-yard.start.1",
+          "speaker": "n",
+          "text": "В кармане лежит тетрадь с записанными словами из прошлого шага.",
+          "ifAny": [
+            "s7-stepan.take.write",
+            "s7-tamara.take.write",
+            "s7-lena.take.write",
+            "s7-tim.take.write",
+            "s7-neighbor.take.write"
+          ]
+        },
+        {
+          "id": "s8-yard.start.2",
+          "speaker": "marat",
+          "text": "Восьмой — это список. Кого ты задел. Только список."
+        },
+        {
+          "id": "s8-yard.start.3",
+          "speaker": "you",
+          "text": "И потом идти ко всем?"
+        },
+        {
+          "id": "s8-yard.start.4",
+          "speaker": "marat",
+          "text": "Никуда не ходи. Никому не пиши. Ни сегодня, ни завтра. Сначала — бумага и разговор со Степанычем."
+        },
+        {
+          "id": "s8-yard.start.5",
+          "speaker": "marat",
+          "text": "Если кто-то из списка опасен для тебя или ты для него — такое окно можно оставить тёмным. Об этом говорят отдельно и осторожно."
+        },
+        {
+          "id": "s8-yard.start.6",
+          "speaker": "voice",
+          "text": "Список врагов составь. Это проще."
+        },
+        {
+          "id": "s8-yard.start.7",
+          "speaker": "marat",
+          "text": "Смотри на окна. Каждое — человек. Подходи к тем, к которым можешь."
+        }
+      ],
+      "next": "s8-yard-journal"
+    },
+    "s8-yard-journal": {
+      "type": "journal",
+      "intro": "Можно оставить одну строку или ответить позже.",
+      "questionIds": [
+        "q.s8-yard.1"
+      ],
+      "next": "s8-yard-end"
+    },
+    "s8-yard-end": {
+      "type": "ending",
+      "title": "Окна горят",
+      "lines": [
+        {
+          "id": "s8-yard.end.0",
+          "speaker": "n",
+          "text": "Марат уходит. Ты остаёшься на скамейке с тетрадью. Окна горят."
+        }
+      ]
+    }
+  }
+}

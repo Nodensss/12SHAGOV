@@ -623,6 +623,110 @@
           "step07-neighbor"
         ]
       }
+    },
+    {
+      "id": "step08-yard",
+      "step": 8,
+      "title": "Пока только список",
+      "teaser": "Скамейка, Марат и горящие окна.",
+      "minutes": "2 минуты",
+      "file": "chapters/step08-yard.json",
+      "after": "step07-own"
+    },
+    {
+      "id": "step08-lena",
+      "step": 8,
+      "title": "Окно Лены",
+      "teaser": "Третий этаж. На подоконнике банка с кисточками.",
+      "minutes": "2–3 минуты",
+      "file": "chapters/step08-lena.json",
+      "after": "step08-yard"
+    },
+    {
+      "id": "step08-tim",
+      "step": 8,
+      "title": "Окно с рисунком",
+      "teaser": "На стекле изнутри — бумажный самолёт.",
+      "minutes": "2–3 минуты",
+      "file": "chapters/step08-tim.json",
+      "after": "step08-yard"
+    },
+    {
+      "id": "step08-mother",
+      "step": 8,
+      "title": "Окно матери",
+      "teaser": "Телевизор мигает синим. Звук выключен.",
+      "minutes": "2–3 минуты",
+      "file": "chapters/step08-mother.json",
+      "after": "step08-yard"
+    },
+    {
+      "id": "step08-work",
+      "step": 8,
+      "title": "Окно бытовки",
+      "teaser": "Склад за гаражами. Там всегда кто-то на смене.",
+      "minutes": "2–3 минуты",
+      "file": "chapters/step08-work.json",
+      "after": "step08-yard"
+    },
+    {
+      "id": "step08-neighbor",
+      "step": 8,
+      "title": "Окно соседки",
+      "teaser": "Второй этаж, под твоей бывшей квартирой.",
+      "minutes": "2–3 минуты",
+      "file": "chapters/step08-neighbor.json",
+      "after": "step08-yard"
+    },
+    {
+      "id": "step08-siply",
+      "step": 8,
+      "title": "Окно в торце",
+      "teaser": "Подъезд, куда раньше ходил каждый день.",
+      "minutes": "2–3 минуты",
+      "file": "chapters/step08-siply.json",
+      "after": "step08-yard"
+    },
+    {
+      "id": "step08-self",
+      "step": 8,
+      "title": "Своё отражение",
+      "teaser": "Тёмное стекло подъезда отражает тебя.",
+      "minutes": "2–3 минуты",
+      "file": "chapters/step08-self.json",
+      "after": "step08-yard"
+    },
+    {
+      "id": "step08-own",
+      "step": 8,
+      "title": "Своё окно",
+      "teaser": "Окно, которого нет в этой истории. Подпиши его сам.",
+      "minutes": "2–3 минуты",
+      "file": "chapters/step08-own.json",
+      "after": "step08-yard"
+    },
+    {
+      "id": "step08-questions",
+      "step": 8,
+      "title": "Вопросы для Степаныча",
+      "teaser": "Список на столе в комнате группы.",
+      "minutes": "3 минуты",
+      "file": "chapters/step08-questions.json",
+      "after": "step08-yard",
+      "needs": {
+        "count": 5,
+        "of": [
+          "step08-lena",
+          "step08-tim",
+          "step08-mother",
+          "step08-work",
+          "step08-neighbor",
+          "step08-siply",
+          "step08-self",
+          "step08-own"
+        ]
+      },
+      "final": true
     }
   ],
   "steps": [
@@ -994,10 +1098,112 @@
         }
       ],
       "silenceFormat": "quiet"
+    },
+    {
+      "id": 8,
+      "title": "Шаг восьмой",
+      "name": "Список",
+      "layout": "windows",
+      "after": "step07-own",
+      "lockedText": "Откроется после седьмого шага «Свои слова».",
+      "lead": "Вечер во дворе. Каждое окно — человек. Только список: никуда не ходить и никому не писать.",
+      "intro": "step08-yard",
+      "finale": "step08-questions",
+      "windows": [
+        {
+          "id": "lena",
+          "title": "Окно Лены",
+          "chapter": "step08-lena",
+          "choice": "s8-lena.ready",
+          "ready": "s8-lena.ready.ready",
+          "notyet": "s8-lena.ready.notyet",
+          "unsure": "s8-lena.ready.unsure"
+        },
+        {
+          "id": "tim",
+          "title": "Окно с рисунком",
+          "chapter": "step08-tim",
+          "choice": "s8-tim.ready",
+          "ready": "s8-tim.ready.ready",
+          "notyet": "s8-tim.ready.notyet",
+          "unsure": "s8-tim.ready.unsure"
+        },
+        {
+          "id": "mother",
+          "title": "Окно матери",
+          "chapter": "step08-mother",
+          "choice": "s8-mother.ready",
+          "ready": "s8-mother.ready.ready",
+          "notyet": "s8-mother.ready.notyet",
+          "unsure": "s8-mother.ready.unsure"
+        },
+        {
+          "id": "work",
+          "title": "Окно бытовки",
+          "chapter": "step08-work",
+          "choice": "s8-work.ready",
+          "ready": "s8-work.ready.ready",
+          "notyet": "s8-work.ready.notyet",
+          "unsure": "s8-work.ready.unsure"
+        },
+        {
+          "id": "neighbor",
+          "title": "Окно соседки",
+          "chapter": "step08-neighbor",
+          "choice": "s8-neighbor.ready",
+          "ready": "s8-neighbor.ready.ready",
+          "notyet": "s8-neighbor.ready.notyet",
+          "unsure": "s8-neighbor.ready.unsure"
+        },
+        {
+          "id": "siply",
+          "title": "Окно в торце",
+          "chapter": "step08-siply",
+          "choice": "s8-siply.ready",
+          "ready": "s8-siply.ready.ready",
+          "notyet": "s8-siply.ready.notyet",
+          "unsure": "s8-siply.ready.unsure"
+        },
+        {
+          "id": "self",
+          "title": "Своё отражение",
+          "chapter": "step08-self",
+          "choice": "s8-self.ready",
+          "ready": "s8-self.ready.ready",
+          "notyet": "s8-self.ready.notyet",
+          "unsure": "s8-self.ready.unsure"
+        },
+        {
+          "id": "own",
+          "title": "Своё окно",
+          "chapter": "step08-own",
+          "choice": "s8-own.ready",
+          "ready": "s8-own.ready.ready",
+          "notyet": "s8-own.ready.notyet",
+          "unsure": "s8-own.ready.unsure"
+        }
+      ],
+      "labels": {
+        "intro": "Начало вечера",
+        "finale": "Финал",
+        "chooseWindow": "Выбери окно",
+        "progress": "Окон в списке",
+        "locked": "Финал откроется после пяти окон. Какой свет в каждом — не важно.",
+        "unavailable": "Сначала посиди с Маратом.",
+        "dark": "Не открыто",
+        "inProgress": "В процессе",
+        "ready": "Готов, когда придёт время",
+        "notyet": "Пока не готов",
+        "unsure": "Не знаю",
+        "open": "Открыть",
+        "resume": "Продолжить",
+        "again": "Вернуться",
+        "privacy": "Список хранится только на этом устройстве. Кнопок «написать человеку» здесь нет."
+      }
     }
   ],
   "nextStep": {
-    "title": "Шаг восьмой",
-    "teaser": "В работе. Вернуться к именам и посмотреть, что остаётся между вами."
+    "title": "Шаг девятый",
+    "teaser": "В работе. Только вместе с тем, кому доверяешь."
   }
 }

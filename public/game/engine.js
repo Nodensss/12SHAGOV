@@ -554,3 +554,35 @@ export function requestText(game,step,sceneId=game.ownWords?.final) {
   const d=requestDraft(game,sceneId);
   return d.silent?step.labels.silent:d.parts.map(id=>step.words.find(w=>w.id===id)?.text || '').filter(Boolean).join(' · ');
 }
+
+// Окна восьмого шага: отметка готовности хранится обычным выбором главы, поэтому
+// новое поле сохранения не нужно. Отметки равноправны и не складываются в баллы.
+export const WINDOW_MODES = ['ready', 'notyet', 'unsure'];
+export function windowsState(step, index, game) {
+  const have = picked(game);
+  const windows = (step?.windows || []).map(win => {
+    const progress = game?.chapters?.[win.chapter], selected = progress?.choices?.[win.choice];
+    const mode = WINDOW_MODES.find(mode => selected === win[mode]) || null;
+    return { ...win, mode, done: progress?.done === true, started: !!progress && !progress.done && !!(progress.scene || progress.line || Object.keys(progress.choices || {}).length) };
+  });
+  const finale = (index?.chapters || []).find(item => item.id === step?.finale);
+  const arrived = have.has(step?.intro);
+  return { windows, completed: windows.filter(win => win.done).length, arrived, finaleAvailable: arrived && !!finale && !isLocked(finale, game) };
+}
+
+export function validateWindows(step, index) {
+  const errors = [], windows = step?.windows, hasText = value => typeof value === 'string' && value.trim().length > 0;
+  if (step?.layout !== 'windows' || !Array.isArray(windows) || windows.length < 2) return ['окна: нужно хотя бы два окна'];
+  const chapters = (index?.chapters || []).filter(item => item.step === step.id), ids = new Set();
+  if (!hasText(step.intro) || !hasText(step.finale) || step.intro === step.finale || !chapters.some(item => item.id === step.intro) || !chapters.some(item => item.id === step.finale)) errors.push('окна: нет введения или финала');
+  for (const win of windows) {
+    for (const key of ['id', 'title', 'chapter', 'choice', ...WINDOW_MODES]) if (!hasText(win?.[key])) errors.push('окно без ' + key);
+    for (const key of ['id', 'chapter', 'choice', ...WINDOW_MODES]) {
+      if (ids.has(win?.[key])) errors.push('окна: повтор id ' + win?.[key]);
+      ids.add(win?.[key]);
+    }
+    if (!chapters.some(item => item.id === win?.chapter)) errors.push('нет главы окна ' + win?.id);
+  }
+  for (const key of ['intro', 'finale', 'chooseWindow', 'progress', 'locked', 'unavailable', 'dark', 'inProgress', 'open', 'resume', 'again', 'privacy', ...WINDOW_MODES]) if (!hasText(step.labels?.[key])) errors.push('окна без подписи ' + key);
+  return errors;
+}

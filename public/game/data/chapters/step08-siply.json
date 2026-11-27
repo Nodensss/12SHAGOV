@@ -1,0 +1,184 @@
+{
+  "id": "step08-siply",
+  "version": 1,
+  "step": 8,
+  "title": "Окно в торце",
+  "returnLabel": "К окнам",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_08_Восьмой.md: приватный список, готовность без контакта, вопросы спонсору",
+    "public/steps.js: шаг 8; оригинальная история героя"
+  ],
+  "disclaimer": "Вымышленная история. Это не литература АН. Список личный: имена не нужны, писать людям и что-то возмещать игра не предлагает. Любой вопрос можно пропустить.",
+  "background": "art/scene-stairs-locked.webp",
+  "speakers": {
+    "n": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "marat": {
+      "name": "Марат",
+      "role": "character"
+    },
+    "stepan": {
+      "name": "Степаныч",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "questions": [
+    {
+      "id": "q.s8-siply.name",
+      "text": "Как я подпишу это окно в списке? Можно буквой или псевдонимом."
+    },
+    {
+      "id": "q.s8-siply.what",
+      "text": "Что произошло? Подробности, которые могут навредить, писать не нужно."
+    },
+    {
+      "id": "q.s8-siply.understand",
+      "text": "Что мне нужно понять, прежде чем что-то делать?"
+    }
+  ],
+  "start": "s8-siply-start",
+  "scenes": {
+    "s8-siply-start": {
+      "type": "story",
+      "title": "Окно в торце",
+      "lines": [
+        {
+          "id": "s8-siply.start.0",
+          "speaker": "n",
+          "text": "Торцевой подъезд. Окно Сиплого заклеено фольгой, как и раньше."
+        },
+        {
+          "id": "s8-siply.start.1",
+          "speaker": "you",
+          "text": "Я втянул его в один долг. Потом пропал, а спрашивали с него."
+        },
+        {
+          "id": "s8-siply.start.2",
+          "speaker": "voice",
+          "text": "Иди, поговори. Ты же теперь честный."
+        },
+        {
+          "id": "s8-siply.start.3",
+          "speaker": "marat",
+          "text": "Стоп. Есть двери, которые не открывают в одиночку. А есть те, которые не открывают вообще."
+        },
+        {
+          "id": "s8-siply.start.4",
+          "speaker": "marat",
+          "text": "Если рядом с человеком ты можешь сорваться или тебе там опасно — это окно можно оставить тёмным. Оно всё равно в списке."
+        },
+        {
+          "id": "s8-siply.start.5",
+          "speaker": "n",
+          "text": "В ту ночь ты не вошёл к нему, а пошёл к двери группы. Тело это помнит.",
+          "if": "s2-porch.choice.enter"
+        }
+      ],
+      "next": "s8-siply-card"
+    },
+    "s8-siply-card": {
+      "type": "journal",
+      "intro": "Карточка окна. Отвечай на что хочешь, остальное — потом или никогда.",
+      "questionIds": [
+        "q.s8-siply.name",
+        "q.s8-siply.what",
+        "q.s8-siply.understand"
+      ],
+      "next": "s8-siply-light"
+    },
+    "s8-siply-light": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-siply.light.0",
+          "speaker": "marat",
+          "text": "Что бы ты ни выбрал — к нему одному ты не идёшь."
+        },
+        {
+          "id": "s8-siply.light.1",
+          "speaker": "n",
+          "text": "Какой свет оставить в этом окне? Все три отметки равноправны."
+        }
+      ],
+      "choice": {
+        "id": "s8-siply.ready",
+        "prompt": "Отметка готовности",
+        "options": [
+          {
+            "id": "s8-siply.ready.ready",
+            "label": "Готов, когда придёт время",
+            "next": "s8-siply-ready"
+          },
+          {
+            "id": "s8-siply.ready.notyet",
+            "label": "Пока не готов",
+            "next": "s8-siply-notyet"
+          },
+          {
+            "id": "s8-siply.ready.unsure",
+            "label": "Не знаю. Обсужу со Степанычем",
+            "next": "s8-siply-unsure"
+          }
+        ]
+      }
+    },
+    "s8-siply-end": {
+      "type": "ending",
+      "title": "Строка в списке",
+      "lines": [
+        {
+          "id": "s8-siply.end.0",
+          "speaker": "n",
+          "text": "Ты уходишь от торцевого подъезда, не оглядываясь. Строка в тетради останется и без визита."
+        }
+      ]
+    },
+    "s8-siply-ready": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-siply.ready.0",
+          "speaker": "marat",
+          "text": "Готовность — это не «пойти к нему». Как именно и можно ли вообще — решим вместе."
+        }
+      ],
+      "next": "s8-siply-end"
+    },
+    "s8-siply-notyet": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-siply.notyet.0",
+          "speaker": "n",
+          "text": "Окно в торце остаётся тёмным. Это забота о себе, а не трусость."
+        }
+      ],
+      "next": "s8-siply-end"
+    },
+    "s8-siply-unsure": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-siply.unsure.0",
+          "speaker": "you",
+          "text": "Безопасно ли это вообще — вот главный вопрос. Его задам первым."
+        }
+      ],
+      "next": "s8-siply-end"
+    }
+  }
+}

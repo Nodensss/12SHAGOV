@@ -7,7 +7,7 @@ import {
   saveEntry, setDraft, stage, validateChapter, validateVocab,
   itemsOf, levelOf, markDone, recordFight, assignSteering, leaveSteering, restartChapter,
   depthOf, scaledSkills, conversationState, validateConversation,
-  habitMapOf, assignHabitCell, canLeaveHabitMap, leaveHabitMap, loopsState, validateLoops,
+  habitMapOf, assignHabitCell, canLeaveHabitMap, leaveHabitMap, loopsState, validateLoops, windowsState, validateWindows,
 } from '../public/game/engine.js';
 import { canUse, playTurn, restoreBattle, skillsOf, startBattle, validateFight } from '../public/game/battle.js';
 
@@ -291,7 +291,7 @@ test('третий шаг открывается после Ночи, содер
   assert.equal(isLocked(thirdItems[0], game), true);
   markDone(game, 'step02-night');
   assert.equal(isLocked(thirdItems[0], game), false);
-  assert.equal(index.nextStep.title, 'Шаг восьмой');
+  assert.equal(index.nextStep.title, 'Шаг девятый');
   for (const chapter of thirdChapters) {
     assert.ok(chapter.disclaimer && chapter.basedOn.some(source => source.includes('docs/step03.md')), chapter.id);
     assert.ok(chapter.questions.length >= 2 && chapter.questions.length <= 3, chapter.id);
@@ -754,4 +754,35 @@ test('петли седьмого шага помнят все три отмет
  for(const c of chapters.filter(c=>c.step===7))for(const scene of Object.values(c.scenes).filter(s=>s.title==='Петля')){
   for(const mode of ['try','watch','hold']){const line=scene.lines.find(l=>l.id.endsWith('.callback.'+mode));assert.ok(line);const g=freshGame();g.chapters.fixture={choices:{mark:line.if},done:false};const visible=linesOf(scene,g);assert.ok(visible.includes(line));assert.equal(visible.filter(l=>l.id.includes('.callback.')).length,1);}
  }
+});
+
+test('восьмой шаг: окна без нового поля сохранения, три равноправные отметки, финал по пяти окнам', () => {
+  const step = index.steps.find(s => s.id === 8);
+  assert.equal(step.layout, 'windows');
+  assert.deepEqual(validateWindows(step, index), []);
+  assert.ok(validateWindows({ ...step, windows: [step.windows[0], step.windows[0]] }, index).length);
+  const final = index.chapters.find(c => c.id === step.finale), game = freshGame();
+  assert.equal(windowsState(step, index, game).arrived, false);
+  markDone(game, step.intro);
+  step.windows.forEach((win, i) => {
+    const chapter = chapters.find(c => c.id === win.chapter), mode = ['ready', 'notyet', 'unsure'][i % 3];
+    const pick = chapter.scenes[chapter.scenes[chapter.start].next] && Object.values(chapter.scenes).find(s => s.choice).choice.options.findIndex(o => o.id === win[mode]);
+    assert.ok(pick >= 0, win.id);
+    assert.equal(windowsState(step, index, game).finaleAvailable, i >= 5);
+    const progress = progressOf(game, chapter);
+    for (let guard = 0; guard < 100 && stage(progress, chapter, game) !== 'ending'; guard += 1) {
+      const now = stage(progress, chapter, game);
+      if (now === 'choice') choose(progress, chapter, chapter.scenes[progress.scene].choice.options[pick].id, game);
+      else if (now === 'journal') { for (const id of chapter.scenes[progress.scene].questionIds) answerLater(game, id, chapter.id); leaveJournal(progress, chapter, game); }
+      else advance(progress, chapter, game);
+    }
+    assert.equal(windowsState(step, index, game).windows[i].mode, mode);
+  });
+  assert.equal(isLocked(final, game), false);
+  assert.ok(!JSON.stringify(normalizeGame(JSON.parse(JSON.stringify(game)))).includes('windows'));
+  // Список не предлагает связаться с людьми: в текстах нет кнопок «написать» / «позвонить».
+  for (const chapter of chapters.filter(c => c.step === 8)) for (const scene of Object.values(chapter.scenes)) for (const o of scene.choice?.options || []) assert.doesNotMatch(o.label, /напис|позвон|отправ/i, o.id);
+  // Вопросы для Степаныча зависят от отметок окон.
+  const finale = chapters.find(c => c.id === step.finale), lines = linesOf(finale.scenes[finale.start], game).map(l => l.text);
+  assert.ok(lines.some(t => t.startsWith('Про Тимку')) && !lines.some(t => t.startsWith('Про Лену')));
 });

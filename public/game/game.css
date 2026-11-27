@@ -573,6 +573,19 @@ textarea::placeholder { color: #8a958a; }
 .g-loop-mark { display: block; margin-top: .55rem; padding-top: .5rem; width: 100%; border-top: 1px solid var(--line); color: var(--ink); font-size: .9rem; line-height: 1.4; }
 .g-loop-progress { margin: .85rem 0 1.2rem; color: var(--muted); font-size: .9rem; }
 .g-loop-story { margin-top: .9rem; }
+/* Восьмой шаг: фасад дома с окнами. Цвет света — только отметка, не оценка. */
+.g-facade { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; padding: .8rem; border: 1px solid var(--line); border-radius: 1rem; background: #1b211d; }
+.g-window { display: flex; min-width: 0; min-height: 44px; padding: .6rem .55rem .8rem; flex-direction: column; align-items: center; gap: .35rem; border: 1px solid #4d5548; border-radius: .6rem; background: #222a25; color: var(--ink); text-align: center; }
+.g-window:disabled { cursor: default; border-style: dashed; }
+.g-window strong { font-family: Georgia, "Times New Roman", serif; font-weight: 500; font-size: 1.05rem; line-height: 1.25; }
+.g-window-pane { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; width: 4.2rem; height: 4.6rem; padding: 3px; border-radius: 3px; background: #0f1411; }
+.g-window-pane i { background: #1a2320; }
+.g-window[data-mode="ready"] .g-window-pane i { background: #e3b766; box-shadow: 0 0 10px rgba(227, 183, 102, .35); }
+.g-window[data-mode="notyet"] .g-window-pane i { background: #6f7f8f; }
+.g-window[data-mode="unsure"] .g-window-pane i { background: #a58fbf; }
+.g-window-status { color: var(--muted); font-size: .85rem; line-height: 1.35; }
+.g-window:not([data-mode=""]) .g-window-status { color: var(--ink); }
+
 .g-loop-story .g-btn { min-height: 44px; }
 
 .g-habit-map { padding-bottom: 2rem; }

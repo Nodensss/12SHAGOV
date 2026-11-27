@@ -1,0 +1,249 @@
+{
+  "id": "step08-questions",
+  "version": 1,
+  "step": 8,
+  "title": "Вопросы для Степаныча",
+  "returnLabel": "К окнам",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_08_Восьмой.md: приватный список, готовность без контакта, вопросы спонсору",
+    "public/steps.js: шаг 8; оригинальная история героя"
+  ],
+  "disclaimer": "Вымышленная история. Это не литература АН. Список личный: имена не нужны, писать людям и что-то возмещать игра не предлагает. Любой вопрос можно пропустить.",
+  "background": "art/scene-group.webp",
+  "speakers": {
+    "n": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "marat": {
+      "name": "Марат",
+      "role": "character"
+    },
+    "stepan": {
+      "name": "Степаныч",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "questions": [
+    {
+      "id": "q.s8-questions.1",
+      "text": "Какие вопросы я задам Степанычу или другому доверенному человеку?"
+    },
+    {
+      "id": "q.s8-questions.2",
+      "text": "Где мне нужна особая осторожность?"
+    }
+  ],
+  "start": "s8-questions-start",
+  "scenes": {
+    "s8-questions-start": {
+      "type": "story",
+      "title": "После группы",
+      "lines": [
+        {
+          "id": "s8-questions.start.0",
+          "speaker": "stepan",
+          "text": "Ну, показывай. Только то, что хочешь."
+        },
+        {
+          "id": "s8-questions.start.1",
+          "speaker": "you",
+          "text": "Про Лену: как понять, что мой разговор не станет для неё ещё одной ношей?",
+          "ifAny": [
+            "s8-lena.ready.notyet",
+            "s8-lena.ready.unsure"
+          ]
+        },
+        {
+          "id": "s8-questions.start.2",
+          "speaker": "you",
+          "text": "Про Тимку: что честно сказать ребёнку, а что лучше показать делом?",
+          "ifAny": [
+            "s8-tim.ready.notyet",
+            "s8-tim.ready.unsure"
+          ]
+        },
+        {
+          "id": "s8-questions.start.3",
+          "speaker": "you",
+          "text": "Про маму: как быть с тем, что не возвращается деньгами?",
+          "ifAny": [
+            "s8-mother.ready.notyet",
+            "s8-mother.ready.unsure"
+          ]
+        },
+        {
+          "id": "s8-questions.start.4",
+          "speaker": "you",
+          "text": "Про работу: как не подставить того, кто меня прикрывал?",
+          "ifAny": [
+            "s8-work.ready.notyet",
+            "s8-work.ready.unsure"
+          ]
+        },
+        {
+          "id": "s8-questions.start.5",
+          "speaker": "you",
+          "text": "Про соседку: хватит ли того, что я больше не шумлю?",
+          "ifAny": [
+            "s8-neighbor.ready.notyet",
+            "s8-neighbor.ready.unsure"
+          ]
+        },
+        {
+          "id": "s8-questions.start.6",
+          "speaker": "you",
+          "text": "Про Сиплого: безопасно ли это вообще, и для меня, и для него?",
+          "ifAny": [
+            "s8-siply.ready.notyet",
+            "s8-siply.ready.unsure"
+          ]
+        },
+        {
+          "id": "s8-questions.start.7",
+          "speaker": "you",
+          "text": "Про себя: с чего начинают возмещать себе?",
+          "ifAny": [
+            "s8-self.ready.notyet",
+            "s8-self.ready.unsure"
+          ]
+        },
+        {
+          "id": "s8-questions.start.8",
+          "speaker": "you",
+          "text": "Про своё окно: с кем и когда я готов об этом поговорить?",
+          "ifAny": [
+            "s8-own.ready.notyet",
+            "s8-own.ready.unsure"
+          ]
+        },
+        {
+          "id": "s8-questions.start.9",
+          "speaker": "n",
+          "text": "Вопросов почти нет. Ты сам удивлён.",
+          "ifNone": [
+            "s8-lena.ready.notyet",
+            "s8-lena.ready.unsure",
+            "s8-tim.ready.notyet",
+            "s8-tim.ready.unsure",
+            "s8-mother.ready.notyet",
+            "s8-mother.ready.unsure",
+            "s8-work.ready.notyet",
+            "s8-work.ready.unsure",
+            "s8-neighbor.ready.notyet",
+            "s8-neighbor.ready.unsure",
+            "s8-siply.ready.notyet",
+            "s8-siply.ready.unsure",
+            "s8-self.ready.notyet",
+            "s8-self.ready.unsure",
+            "s8-own.ready.notyet",
+            "s8-own.ready.unsure"
+          ]
+        },
+        {
+          "id": "s8-questions.start.10",
+          "speaker": "stepan",
+          "text": "Список — не приговор и не план. Это то, что ты увидел."
+        },
+        {
+          "id": "s8-questions.start.11",
+          "speaker": "stepan",
+          "text": "Кому, как и когда — решим вместе. Ты не назначаешь себе возмещение сам и не бежишь сегодня ночью звонить."
+        },
+        {
+          "id": "s8-questions.start.12",
+          "speaker": "stepan",
+          "text": "Те окна, где опасно, вообще отдельный разговор. Там бывает так, что лучшее возмещение — не появляться.",
+          "ifAny": [
+            "s8-siply.ready.ready",
+            "s8-siply.ready.notyet",
+            "s8-siply.ready.unsure"
+          ]
+        },
+        {
+          "id": "s8-questions.start.13",
+          "speaker": "you",
+          "text": "А если я никогда не буду готов к какому-то окну?"
+        },
+        {
+          "id": "s8-questions.start.14",
+          "speaker": "stepan",
+          "text": "Значит, будем говорить о нём столько, сколько нужно."
+        }
+      ],
+      "choice": {
+        "id": "s8-questions.plan",
+        "prompt": "Что дальше?",
+        "options": [
+          {
+            "id": "s8-questions.plan.meet",
+            "label": "Договориться разобрать список в субботу",
+            "next": "s8-questions-meet"
+          },
+          {
+            "id": "s8-questions.plan.wait",
+            "label": "Пока просто носить тетрадь с собой",
+            "next": "s8-questions-wait"
+          }
+        ]
+      }
+    },
+    "s8-questions-meet": {
+      "type": "story",
+      "title": "Суббота",
+      "lines": [
+        {
+          "id": "s8-questions.meet.0",
+          "speaker": "stepan",
+          "text": "В субботу. Чай мой, тетрадь твоя."
+        }
+      ],
+      "next": "s8-questions-journal"
+    },
+    "s8-questions-wait": {
+      "type": "story",
+      "title": "Тетрадь в кармане",
+      "lines": [
+        {
+          "id": "s8-questions.wait.0",
+          "speaker": "stepan",
+          "text": "Носи. Когда захочешь — позвони. Я не тороплю."
+        }
+      ],
+      "next": "s8-questions-journal"
+    },
+    "s8-questions-journal": {
+      "type": "journal",
+      "intro": "Это страница вопросов. Её никто не увидит, пока ты сам не покажешь.",
+      "questionIds": [
+        "q.s8-questions.1",
+        "q.s8-questions.2"
+      ],
+      "next": "s8-questions-end"
+    },
+    "s8-questions-end": {
+      "type": "ending",
+      "title": "Список в тетради",
+      "lines": [
+        {
+          "id": "s8-questions.end.0",
+          "speaker": "n",
+          "text": "Ты идёшь через двор. Окна те же. Только теперь ты знаешь, что за ними."
+        },
+        {
+          "id": "s8-questions.end.1",
+          "speaker": "n",
+          "text": "Девятый шаг будет потом. Не сегодня и не в одиночку."
+        }
+      ]
+    }
+  }
+}

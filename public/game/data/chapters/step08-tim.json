@@ -1,0 +1,182 @@
+{
+  "id": "step08-tim",
+  "version": 1,
+  "step": 8,
+  "title": "Окно с рисунком",
+  "returnLabel": "К окнам",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_08_Восьмой.md: приватный список, готовность без контакта, вопросы спонсору",
+    "public/steps.js: шаг 8; оригинальная история героя"
+  ],
+  "disclaimer": "Вымышленная история. Это не литература АН. Список личный: имена не нужны, писать людям и что-то возмещать игра не предлагает. Любой вопрос можно пропустить.",
+  "background": "art/scene-yard.webp",
+  "speakers": {
+    "n": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "marat": {
+      "name": "Марат",
+      "role": "character"
+    },
+    "stepan": {
+      "name": "Степаныч",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "questions": [
+    {
+      "id": "q.s8-tim.name",
+      "text": "Как я подпишу это окно в списке? Можно буквой или псевдонимом."
+    },
+    {
+      "id": "q.s8-tim.what",
+      "text": "Что произошло? Можно не описывать."
+    },
+    {
+      "id": "q.s8-tim.understand",
+      "text": "Что мне нужно понять, прежде чем что-то делать?"
+    }
+  ],
+  "start": "s8-tim-start",
+  "scenes": {
+    "s8-tim-start": {
+      "type": "story",
+      "title": "Окно с рисунком",
+      "lines": [
+        {
+          "id": "s8-tim.start.0",
+          "speaker": "n",
+          "text": "В детской Лены к стеклу приклеен рисунок: самолёт и человек с длинными руками."
+        },
+        {
+          "id": "s8-tim.start.1",
+          "speaker": "you",
+          "text": "Это я. Он так рисует, когда я обещаю прийти."
+        },
+        {
+          "id": "s8-tim.start.2",
+          "speaker": "n",
+          "text": "Утренник в садике. Ты обещал. Тимка весь утренник смотрел на дверь."
+        },
+        {
+          "id": "s8-tim.start.3",
+          "speaker": "voice",
+          "text": "Он маленький. Он забыл."
+        },
+        {
+          "id": "s8-tim.start.4",
+          "speaker": "marat",
+          "text": "Дети не забывают. Но твоя работа — не объяснять ему всё. Твоя работа — приходить."
+        },
+        {
+          "id": "s8-tim.start.5",
+          "speaker": "n",
+          "text": "На встрече ты слышал от него «побудь рядом». Эти слова лежат в копилке.",
+          "ifAny": [
+            "s7-tim.take.remember",
+            "s7-tim.take.write"
+          ]
+        }
+      ],
+      "next": "s8-tim-card"
+    },
+    "s8-tim-card": {
+      "type": "journal",
+      "intro": "Карточка окна. Отвечай на что хочешь, остальное — потом или никогда.",
+      "questionIds": [
+        "q.s8-tim.name",
+        "q.s8-tim.what",
+        "q.s8-tim.understand"
+      ],
+      "next": "s8-tim-light"
+    },
+    "s8-tim-light": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-tim.light.0",
+          "speaker": "n",
+          "text": "Какой свет оставить в этом окне? Все три отметки равноправны."
+        }
+      ],
+      "choice": {
+        "id": "s8-tim.ready",
+        "prompt": "Отметка готовности",
+        "options": [
+          {
+            "id": "s8-tim.ready.ready",
+            "label": "Готов, когда придёт время",
+            "next": "s8-tim-ready"
+          },
+          {
+            "id": "s8-tim.ready.notyet",
+            "label": "Пока не готов",
+            "next": "s8-tim-notyet"
+          },
+          {
+            "id": "s8-tim.ready.unsure",
+            "label": "Не знаю. Обсужу со Степанычем",
+            "next": "s8-tim-unsure"
+          }
+        ]
+      }
+    },
+    "s8-tim-end": {
+      "type": "ending",
+      "title": "Строка в списке",
+      "lines": [
+        {
+          "id": "s8-tim.end.0",
+          "speaker": "n",
+          "text": "Ты смотришь на самолёт ещё минуту. Потом идёшь дальше вдоль дома."
+        }
+      ]
+    },
+    "s8-tim-ready": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-tim.ready.0",
+          "speaker": "n",
+          "text": "Самолёт на стекле будто чуть светлее. Возместить ребёнку — значит быть рядом, а не говорить речь."
+        }
+      ],
+      "next": "s8-tim-end"
+    },
+    "s8-tim-notyet": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-tim.notyet.0",
+          "speaker": "n",
+          "text": "Ты оставляешь окно как есть. Сначала — просто приходить вовремя."
+        }
+      ],
+      "next": "s8-tim-end"
+    },
+    "s8-tim-unsure": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-tim.unsure.0",
+          "speaker": "you",
+          "text": "Что можно сказать ребёнку, а что лучше не говорить вообще? Спрошу."
+        }
+      ],
+      "next": "s8-tim-end"
+    }
+  }
+}

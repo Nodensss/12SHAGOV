@@ -1,0 +1,179 @@
+{
+  "id": "step08-self",
+  "version": 1,
+  "step": 8,
+  "title": "Своё отражение",
+  "returnLabel": "К окнам",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_08_Восьмой.md: приватный список, готовность без контакта, вопросы спонсору",
+    "public/steps.js: шаг 8; оригинальная история героя"
+  ],
+  "disclaimer": "Вымышленная история. Это не литература АН. Список личный: имена не нужны, писать людям и что-то возмещать игра не предлагает. Любой вопрос можно пропустить.",
+  "background": "art/scene-porch.webp",
+  "speakers": {
+    "n": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "marat": {
+      "name": "Марат",
+      "role": "character"
+    },
+    "stepan": {
+      "name": "Степаныч",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "questions": [
+    {
+      "id": "q.s8-self.name",
+      "text": "Как я подпишу это окно в списке? Можно буквой или псевдонимом."
+    },
+    {
+      "id": "q.s8-self.what",
+      "text": "Что я сделал с собой? Можно пропустить."
+    },
+    {
+      "id": "q.s8-self.understand",
+      "text": "Что мне нужно понять, прежде чем что-то делать?"
+    }
+  ],
+  "start": "s8-self-start",
+  "scenes": {
+    "s8-self-start": {
+      "type": "story",
+      "title": "Своё отражение",
+      "lines": [
+        {
+          "id": "s8-self.start.0",
+          "speaker": "n",
+          "text": "В стекле двери подъезда — ты. Куртка, лампа над головой."
+        },
+        {
+          "id": "s8-self.start.1",
+          "speaker": "marat",
+          "text": "Себя тоже пиши. Ты себе тоже много задолжал."
+        },
+        {
+          "id": "s8-self.start.2",
+          "speaker": "you",
+          "text": "Зубы. Два года. Брат на свадьбе без меня."
+        },
+        {
+          "id": "s8-self.start.3",
+          "speaker": "n",
+          "text": "На странице «Что во мне есть» ты писал не только плохое.",
+          "if": "s4-worth1.choice.mark"
+        },
+        {
+          "id": "s8-self.start.4",
+          "speaker": "voice",
+          "text": "Себе-то можно и не возмещать."
+        },
+        {
+          "id": "s8-self.start.5",
+          "speaker": "marat",
+          "text": "Можно. Только тогда ты будешь возмещать другим из пустого кармана."
+        }
+      ],
+      "next": "s8-self-card"
+    },
+    "s8-self-card": {
+      "type": "journal",
+      "intro": "Карточка окна. Отвечай на что хочешь, остальное — потом или никогда.",
+      "questionIds": [
+        "q.s8-self.name",
+        "q.s8-self.what",
+        "q.s8-self.understand"
+      ],
+      "next": "s8-self-light"
+    },
+    "s8-self-light": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-self.light.0",
+          "speaker": "n",
+          "text": "Какой свет оставить в этом окне? Все три отметки равноправны."
+        }
+      ],
+      "choice": {
+        "id": "s8-self.ready",
+        "prompt": "Отметка готовности",
+        "options": [
+          {
+            "id": "s8-self.ready.ready",
+            "label": "Готов, когда придёт время",
+            "next": "s8-self-ready"
+          },
+          {
+            "id": "s8-self.ready.notyet",
+            "label": "Пока не готов",
+            "next": "s8-self-notyet"
+          },
+          {
+            "id": "s8-self.ready.unsure",
+            "label": "Не знаю. Обсужу со Степанычем",
+            "next": "s8-self-unsure"
+          }
+        ]
+      }
+    },
+    "s8-self-end": {
+      "type": "ending",
+      "title": "Строка в списке",
+      "lines": [
+        {
+          "id": "s8-self.end.0",
+          "speaker": "n",
+          "text": "Лампа над дверью моргает. Ты заходишь домой."
+        }
+      ]
+    },
+    "s8-self-ready": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-self.ready.0",
+          "speaker": "n",
+          "text": "Отражение не меняется. Но ты смотришь на него дольше обычного."
+        }
+      ],
+      "next": "s8-self-end"
+    },
+    "s8-self-notyet": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-self.notyet.0",
+          "speaker": "n",
+          "text": "Ты отворачиваешься от стекла. Это окно тоже можно открыть позже."
+        }
+      ],
+      "next": "s8-self-end"
+    },
+    "s8-self-unsure": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-self.unsure.0",
+          "speaker": "you",
+          "text": "С чего вообще начинают с собой? Спрошу."
+        }
+      ],
+      "next": "s8-self-end"
+    }
+  }
+}

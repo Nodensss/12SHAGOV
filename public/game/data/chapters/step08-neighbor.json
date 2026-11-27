@@ -1,0 +1,173 @@
+{
+  "id": "step08-neighbor",
+  "version": 1,
+  "step": 8,
+  "title": "Окно соседки",
+  "returnLabel": "К окнам",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_08_Восьмой.md: приватный список, готовность без контакта, вопросы спонсору",
+    "public/steps.js: шаг 8; оригинальная история героя"
+  ],
+  "disclaimer": "Вымышленная история. Это не литература АН. Список личный: имена не нужны, писать людям и что-то возмещать игра не предлагает. Любой вопрос можно пропустить.",
+  "background": "art/scene-stairs-locked.webp",
+  "speakers": {
+    "n": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "marat": {
+      "name": "Марат",
+      "role": "character"
+    },
+    "stepan": {
+      "name": "Степаныч",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "questions": [
+    {
+      "id": "q.s8-neighbor.name",
+      "text": "Как я подпишу это окно в списке? Можно буквой или псевдонимом."
+    },
+    {
+      "id": "q.s8-neighbor.what",
+      "text": "Что она могла пережить из-за меня? Можно оставить пустым."
+    },
+    {
+      "id": "q.s8-neighbor.understand",
+      "text": "Что мне нужно понять, прежде чем что-то делать?"
+    }
+  ],
+  "start": "s8-neighbor-start",
+  "scenes": {
+    "s8-neighbor-start": {
+      "type": "story",
+      "title": "Окно соседки",
+      "lines": [
+        {
+          "id": "s8-neighbor.start.0",
+          "speaker": "n",
+          "text": "Тётя Валя со второго этажа. Её окно под твоим старым окном."
+        },
+        {
+          "id": "s8-neighbor.start.1",
+          "speaker": "you",
+          "text": "Крики ночью. Друзья на лестнице. Однажды она вызвала участкового, и я неделю не здоровался."
+        },
+        {
+          "id": "s8-neighbor.start.2",
+          "speaker": "voice",
+          "text": "Она всех сдаёт. Вредная старуха."
+        },
+        {
+          "id": "s8-neighbor.start.3",
+          "speaker": "you",
+          "text": "Она боялась. Одна, а над ней — я."
+        },
+        {
+          "id": "s8-neighbor.start.4",
+          "speaker": "marat",
+          "text": "Иногда ты даже не знаешь, как человек это пережил. Это не повод не писать."
+        }
+      ],
+      "next": "s8-neighbor-card"
+    },
+    "s8-neighbor-card": {
+      "type": "journal",
+      "intro": "Карточка окна. Отвечай на что хочешь, остальное — потом или никогда.",
+      "questionIds": [
+        "q.s8-neighbor.name",
+        "q.s8-neighbor.what",
+        "q.s8-neighbor.understand"
+      ],
+      "next": "s8-neighbor-light"
+    },
+    "s8-neighbor-light": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-neighbor.light.0",
+          "speaker": "n",
+          "text": "Какой свет оставить в этом окне? Все три отметки равноправны."
+        }
+      ],
+      "choice": {
+        "id": "s8-neighbor.ready",
+        "prompt": "Отметка готовности",
+        "options": [
+          {
+            "id": "s8-neighbor.ready.ready",
+            "label": "Готов, когда придёт время",
+            "next": "s8-neighbor-ready"
+          },
+          {
+            "id": "s8-neighbor.ready.notyet",
+            "label": "Пока не готов",
+            "next": "s8-neighbor-notyet"
+          },
+          {
+            "id": "s8-neighbor.ready.unsure",
+            "label": "Не знаю. Обсужу со Степанычем",
+            "next": "s8-neighbor-unsure"
+          }
+        ]
+      }
+    },
+    "s8-neighbor-end": {
+      "type": "ending",
+      "title": "Строка в списке",
+      "lines": [
+        {
+          "id": "s8-neighbor.end.0",
+          "speaker": "n",
+          "text": "Занавеска опускается. Подъезд тихий — впервые за долгое время из-за тебя тоже."
+        }
+      ]
+    },
+    "s8-neighbor-ready": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-neighbor.ready.0",
+          "speaker": "n",
+          "text": "В окне за занавеской шевелится тень. Ты киваешь ей, хотя она не видит."
+        }
+      ],
+      "next": "s8-neighbor-end"
+    },
+    "s8-neighbor-notyet": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-neighbor.notyet.0",
+          "speaker": "n",
+          "text": "Ты пока не знаешь, что тут можно сделать. Окно остаётся в списке."
+        }
+      ],
+      "next": "s8-neighbor-end"
+    },
+    "s8-neighbor-unsure": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-neighbor.unsure.0",
+          "speaker": "you",
+          "text": "Может, лучшее — просто жить тихо. А может, нет. Спрошу."
+        }
+      ],
+      "next": "s8-neighbor-end"
+    }
+  }
+}

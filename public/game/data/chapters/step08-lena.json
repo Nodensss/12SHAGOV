@@ -1,0 +1,186 @@
+{
+  "id": "step08-lena",
+  "version": 1,
+  "step": 8,
+  "title": "Окно Лены",
+  "returnLabel": "К окнам",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_08_Восьмой.md: приватный список, готовность без контакта, вопросы спонсору",
+    "public/steps.js: шаг 8; оригинальная история героя"
+  ],
+  "disclaimer": "Вымышленная история. Это не литература АН. Список личный: имена не нужны, писать людям и что-то возмещать игра не предлагает. Любой вопрос можно пропустить.",
+  "background": "art/scene-yard.webp",
+  "speakers": {
+    "n": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "marat": {
+      "name": "Марат",
+      "role": "character"
+    },
+    "stepan": {
+      "name": "Степаныч",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "questions": [
+    {
+      "id": "q.s8-lena.name",
+      "text": "Как я подпишу это окно в списке? Можно буквой или псевдонимом."
+    },
+    {
+      "id": "q.s8-lena.what",
+      "text": "Что произошло между нами? Можно одной строкой или пропустить."
+    },
+    {
+      "id": "q.s8-lena.understand",
+      "text": "Что мне нужно понять, прежде чем что-то делать?"
+    }
+  ],
+  "start": "s8-lena-start",
+  "scenes": {
+    "s8-lena-start": {
+      "type": "story",
+      "title": "Окно Лены",
+      "lines": [
+        {
+          "id": "s8-lena.start.0",
+          "speaker": "n",
+          "text": "У Лены горит кухня. Отсюда видно, как она ходит от плиты к столу."
+        },
+        {
+          "id": "s8-lena.start.1",
+          "speaker": "voice",
+          "text": "Ты ей уже всё сказал. Хватит ковырять."
+        },
+        {
+          "id": "s8-lena.start.2",
+          "speaker": "n",
+          "text": "В ту ночь ты сказал ей правду. Это было начало, а не расчёт.",
+          "if": "s2-talk.choice.truth"
+        },
+        {
+          "id": "s8-lena.start.3",
+          "speaker": "n",
+          "text": "Тогда ты сказал ей только часть. Остальное так и лежит между вами.",
+          "ifNot": "s2-talk.choice.truth"
+        },
+        {
+          "id": "s8-lena.start.4",
+          "speaker": "you",
+          "text": "Кошелёк в прихожей. Деньги «до пятницы». Пятниц было много."
+        },
+        {
+          "id": "s8-lena.start.5",
+          "speaker": "n",
+          "text": "Тетрадь открыта на странице «Люди». Её имя там уже стоит.",
+          "if": "s4-bond1.choice.mark"
+        },
+        {
+          "id": "s8-lena.start.6",
+          "speaker": "marat",
+          "text": "Пиши, что было. Что делать — потом. И не сам."
+        }
+      ],
+      "next": "s8-lena-card"
+    },
+    "s8-lena-card": {
+      "type": "journal",
+      "intro": "Карточка окна. Отвечай на что хочешь, остальное — потом или никогда.",
+      "questionIds": [
+        "q.s8-lena.name",
+        "q.s8-lena.what",
+        "q.s8-lena.understand"
+      ],
+      "next": "s8-lena-light"
+    },
+    "s8-lena-light": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-lena.light.0",
+          "speaker": "n",
+          "text": "Какой свет оставить в этом окне? Все три отметки равноправны."
+        }
+      ],
+      "choice": {
+        "id": "s8-lena.ready",
+        "prompt": "Отметка готовности",
+        "options": [
+          {
+            "id": "s8-lena.ready.ready",
+            "label": "Готов, когда придёт время",
+            "next": "s8-lena-ready"
+          },
+          {
+            "id": "s8-lena.ready.notyet",
+            "label": "Пока не готов",
+            "next": "s8-lena-notyet"
+          },
+          {
+            "id": "s8-lena.ready.unsure",
+            "label": "Не знаю. Обсужу со Степанычем",
+            "next": "s8-lena-unsure"
+          }
+        ]
+      }
+    },
+    "s8-lena-end": {
+      "type": "ending",
+      "title": "Строка в списке",
+      "lines": [
+        {
+          "id": "s8-lena.end.0",
+          "speaker": "n",
+          "text": "Свет на третьем этаже гаснет: Лена легла спать. В тетради осталась строка."
+        }
+      ]
+    },
+    "s8-lena-ready": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-lena.ready.0",
+          "speaker": "n",
+          "text": "Окно Лены становится тёплым. Ты никуда не идёшь. Просто знаешь, что однажды сможешь."
+        }
+      ],
+      "next": "s8-lena-end"
+    },
+    "s8-lena-notyet": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-lena.notyet.0",
+          "speaker": "n",
+          "text": "Окно остаётся приглушённым. Это честная отметка, не провал."
+        }
+      ],
+      "next": "s8-lena-end"
+    },
+    "s8-lena-unsure": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-lena.unsure.0",
+          "speaker": "you",
+          "text": "Вдруг ей станет только тяжелее от моих слов. Это спрошу первым."
+        }
+      ],
+      "next": "s8-lena-end"
+    }
+  }
+}

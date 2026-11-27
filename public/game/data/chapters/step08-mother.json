@@ -1,0 +1,179 @@
+{
+  "id": "step08-mother",
+  "version": 1,
+  "step": 8,
+  "title": "Окно матери",
+  "returnLabel": "К окнам",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_08_Восьмой.md: приватный список, готовность без контакта, вопросы спонсору",
+    "public/steps.js: шаг 8; оригинальная история героя"
+  ],
+  "disclaimer": "Вымышленная история. Это не литература АН. Список личный: имена не нужны, писать людям и что-то возмещать игра не предлагает. Любой вопрос можно пропустить.",
+  "background": "art/scene-yard.webp",
+  "speakers": {
+    "n": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "marat": {
+      "name": "Марат",
+      "role": "character"
+    },
+    "stepan": {
+      "name": "Степаныч",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "questions": [
+    {
+      "id": "q.s8-mother.name",
+      "text": "Как я подпишу это окно в списке? Можно буквой или псевдонимом."
+    },
+    {
+      "id": "q.s8-mother.what",
+      "text": "Что произошло? Деньги, слова, время — можно выбрать одно или ничего."
+    },
+    {
+      "id": "q.s8-mother.understand",
+      "text": "Что мне нужно понять, прежде чем что-то делать?"
+    }
+  ],
+  "start": "s8-mother-start",
+  "scenes": {
+    "s8-mother-start": {
+      "type": "story",
+      "title": "Окно матери",
+      "lines": [
+        {
+          "id": "s8-mother.start.0",
+          "speaker": "n",
+          "text": "Мама живёт через двор. У неё всегда включён телевизор — чтобы не было тихо."
+        },
+        {
+          "id": "s8-mother.start.1",
+          "speaker": "you",
+          "text": "Звонки я не брал месяцами. Брал деньги — «на проезд до работы»."
+        },
+        {
+          "id": "s8-mother.start.2",
+          "speaker": "voice",
+          "text": "Она сама давала. Ты не просил."
+        },
+        {
+          "id": "s8-mother.start.3",
+          "speaker": "you",
+          "text": "Просил. Только так, чтобы она сама предложила."
+        },
+        {
+          "id": "s8-mother.start.4",
+          "speaker": "n",
+          "text": "На странице «Люди» её строка была глубже, чем ты думал.",
+          "if": "s4-bond1.choice.mark"
+        },
+        {
+          "id": "s8-mother.start.5",
+          "speaker": "marat",
+          "text": "Вред — это не только деньги. Это ещё и ночи, которые она не спала."
+        }
+      ],
+      "next": "s8-mother-card"
+    },
+    "s8-mother-card": {
+      "type": "journal",
+      "intro": "Карточка окна. Отвечай на что хочешь, остальное — потом или никогда.",
+      "questionIds": [
+        "q.s8-mother.name",
+        "q.s8-mother.what",
+        "q.s8-mother.understand"
+      ],
+      "next": "s8-mother-light"
+    },
+    "s8-mother-light": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-mother.light.0",
+          "speaker": "n",
+          "text": "Какой свет оставить в этом окне? Все три отметки равноправны."
+        }
+      ],
+      "choice": {
+        "id": "s8-mother.ready",
+        "prompt": "Отметка готовности",
+        "options": [
+          {
+            "id": "s8-mother.ready.ready",
+            "label": "Готов, когда придёт время",
+            "next": "s8-mother-ready"
+          },
+          {
+            "id": "s8-mother.ready.notyet",
+            "label": "Пока не готов",
+            "next": "s8-mother-notyet"
+          },
+          {
+            "id": "s8-mother.ready.unsure",
+            "label": "Не знаю. Обсужу со Степанычем",
+            "next": "s8-mother-unsure"
+          }
+        ]
+      }
+    },
+    "s8-mother-end": {
+      "type": "ending",
+      "title": "Строка в списке",
+      "lines": [
+        {
+          "id": "s8-mother.end.0",
+          "speaker": "n",
+          "text": "Телевизор у мамы гаснет. Значит, уснула. Ты отмечаешь это без тревоги."
+        }
+      ]
+    },
+    "s8-mother-ready": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-mother.ready.0",
+          "speaker": "n",
+          "text": "Синий свет в окне ровный. Ты замечаешь, что больше не хочешь отвести глаза."
+        }
+      ],
+      "next": "s8-mother-end"
+    },
+    "s8-mother-notyet": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-mother.notyet.0",
+          "speaker": "n",
+          "text": "Ты стоишь и не делаешь выводов. Окно подождёт."
+        }
+      ],
+      "next": "s8-mother-end"
+    },
+    "s8-mother-unsure": {
+      "type": "story",
+      "title": "Свет в окне",
+      "lines": [
+        {
+          "id": "s8-mother.unsure.0",
+          "speaker": "you",
+          "text": "Как вернуть то, что не в деньгах? Это вопрос не на одну ночь."
+        }
+      ],
+      "next": "s8-mother-end"
+    }
+  }
+}
