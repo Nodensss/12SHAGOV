@@ -1,0 +1,247 @@
+{
+  "id": "step09-siply",
+  "version": 1,
+  "step": 9,
+  "title": "Строка про Сиплого",
+  "returnLabel": "К списку",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_09_Девятый.md: три маршрута, проверка вреда, план для спонсора, необязательная заметка",
+    "public/steps.js: шаг 9; оригинальная история героя"
+  ],
+  "disclaimer": "Вымышленная история. Это не литература АН и не юридический, медицинский или семейный совет. Игра ничего не отправляет и не запускает. План не считается одобренным оттого, что заполнен.",
+  "background": "art/scene-kitchen.webp",
+  "speakers": {
+    "n": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "stepan": {
+      "name": "Степаныч",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "questions": [
+    {
+      "id": "q.s9-siply.fix",
+      "text": "Что можно исправить?"
+    },
+    {
+      "id": "q.s9-siply.who",
+      "text": "Кого это затронет, кроме нас двоих?"
+    },
+    {
+      "id": "q.s9-siply.risk",
+      "text": "Какой риск я вижу?"
+    },
+    {
+      "id": "q.s9-siply.after",
+      "text": "Если однажды сделаю — что получилось? Необязательная заметка."
+    }
+  ],
+  "start": "s9-siply-start",
+  "scenes": {
+    "s9-siply-start": {
+      "type": "story",
+      "title": "Строка про Сиплого",
+      "lines": [
+        {
+          "id": "s9-siply.start.0",
+          "speaker": "stepan",
+          "text": "Здесь стоп. Что будет, если ты придёшь к нему?"
+        },
+        {
+          "id": "s9-siply.start.1",
+          "speaker": "you",
+          "text": "Там те же люди. И то же предложение."
+        },
+        {
+          "id": "s9-siply.start.2",
+          "speaker": "stepan",
+          "text": "Значит, напрямую — нет. Никакой план не стоит твоей трезвости и твоей жизни."
+        }
+      ],
+      "next": "s9-siply-card"
+    },
+    "s9-siply-card": {
+      "type": "journal",
+      "intro": "Можно ответить на любой вопрос или ни на один.",
+      "questionIds": [
+        "q.s9-siply.fix",
+        "q.s9-siply.who",
+        "q.s9-siply.risk"
+      ],
+      "next": "s9-siply-harm"
+    },
+    "s9-siply-harm": {
+      "type": "habit-map",
+      "title": "Проверка вреда",
+      "intro": "В каждой клетке выбери то, что сейчас ближе. Это не экзамен: правильного ответа нет.",
+      "cells": [
+        {
+          "id": "s9-siply.harm.0",
+          "title": "Мне",
+          "options": [
+            {
+              "id": "s9-siply.harm.0.risk",
+              "text": "Вижу риск: я могу сорваться прямо там."
+            },
+            {
+              "id": "s9-siply.harm.0.none",
+              "text": "Сейчас риска здесь не вижу или не знаю"
+            }
+          ]
+        },
+        {
+          "id": "s9-siply.harm.1",
+          "title": "Тому человеку",
+          "options": [
+            {
+              "id": "s9-siply.harm.1.risk",
+              "text": "Вижу риск: мне или ему может быть физически опасно."
+            },
+            {
+              "id": "s9-siply.harm.1.none",
+              "text": "Сейчас риска здесь не вижу или не знаю"
+            }
+          ]
+        },
+        {
+          "id": "s9-siply.harm.2",
+          "title": "Другим людям",
+          "options": [
+            {
+              "id": "s9-siply.harm.2.risk",
+              "text": "Вижу риск: деньги могут уйти не на долг, а на употребление."
+            },
+            {
+              "id": "s9-siply.harm.2.none",
+              "text": "Сейчас риска здесь не вижу или не знаю"
+            }
+          ]
+        },
+        {
+          "id": "s9-siply.harm.3",
+          "title": "Хватит ли сил",
+          "options": [
+            {
+              "id": "s9-siply.harm.3.risk",
+              "text": "Сейчас сил может не хватить"
+            },
+            {
+              "id": "s9-siply.harm.3.none",
+              "text": "Силы есть, если не один"
+            }
+          ]
+        }
+      ],
+      "continueLabel": "К дорогам",
+      "next": "s9-siply-road"
+    },
+    "s9-siply-road": {
+      "type": "story",
+      "title": "Три дороги",
+      "lines": [
+        {
+          "id": "s9-siply.road.0",
+          "speaker": "stepan",
+          "text": "Риск, который видишь, — это уже ответ. Не говорю: нет. Говорю: смотри.",
+          "ifAny": [
+            "s9-siply.harm.0.risk",
+            "s9-siply.harm.1.risk",
+            "s9-siply.harm.2.risk",
+            "s9-siply.harm.3.risk"
+          ]
+        },
+        {
+          "id": "s9-siply.road.1",
+          "speaker": "stepan",
+          "text": "Ну что, какую дорогу пока рисуем? Это черновик, не обещание."
+        }
+      ],
+      "choice": {
+        "id": "s9-siply.route",
+        "prompt": "Какая дорога",
+        "options": [
+          {
+            "id": "s9-siply.route.direct",
+            "label": "Прямо: сказать и исправить самому",
+            "next": "s9-siply-direct"
+          },
+          {
+            "id": "s9-siply.route.indirect",
+            "label": "Косвенно: исправить делом, не напоминая о себе",
+            "next": "s9-siply-indirect"
+          },
+          {
+            "id": "s9-siply.route.wait",
+            "label": "Пока не связываться",
+            "next": "s9-siply-wait"
+          }
+        ]
+      }
+    },
+    "s9-siply-after": {
+      "type": "journal",
+      "intro": "Эту страницу можно заполнить потом, после настоящего дела. Или никогда.",
+      "questionIds": [
+        "q.s9-siply.after"
+      ],
+      "next": "s9-siply-end"
+    },
+    "s9-siply-end": {
+      "type": "ending",
+      "title": "Дорога на бумаге",
+      "lines": [
+        {
+          "id": "s9-siply.end.0",
+          "speaker": "n",
+          "text": "Степаныч ставит карандашом маленькую стрелку у строки. Никто никуда не идёт."
+        }
+      ]
+    },
+    "s9-siply-direct": {
+      "type": "story",
+      "title": "Три дороги",
+      "lines": [
+        {
+          "id": "s9-siply.direct.0",
+          "speaker": "stepan",
+          "text": "Прямо я тебе сейчас не советую. Если когда-то — только не одному и не к нему домой. А пока запишем как вопрос."
+        }
+      ],
+      "next": "s9-siply-after"
+    },
+    "s9-siply-indirect": {
+      "type": "story",
+      "title": "Три дороги",
+      "lines": [
+        {
+          "id": "s9-siply.indirect.0",
+          "speaker": "stepan",
+          "text": "Косвенно — может быть. Но с людьми, которые знают в этом толк, а не наугад."
+        }
+      ],
+      "next": "s9-siply-after"
+    },
+    "s9-siply-wait": {
+      "type": "story",
+      "title": "Три дороги",
+      "lines": [
+        {
+          "id": "s9-siply.wait.0",
+          "speaker": "stepan",
+          "text": "Не связываться — это не трусость. Это забота о двух людях сразу."
+        }
+      ],
+      "next": "s9-siply-after"
+    }
+  }
+}

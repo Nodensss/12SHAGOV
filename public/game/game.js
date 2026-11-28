@@ -225,11 +225,12 @@ function windowsSection(step, head, fresh) {
   };
   const windows = state.windows.map(win => {
     const started = startedOf(win.chapter);
-    const status = win.mode ? labels[win.mode] : started ? labels.inProgress : labels.dark;
-    return '<button type="button" class="g-window" data-window="' + h(win.id) + '" data-mode="' + h(win.mode || '') + '" data-act="' + (win.done && !started ? 'restart' : 'play') + '" data-id="' + h(win.chapter) + '"' + (state.arrived && chapterOf(win.chapter) ? '' : ' disabled') + '>' +
+    const closed = win.locked && labels.closed;
+    const status = closed ? labels.closed : win.mode ? labels[win.mode] : started ? labels.inProgress : labels.dark;
+    return '<button type="button" class="g-window" data-window="' + h(win.id) + '" data-mode="' + h(win.mode || '') + '" data-act="' + (win.done && !started ? 'restart' : 'play') + '" data-id="' + h(win.chapter) + '"' + (state.arrived && !closed && chapterOf(win.chapter) ? '' : ' disabled') + '>' +
       '<span class="g-window-pane" aria-hidden="true"><i></i><i></i><i></i><i></i></span><strong>' + h(win.title) + '</strong><span class="g-window-status">' + h(state.arrived ? status : labels.unavailable) + '</span></button>';
   }).join('');
-  return '<section class="g-section g-section-windows" data-step-section="' + h(step.id) + '">' + head + fresh + '<p class="g-lead g-section-lead">' + h(step.lead) + '</p>' +
+  return '<section class="g-section g-section-windows' + (step.layout === 'routes' ? ' g-section-routes' : '') + '" data-step-section="' + h(step.id) + '">' + head + fresh + '<p class="g-lead g-section-lead">' + h(step.lead) + '</p>' +
     (!state.arrived ? storyCard(list.find(item => item.id === step.intro), 'intro') : '') +
     '<p class="g-loop-instruction">' + h(labels.chooseWindow) + '</p><div class="g-facade" role="group" aria-label="' + h(labels.chooseWindow) + '">' + windows + '</div>' +
     '<p class="g-loop-progress">' + h(labels.progress) + ': ' + state.completed + ' / ' + state.windows.length + '</p><p class="g-note">' + h(labels.privacy) + '</p>' +
@@ -249,7 +250,7 @@ function stepSection(step) {
   if (step.layout === 'conversation') return conversationSection(step, head, fresh);
   if (step.layout === 'loops') return loopsSection(step, head, fresh);
   if (step.layout === 'words') return wordsSection(step, head, fresh);
-  if (step.layout === 'windows') return windowsSection(step, head, fresh);
+  if (step.layout === 'windows' || step.layout === 'routes') return windowsSection(step, head, fresh);
   if (step.layout !== 'map') return '<section class="g-section' + (step.layout === 'wheel' ? ' g-section-wheel' : '') + '">' + head + fresh + (folded ? '<details class="g-fold"><summary>Шаг пройден. Показать эпизоды и бои</summary>' : (step.layout === 'wheel' ? '<div class="g-wheel g-wheel-menu" aria-hidden="true"><i></i><b></b></div>' : '') + '<p class="g-lead g-section-lead">' + h(step.lead || '') + '</p>') + '<div class="g-list">' + list.map(item => item.type === 'fight' ? fightCard(item) : item.type === 'trial' ? trialCard(item) : episodeCard(item)).join('') + '</div>' + (folded ? '</details>' : '') + '</section>';
   const supports = itemsOf(items, game).filter(i => i.kind === 'support' && i.step === step.id), places = list.filter(item => !item.final), finals = list.filter(item => item.final);
   return '<section class="g-section g-section-map">' + head + fresh + '<p class="g-lead g-section-lead">' + h(step.lead || '') + '</p>' +
@@ -408,10 +409,10 @@ function play() {
   // Optional artwork is local data; chapters without it keep the original scene markup.
   const background = scene.background ?? chapter.background;
   if (typeof background === 'string' && /^art\/[a-z0-9-]+\.webp$/.test(background)) {
-    return top + '<section class="g-story-art' + (['conversation', 'loops', 'words', 'windows'].includes((index.steps || []).find(step => step.id === chapter.step)?.layout) ? ' g-talk-story' : '') + '"><img class="g-scene-art" src="' + h(background) + '" alt="" aria-hidden="true">' +
+    return top + '<section class="g-story-art' + (['conversation', 'loops', 'words', 'windows', 'routes'].includes((index.steps || []).find(step => step.id === chapter.step)?.layout) ? ' g-talk-story' : '') + '"><img class="g-scene-art" src="' + h(background) + '" alt="" aria-hidden="true">' +
       '<div class="g-scene-window" aria-hidden="true"></div>' + log + foot + '</section>';
   }
-  if (['conversation', 'loops', 'words', 'windows'].includes((index.steps || []).find(step => step.id === chapter.step)?.layout)) {
+  if (['conversation', 'loops', 'words', 'windows', 'routes'].includes((index.steps || []).find(step => step.id === chapter.step)?.layout)) {
     return top + '<section class="g-story-art g-talk-story g-talk-plain">' + log + foot + '</section>';
   }
   return top + log + foot;
@@ -594,7 +595,7 @@ const actions = {
   },
   menu: () => {
     const step = (index.steps || []).find(step => step.id === chapterOf(view.id)?.step);
-    dropBattle(); go({ name: 'menu', ...(['conversation', 'loops', 'words', 'windows'].includes(step?.layout) ? { section: step.id } : {}) });
+    dropBattle(); go({ name: 'menu', ...(['conversation', 'loops', 'words', 'windows', 'routes'].includes(step?.layout) ? { section: step.id } : {}) });
   },
   bag: () => go({ name: 'bag' }),
   trial: id => go({ name: 'trial', id, card: null, answer: null }),
@@ -732,7 +733,7 @@ async function boot() {
     const problems = validateVocab(vocab);
     for (const step of index.steps || []) if (step.layout === 'conversation') problems.push(...validateConversation(step, index));
     for (const step of index.steps || []) if (step.layout === 'loops') problems.push(...validateLoops(step, index));
-    for (const step of index.steps || []) if (step.layout === 'windows') problems.push(...validateWindows(step, index));
+    for (const step of index.steps || []) if (step.layout === 'windows' || step.layout === 'routes') problems.push(...validateWindows(step, index));
     await Promise.all(index.chapters.map(async item => {
       try {
         if (item.type === 'trial') {

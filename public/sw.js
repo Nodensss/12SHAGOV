@@ -1,6 +1,16 @@
-const CACHE = '12shagov-shell-v24';
+const CACHE = '12shagov-shell-v25';
 // Каждый файл на своей строке: так правки разных авторов не сталкиваются при слиянии.
 const ASSETS = [
+  './game/data/chapters/step09-plan.json',
+  './game/data/chapters/step09-own.json',
+  './game/data/chapters/step09-self.json',
+  './game/data/chapters/step09-siply.json',
+  './game/data/chapters/step09-neighbor.json',
+  './game/data/chapters/step09-work.json',
+  './game/data/chapters/step09-mother.json',
+  './game/data/chapters/step09-tim.json',
+  './game/data/chapters/step09-lena.json',
+  './game/data/chapters/step09-saturday.json',
   './game/data/chapters/step08-yard.json',
   './game/data/chapters/step08-lena.json',
   './game/data/chapters/step08-tim.json',

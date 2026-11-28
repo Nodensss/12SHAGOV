@@ -67,7 +67,17 @@
       "step08-siply": "night",
       "step08-self": "night",
       "step08-own": "yard",
-      "step08-questions": "room"
+      "step08-questions": "room",
+      "step09-saturday": "kitchen",
+      "step09-lena": "kitchen",
+      "step09-tim": "kitchen",
+      "step09-mother": "kitchen",
+      "step09-work": "kitchen",
+      "step09-neighbor": "kitchen",
+      "step09-siply": "kitchen",
+      "step09-self": "kitchen",
+      "step09-own": "kitchen",
+      "step09-plan": "night"
     },
     "scenes": {
       "step01-only-once": {

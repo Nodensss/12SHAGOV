@@ -1,0 +1,247 @@
+{
+  "id": "step09-mother",
+  "version": 1,
+  "step": 9,
+  "title": "Строка про маму",
+  "returnLabel": "К списку",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_09_Девятый.md: три маршрута, проверка вреда, план для спонсора, необязательная заметка",
+    "public/steps.js: шаг 9; оригинальная история героя"
+  ],
+  "disclaimer": "Вымышленная история. Это не литература АН и не юридический, медицинский или семейный совет. Игра ничего не отправляет и не запускает. План не считается одобренным оттого, что заполнен.",
+  "background": "art/scene-kitchen.webp",
+  "speakers": {
+    "n": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "stepan": {
+      "name": "Степаныч",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "questions": [
+    {
+      "id": "q.s9-mother.fix",
+      "text": "Что можно исправить?"
+    },
+    {
+      "id": "q.s9-mother.who",
+      "text": "Кого это затронет, кроме нас двоих?"
+    },
+    {
+      "id": "q.s9-mother.risk",
+      "text": "Какой риск я вижу?"
+    },
+    {
+      "id": "q.s9-mother.after",
+      "text": "Если однажды сделаю — что получилось? Необязательная заметка."
+    }
+  ],
+  "start": "s9-mother-start",
+  "scenes": {
+    "s9-mother-start": {
+      "type": "story",
+      "title": "Строка про маму",
+      "lines": [
+        {
+          "id": "s9-mother.start.0",
+          "speaker": "stepan",
+          "text": "Мама. Деньги ты, может, и вернёшь. А что ещё?"
+        },
+        {
+          "id": "s9-mother.start.1",
+          "speaker": "you",
+          "text": "Не знаю. Она всё время одна с телевизором."
+        },
+        {
+          "id": "s9-mother.start.2",
+          "speaker": "stepan",
+          "text": "Вот ты и ответил."
+        }
+      ],
+      "next": "s9-mother-card"
+    },
+    "s9-mother-card": {
+      "type": "journal",
+      "intro": "Можно ответить на любой вопрос или ни на один.",
+      "questionIds": [
+        "q.s9-mother.fix",
+        "q.s9-mother.who",
+        "q.s9-mother.risk"
+      ],
+      "next": "s9-mother-harm"
+    },
+    "s9-mother-harm": {
+      "type": "habit-map",
+      "title": "Проверка вреда",
+      "intro": "В каждой клетке выбери то, что сейчас ближе. Это не экзамен: правильного ответа нет.",
+      "cells": [
+        {
+          "id": "s9-mother.harm.0",
+          "title": "Мне",
+          "options": [
+            {
+              "id": "s9-mother.harm.0.risk",
+              "text": "Вижу риск: я могу взять на себя больше, чем вытяну, и сорваться."
+            },
+            {
+              "id": "s9-mother.harm.0.none",
+              "text": "Сейчас риска здесь не вижу или не знаю"
+            }
+          ]
+        },
+        {
+          "id": "s9-mother.harm.1",
+          "title": "Тому человеку",
+          "options": [
+            {
+              "id": "s9-mother.harm.1.risk",
+              "text": "Вижу риск: её старые обиды на отца могут лечь на меня — и это не мой ответ."
+            },
+            {
+              "id": "s9-mother.harm.1.none",
+              "text": "Сейчас риска здесь не вижу или не знаю"
+            }
+          ]
+        },
+        {
+          "id": "s9-mother.harm.2",
+          "title": "Другим людям",
+          "options": [
+            {
+              "id": "s9-mother.harm.2.risk",
+              "text": "Вижу риск: брат решит, что я опять что-то хочу."
+            },
+            {
+              "id": "s9-mother.harm.2.none",
+              "text": "Сейчас риска здесь не вижу или не знаю"
+            }
+          ]
+        },
+        {
+          "id": "s9-mother.harm.3",
+          "title": "Хватит ли сил",
+          "options": [
+            {
+              "id": "s9-mother.harm.3.risk",
+              "text": "Сейчас сил может не хватить"
+            },
+            {
+              "id": "s9-mother.harm.3.none",
+              "text": "Силы есть, если не один"
+            }
+          ]
+        }
+      ],
+      "continueLabel": "К дорогам",
+      "next": "s9-mother-road"
+    },
+    "s9-mother-road": {
+      "type": "story",
+      "title": "Три дороги",
+      "lines": [
+        {
+          "id": "s9-mother.road.0",
+          "speaker": "stepan",
+          "text": "Риск, который видишь, — это уже ответ. Не говорю: нет. Говорю: смотри.",
+          "ifAny": [
+            "s9-mother.harm.0.risk",
+            "s9-mother.harm.1.risk",
+            "s9-mother.harm.2.risk",
+            "s9-mother.harm.3.risk"
+          ]
+        },
+        {
+          "id": "s9-mother.road.1",
+          "speaker": "stepan",
+          "text": "Ну что, какую дорогу пока рисуем? Это черновик, не обещание."
+        }
+      ],
+      "choice": {
+        "id": "s9-mother.route",
+        "prompt": "Какая дорога",
+        "options": [
+          {
+            "id": "s9-mother.route.direct",
+            "label": "Прямо: сказать и исправить самому",
+            "next": "s9-mother-direct"
+          },
+          {
+            "id": "s9-mother.route.indirect",
+            "label": "Косвенно: исправить делом, не напоминая о себе",
+            "next": "s9-mother-indirect"
+          },
+          {
+            "id": "s9-mother.route.wait",
+            "label": "Пока не связываться",
+            "next": "s9-mother-wait"
+          }
+        ]
+      }
+    },
+    "s9-mother-after": {
+      "type": "journal",
+      "intro": "Эту страницу можно заполнить потом, после настоящего дела. Или никогда.",
+      "questionIds": [
+        "q.s9-mother.after"
+      ],
+      "next": "s9-mother-end"
+    },
+    "s9-mother-end": {
+      "type": "ending",
+      "title": "Дорога на бумаге",
+      "lines": [
+        {
+          "id": "s9-mother.end.0",
+          "speaker": "n",
+          "text": "Степаныч ставит карандашом маленькую стрелку у строки. Никто никуда не идёт."
+        }
+      ]
+    },
+    "s9-mother-direct": {
+      "type": "story",
+      "title": "Три дороги",
+      "lines": [
+        {
+          "id": "s9-mother.direct.0",
+          "speaker": "stepan",
+          "text": "Прийти в воскресенье и сказать, что помнишь, как было. Потом не исчезать."
+        }
+      ],
+      "next": "s9-mother-after"
+    },
+    "s9-mother-indirect": {
+      "type": "story",
+      "title": "Три дороги",
+      "lines": [
+        {
+          "id": "s9-mother.indirect.0",
+          "speaker": "stepan",
+          "text": "Звонить по средам. Просто спрашивать про давление и рассаду."
+        }
+      ],
+      "next": "s9-mother-after"
+    },
+    "s9-mother-wait": {
+      "type": "story",
+      "title": "Три дороги",
+      "lines": [
+        {
+          "id": "s9-mother.wait.0",
+          "speaker": "stepan",
+          "text": "Не сейчас — ладно. Но строка остаётся, мы к ней вернёмся."
+        }
+      ],
+      "next": "s9-mother-after"
+    }
+  }
+}

@@ -727,6 +727,150 @@
         ]
       },
       "final": true
+    },
+    {
+      "id": "step09-saturday",
+      "step": 9,
+      "title": "Чай мой, тетрадь твоя",
+      "teaser": "Суббота у Степаныча.",
+      "minutes": "2 минуты",
+      "file": "chapters/step09-saturday.json",
+      "after": "step08-questions"
+    },
+    {
+      "id": "step09-lena",
+      "step": 9,
+      "title": "Строка про Лену",
+      "teaser": "Деньги «до пятницы» и всё, что вокруг них.",
+      "minutes": "3 минуты",
+      "file": "chapters/step09-lena.json",
+      "after": "step09-saturday",
+      "allOfAny": [
+        [
+          "step08-lena"
+        ]
+      ]
+    },
+    {
+      "id": "step09-tim",
+      "step": 9,
+      "title": "Строка про Тимку",
+      "teaser": "Утренник, на который ты не пришёл.",
+      "minutes": "3 минуты",
+      "file": "chapters/step09-tim.json",
+      "after": "step09-saturday",
+      "allOfAny": [
+        [
+          "step08-tim"
+        ]
+      ]
+    },
+    {
+      "id": "step09-mother",
+      "step": 9,
+      "title": "Строка про маму",
+      "teaser": "Звонки, которые ты не брал.",
+      "minutes": "3 минуты",
+      "file": "chapters/step09-mother.json",
+      "after": "step09-saturday",
+      "allOfAny": [
+        [
+          "step08-mother"
+        ]
+      ]
+    },
+    {
+      "id": "step09-work",
+      "step": 9,
+      "title": "Строка про Коляна",
+      "teaser": "Смены, которые он закрывал.",
+      "minutes": "3 минуты",
+      "file": "chapters/step09-work.json",
+      "after": "step09-saturday",
+      "allOfAny": [
+        [
+          "step08-work"
+        ]
+      ]
+    },
+    {
+      "id": "step09-neighbor",
+      "step": 9,
+      "title": "Строка про тётю Валю",
+      "teaser": "Ночи шума над её окном.",
+      "minutes": "3 минуты",
+      "file": "chapters/step09-neighbor.json",
+      "after": "step09-saturday",
+      "allOfAny": [
+        [
+          "step08-neighbor"
+        ]
+      ]
+    },
+    {
+      "id": "step09-siply",
+      "step": 9,
+      "title": "Строка про Сиплого",
+      "teaser": "Долг, за который спрашивали с него.",
+      "minutes": "3 минуты",
+      "file": "chapters/step09-siply.json",
+      "after": "step09-saturday",
+      "allOfAny": [
+        [
+          "step08-siply"
+        ]
+      ]
+    },
+    {
+      "id": "step09-self",
+      "step": 9,
+      "title": "Строка про себя",
+      "teaser": "Зубы, свадьба брата, два года.",
+      "minutes": "3 минуты",
+      "file": "chapters/step09-self.json",
+      "after": "step09-saturday",
+      "allOfAny": [
+        [
+          "step08-self"
+        ]
+      ]
+    },
+    {
+      "id": "step09-own",
+      "step": 9,
+      "title": "Строка своего окна",
+      "teaser": "То, что подписал сам.",
+      "minutes": "3 минуты",
+      "file": "chapters/step09-own.json",
+      "after": "step09-saturday",
+      "allOfAny": [
+        [
+          "step08-own"
+        ]
+      ]
+    },
+    {
+      "id": "step09-plan",
+      "step": 9,
+      "title": "План на бумаге",
+      "teaser": "Все дороги на одном листе.",
+      "minutes": "3 минуты",
+      "file": "chapters/step09-plan.json",
+      "after": "step09-saturday",
+      "needs": {
+        "count": 3,
+        "of": [
+          "step09-lena",
+          "step09-tim",
+          "step09-mother",
+          "step09-work",
+          "step09-neighbor",
+          "step09-siply",
+          "step09-self",
+          "step09-own"
+        ]
+      },
+      "final": true
     }
   ],
   "steps": [
@@ -1200,10 +1344,118 @@
         "again": "Вернуться",
         "privacy": "Список хранится только на этом устройстве. Кнопок «написать человеку» здесь нет."
       }
+    },
+    {
+      "id": 9,
+      "title": "Шаг девятый",
+      "name": "Три дороги",
+      "layout": "routes",
+      "after": "step08-questions",
+      "lockedText": "Откроется после восьмого шага «Вопросы для Степаныча».",
+      "lead": "Суббота у Степаныча. Строки из списка, у каждой три дороги. Ничего не делаем — только рисуем.",
+      "intro": "step09-saturday",
+      "finale": "step09-plan",
+      "modes": [
+        "direct",
+        "indirect",
+        "wait"
+      ],
+      "windows": [
+        {
+          "id": "lena",
+          "title": "Строка про Лену",
+          "chapter": "step09-lena",
+          "choice": "s9-lena.route",
+          "direct": "s9-lena.route.direct",
+          "indirect": "s9-lena.route.indirect",
+          "wait": "s9-lena.route.wait"
+        },
+        {
+          "id": "tim",
+          "title": "Строка про Тимку",
+          "chapter": "step09-tim",
+          "choice": "s9-tim.route",
+          "direct": "s9-tim.route.direct",
+          "indirect": "s9-tim.route.indirect",
+          "wait": "s9-tim.route.wait"
+        },
+        {
+          "id": "mother",
+          "title": "Строка про маму",
+          "chapter": "step09-mother",
+          "choice": "s9-mother.route",
+          "direct": "s9-mother.route.direct",
+          "indirect": "s9-mother.route.indirect",
+          "wait": "s9-mother.route.wait"
+        },
+        {
+          "id": "work",
+          "title": "Строка про Коляна",
+          "chapter": "step09-work",
+          "choice": "s9-work.route",
+          "direct": "s9-work.route.direct",
+          "indirect": "s9-work.route.indirect",
+          "wait": "s9-work.route.wait"
+        },
+        {
+          "id": "neighbor",
+          "title": "Строка про тётю Валю",
+          "chapter": "step09-neighbor",
+          "choice": "s9-neighbor.route",
+          "direct": "s9-neighbor.route.direct",
+          "indirect": "s9-neighbor.route.indirect",
+          "wait": "s9-neighbor.route.wait"
+        },
+        {
+          "id": "siply",
+          "title": "Строка про Сиплого",
+          "chapter": "step09-siply",
+          "choice": "s9-siply.route",
+          "direct": "s9-siply.route.direct",
+          "indirect": "s9-siply.route.indirect",
+          "wait": "s9-siply.route.wait"
+        },
+        {
+          "id": "self",
+          "title": "Строка про себя",
+          "chapter": "step09-self",
+          "choice": "s9-self.route",
+          "direct": "s9-self.route.direct",
+          "indirect": "s9-self.route.indirect",
+          "wait": "s9-self.route.wait"
+        },
+        {
+          "id": "own",
+          "title": "Строка своего окна",
+          "chapter": "step09-own",
+          "choice": "s9-own.route",
+          "direct": "s9-own.route.direct",
+          "indirect": "s9-own.route.indirect",
+          "wait": "s9-own.route.wait"
+        }
+      ],
+      "labels": {
+        "intro": "Начало",
+        "finale": "Финал",
+        "chooseWindow": "Выбери строку",
+        "progress": "Строк продумано",
+        "locked": "Финал откроется после трёх строк. Какая дорога у каждой — не важно.",
+        "unavailable": "Сначала приди к Степанычу.",
+        "closed": "Нет в списке восьмого шага",
+        "dark": "Не продумано",
+        "inProgress": "В процессе",
+        "direct": "Прямо",
+        "indirect": "Косвенно",
+        "wait": "Пока не связываться",
+        "open": "Открыть",
+        "resume": "Продолжить",
+        "again": "Вернуться",
+        "privacy": "Игра ничего не отправляет и не запускает. План — только черновик для разговора."
+      }
     }
   ],
   "nextStep": {
-    "title": "Шаг девятый",
-    "teaser": "В работе. Только вместе с тем, кому доверяешь."
+    "title": "Шаг десятый",
+    "teaser": "В работе. Каждый день смотреть, где ты сегодня."
   }
 }

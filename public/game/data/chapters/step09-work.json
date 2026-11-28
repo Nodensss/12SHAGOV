@@ -1,0 +1,247 @@
+{
+  "id": "step09-work",
+  "version": 1,
+  "step": 9,
+  "title": "Строка про Коляна",
+  "returnLabel": "К списку",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_09_Девятый.md: три маршрута, проверка вреда, план для спонсора, необязательная заметка",
+    "public/steps.js: шаг 9; оригинальная история героя"
+  ],
+  "disclaimer": "Вымышленная история. Это не литература АН и не юридический, медицинский или семейный совет. Игра ничего не отправляет и не запускает. План не считается одобренным оттого, что заполнен.",
+  "background": "art/scene-kitchen.webp",
+  "speakers": {
+    "n": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "stepan": {
+      "name": "Степаныч",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "questions": [
+    {
+      "id": "q.s9-work.fix",
+      "text": "Что можно исправить?"
+    },
+    {
+      "id": "q.s9-work.who",
+      "text": "Кого это затронет, кроме нас двоих?"
+    },
+    {
+      "id": "q.s9-work.risk",
+      "text": "Какой риск я вижу?"
+    },
+    {
+      "id": "q.s9-work.after",
+      "text": "Если однажды сделаю — что получилось? Необязательная заметка."
+    }
+  ],
+  "start": "s9-work-start",
+  "scenes": {
+    "s9-work-start": {
+      "type": "story",
+      "title": "Строка про Коляна",
+      "lines": [
+        {
+          "id": "s9-work.start.0",
+          "speaker": "stepan",
+          "text": "Колян прикрывал тебя перед начальником."
+        },
+        {
+          "id": "s9-work.start.1",
+          "speaker": "you",
+          "text": "Если пойду признаваться к начальству — достанется и ему."
+        },
+        {
+          "id": "s9-work.start.2",
+          "speaker": "stepan",
+          "text": "Вот. Возмещение, которое вредит другому, — это не возмещение."
+        }
+      ],
+      "next": "s9-work-card"
+    },
+    "s9-work-card": {
+      "type": "journal",
+      "intro": "Можно ответить на любой вопрос или ни на один.",
+      "questionIds": [
+        "q.s9-work.fix",
+        "q.s9-work.who",
+        "q.s9-work.risk"
+      ],
+      "next": "s9-work-harm"
+    },
+    "s9-work-harm": {
+      "type": "habit-map",
+      "title": "Проверка вреда",
+      "intro": "В каждой клетке выбери то, что сейчас ближе. Это не экзамен: правильного ответа нет.",
+      "cells": [
+        {
+          "id": "s9-work.harm.0",
+          "title": "Мне",
+          "options": [
+            {
+              "id": "s9-work.harm.0.risk",
+              "text": "Вижу риск: колян может потерять работу из-за моей честности."
+            },
+            {
+              "id": "s9-work.harm.0.none",
+              "text": "Сейчас риска здесь не вижу или не знаю"
+            }
+          ]
+        },
+        {
+          "id": "s9-work.harm.1",
+          "title": "Тому человеку",
+          "options": [
+            {
+              "id": "s9-work.harm.1.risk",
+              "text": "Вижу риск: я могу потерять работу и сорваться."
+            },
+            {
+              "id": "s9-work.harm.1.none",
+              "text": "Сейчас риска здесь не вижу или не знаю"
+            }
+          ]
+        },
+        {
+          "id": "s9-work.harm.2",
+          "title": "Другим людям",
+          "options": [
+            {
+              "id": "s9-work.harm.2.risk",
+              "text": "Вижу риск: разговор при всех станет спектаклем."
+            },
+            {
+              "id": "s9-work.harm.2.none",
+              "text": "Сейчас риска здесь не вижу или не знаю"
+            }
+          ]
+        },
+        {
+          "id": "s9-work.harm.3",
+          "title": "Хватит ли сил",
+          "options": [
+            {
+              "id": "s9-work.harm.3.risk",
+              "text": "Сейчас сил может не хватить"
+            },
+            {
+              "id": "s9-work.harm.3.none",
+              "text": "Силы есть, если не один"
+            }
+          ]
+        }
+      ],
+      "continueLabel": "К дорогам",
+      "next": "s9-work-road"
+    },
+    "s9-work-road": {
+      "type": "story",
+      "title": "Три дороги",
+      "lines": [
+        {
+          "id": "s9-work.road.0",
+          "speaker": "stepan",
+          "text": "Риск, который видишь, — это уже ответ. Не говорю: нет. Говорю: смотри.",
+          "ifAny": [
+            "s9-work.harm.0.risk",
+            "s9-work.harm.1.risk",
+            "s9-work.harm.2.risk",
+            "s9-work.harm.3.risk"
+          ]
+        },
+        {
+          "id": "s9-work.road.1",
+          "speaker": "stepan",
+          "text": "Ну что, какую дорогу пока рисуем? Это черновик, не обещание."
+        }
+      ],
+      "choice": {
+        "id": "s9-work.route",
+        "prompt": "Какая дорога",
+        "options": [
+          {
+            "id": "s9-work.route.direct",
+            "label": "Прямо: сказать и исправить самому",
+            "next": "s9-work-direct"
+          },
+          {
+            "id": "s9-work.route.indirect",
+            "label": "Косвенно: исправить делом, не напоминая о себе",
+            "next": "s9-work-indirect"
+          },
+          {
+            "id": "s9-work.route.wait",
+            "label": "Пока не связываться",
+            "next": "s9-work-wait"
+          }
+        ]
+      }
+    },
+    "s9-work-after": {
+      "type": "journal",
+      "intro": "Эту страницу можно заполнить потом, после настоящего дела. Или никогда.",
+      "questionIds": [
+        "q.s9-work.after"
+      ],
+      "next": "s9-work-end"
+    },
+    "s9-work-end": {
+      "type": "ending",
+      "title": "Дорога на бумаге",
+      "lines": [
+        {
+          "id": "s9-work.end.0",
+          "speaker": "n",
+          "text": "Степаныч ставит карандашом маленькую стрелку у строки. Никто никуда не идёт."
+        }
+      ]
+    },
+    "s9-work-direct": {
+      "type": "story",
+      "title": "Три дороги",
+      "lines": [
+        {
+          "id": "s9-work.direct.0",
+          "speaker": "stepan",
+          "text": "С Коляном — один на один. Начальника не трогай, пока не обсудим ещё раз."
+        }
+      ],
+      "next": "s9-work-after"
+    },
+    "s9-work-indirect": {
+      "type": "story",
+      "title": "Три дороги",
+      "lines": [
+        {
+          "id": "s9-work.indirect.0",
+          "speaker": "stepan",
+          "text": "Взять пару его смен. Без объяснений, если он не против."
+        }
+      ],
+      "next": "s9-work-after"
+    },
+    "s9-work-wait": {
+      "type": "story",
+      "title": "Три дороги",
+      "lines": [
+        {
+          "id": "s9-work.wait.0",
+          "speaker": "stepan",
+          "text": "Работа держит тебя на ногах. Ждать — разумно."
+        }
+      ],
+      "next": "s9-work-after"
+    }
+  }
+}

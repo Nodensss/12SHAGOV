@@ -1,0 +1,258 @@
+{
+  "id": "step09-lena",
+  "version": 1,
+  "step": 9,
+  "title": "Строка про Лену",
+  "returnLabel": "К списку",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_09_Девятый.md: три маршрута, проверка вреда, план для спонсора, необязательная заметка",
+    "public/steps.js: шаг 9; оригинальная история героя"
+  ],
+  "disclaimer": "Вымышленная история. Это не литература АН и не юридический, медицинский или семейный совет. Игра ничего не отправляет и не запускает. План не считается одобренным оттого, что заполнен.",
+  "background": "art/scene-kitchen.webp",
+  "speakers": {
+    "n": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "stepan": {
+      "name": "Степаныч",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "questions": [
+    {
+      "id": "q.s9-lena.fix",
+      "text": "Что можно исправить?"
+    },
+    {
+      "id": "q.s9-lena.who",
+      "text": "Кого это затронет, кроме нас двоих?"
+    },
+    {
+      "id": "q.s9-lena.risk",
+      "text": "Какой риск я вижу?"
+    },
+    {
+      "id": "q.s9-lena.after",
+      "text": "Если однажды сделаю — что получилось? Необязательная заметка."
+    }
+  ],
+  "start": "s9-lena-start",
+  "scenes": {
+    "s9-lena-start": {
+      "type": "story",
+      "title": "Строка про Лену",
+      "lines": [
+        {
+          "id": "s9-lena.start.0",
+          "speaker": "n",
+          "text": "Степаныч наливает чай и стучит пальцем по первой строке."
+        },
+        {
+          "id": "s9-lena.start.1",
+          "speaker": "stepan",
+          "text": "Лена. Что тут исправляется?"
+        },
+        {
+          "id": "s9-lena.start.2",
+          "speaker": "you",
+          "text": "Деньги можно вернуть. А вот вечера, когда она ждала, — нет."
+        },
+        {
+          "id": "s9-lena.start.3",
+          "speaker": "n",
+          "text": "Ты помнишь отметку у её окна: «пока не готов».",
+          "if": "s8-lena.ready.notyet"
+        },
+        {
+          "id": "s9-lena.start.4",
+          "speaker": "stepan",
+          "text": "Не торопись говорить «ничего». Подумаем."
+        }
+      ],
+      "next": "s9-lena-card"
+    },
+    "s9-lena-card": {
+      "type": "journal",
+      "intro": "Можно ответить на любой вопрос или ни на один.",
+      "questionIds": [
+        "q.s9-lena.fix",
+        "q.s9-lena.who",
+        "q.s9-lena.risk"
+      ],
+      "next": "s9-lena-harm"
+    },
+    "s9-lena-harm": {
+      "type": "habit-map",
+      "title": "Проверка вреда",
+      "intro": "В каждой клетке выбери то, что сейчас ближе. Это не экзамен: правильного ответа нет.",
+      "cells": [
+        {
+          "id": "s9-lena.harm.0",
+          "title": "Мне",
+          "options": [
+            {
+              "id": "s9-lena.harm.0.risk",
+              "text": "Вижу риск: если вернуть всё разом, мне не на что будет жить."
+            },
+            {
+              "id": "s9-lena.harm.0.none",
+              "text": "Сейчас риска здесь не вижу или не знаю"
+            }
+          ]
+        },
+        {
+          "id": "s9-lena.harm.1",
+          "title": "Тому человеку",
+          "options": [
+            {
+              "id": "s9-lena.harm.1.risk",
+              "text": "Вижу риск: разговор может снова поднять то, что она уже отпустила."
+            },
+            {
+              "id": "s9-lena.harm.1.none",
+              "text": "Сейчас риска здесь не вижу или не знаю"
+            }
+          ]
+        },
+        {
+          "id": "s9-lena.harm.2",
+          "title": "Другим людям",
+          "options": [
+            {
+              "id": "s9-lena.harm.2.risk",
+              "text": "Вижу риск: тимка услышит взрослый разговор, не предназначенный ему."
+            },
+            {
+              "id": "s9-lena.harm.2.none",
+              "text": "Сейчас риска здесь не вижу или не знаю"
+            }
+          ]
+        },
+        {
+          "id": "s9-lena.harm.3",
+          "title": "Хватит ли сил",
+          "options": [
+            {
+              "id": "s9-lena.harm.3.risk",
+              "text": "Сейчас сил может не хватить"
+            },
+            {
+              "id": "s9-lena.harm.3.none",
+              "text": "Силы есть, если не один"
+            }
+          ]
+        }
+      ],
+      "continueLabel": "К дорогам",
+      "next": "s9-lena-road"
+    },
+    "s9-lena-road": {
+      "type": "story",
+      "title": "Три дороги",
+      "lines": [
+        {
+          "id": "s9-lena.road.0",
+          "speaker": "stepan",
+          "text": "Риск, который видишь, — это уже ответ. Не говорю: нет. Говорю: смотри.",
+          "ifAny": [
+            "s9-lena.harm.0.risk",
+            "s9-lena.harm.1.risk",
+            "s9-lena.harm.2.risk",
+            "s9-lena.harm.3.risk"
+          ]
+        },
+        {
+          "id": "s9-lena.road.1",
+          "speaker": "stepan",
+          "text": "Ну что, какую дорогу пока рисуем? Это черновик, не обещание."
+        }
+      ],
+      "choice": {
+        "id": "s9-lena.route",
+        "prompt": "Какая дорога",
+        "options": [
+          {
+            "id": "s9-lena.route.direct",
+            "label": "Прямо: сказать и исправить самому",
+            "next": "s9-lena-direct"
+          },
+          {
+            "id": "s9-lena.route.indirect",
+            "label": "Косвенно: исправить делом, не напоминая о себе",
+            "next": "s9-lena-indirect"
+          },
+          {
+            "id": "s9-lena.route.wait",
+            "label": "Пока не связываться",
+            "next": "s9-lena-wait"
+          }
+        ]
+      }
+    },
+    "s9-lena-after": {
+      "type": "journal",
+      "intro": "Эту страницу можно заполнить потом, после настоящего дела. Или никогда.",
+      "questionIds": [
+        "q.s9-lena.after"
+      ],
+      "next": "s9-lena-end"
+    },
+    "s9-lena-end": {
+      "type": "ending",
+      "title": "Дорога на бумаге",
+      "lines": [
+        {
+          "id": "s9-lena.end.0",
+          "speaker": "n",
+          "text": "Степаныч ставит карандашом маленькую стрелку у строки. Никто никуда не идёт."
+        }
+      ]
+    },
+    "s9-lena-direct": {
+      "type": "story",
+      "title": "Три дороги",
+      "lines": [
+        {
+          "id": "s9-lena.direct.0",
+          "speaker": "stepan",
+          "text": "Можно. Без речей, без оправданий. Сначала с суммой и сроком, которые ты правда потянешь."
+        }
+      ],
+      "next": "s9-lena-after"
+    },
+    "s9-lena-indirect": {
+      "type": "story",
+      "title": "Три дороги",
+      "lines": [
+        {
+          "id": "s9-lena.indirect.0",
+          "speaker": "stepan",
+          "text": "Каждую пятницу — на счёт Тимкиных кружков. Тоже возмещение, если она не против."
+        }
+      ],
+      "next": "s9-lena-after"
+    },
+    "s9-lena-wait": {
+      "type": "story",
+      "title": "Три дороги",
+      "lines": [
+        {
+          "id": "s9-lena.wait.0",
+          "speaker": "stepan",
+          "text": "Подождать — честно. Ты сейчас трезвый рядом с ней. Это уже не пустое место."
+        }
+      ],
+      "next": "s9-lena-after"
+    }
+  }
+}

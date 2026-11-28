@@ -291,7 +291,7 @@ test('третий шаг открывается после Ночи, содер
   assert.equal(isLocked(thirdItems[0], game), true);
   markDone(game, 'step02-night');
   assert.equal(isLocked(thirdItems[0], game), false);
-  assert.equal(index.nextStep.title, 'Шаг девятый');
+  assert.equal(index.nextStep.title, 'Шаг десятый');
   for (const chapter of thirdChapters) {
     assert.ok(chapter.disclaimer && chapter.basedOn.some(source => source.includes('docs/step03.md')), chapter.id);
     assert.ok(chapter.questions.length >= 2 && chapter.questions.length <= 3, chapter.id);
@@ -785,4 +785,24 @@ test('восьмой шаг: окна без нового поля сохран�
   // Вопросы для Степаныча зависят от отметок окон.
   const finale = chapters.find(c => c.id === step.finale), lines = linesOf(finale.scenes[finale.start], game).map(l => l.text);
   assert.ok(lines.some(t => t.startsWith('Про Тимку')) && !lines.some(t => t.startsWith('Про Лену')));
+});
+
+test('девятый шаг: строки открываются по окнам восьмого шага, три дороги равноправны, ничего не отправляется', () => {
+  const step = index.steps.find(s => s.id === 9);
+  assert.equal(step.layout, 'routes');
+  assert.deepEqual(validateWindows(step, index), []);
+  const game = freshGame();
+  markDone(game, step.intro);
+  assert.ok(windowsState(step, index, game).windows.every(w => w.locked));
+  markDone(game, 'step08-siply');
+  const state = windowsState(step, index, game);
+  assert.equal(state.windows.find(w => w.id === 'siply').locked, false);
+  assert.equal(state.windows.find(w => w.id === 'lena').locked, true);
+  for (const chapter of chapters.filter(c => c.step === 9)) {
+    for (const scene of Object.values(chapter.scenes)) for (const o of scene.choice?.options || []) assert.doesNotMatch(o.label, /напис|отправ/i, o.id);
+    const road = Object.values(chapter.scenes).find(s => s.choice?.options.length === 3);
+    if (road) assert.ok(road.choice.options.some(o => o.label === 'Пока не связываться'), chapter.id);
+    const after = chapter.questions.find(q => q.id.endsWith('.after'));
+    if (road) assert.match(after.text, /Необязательная/);
+  }
 });

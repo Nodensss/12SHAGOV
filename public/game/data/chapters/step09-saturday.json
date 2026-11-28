@@ -1,0 +1,103 @@
+{
+  "id": "step09-saturday",
+  "version": 1,
+  "step": 9,
+  "title": "Чай мой, тетрадь твоя",
+  "returnLabel": "К списку",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_09_Девятый.md: три маршрута, проверка вреда, план для спонсора, необязательная заметка",
+    "public/steps.js: шаг 9; оригинальная история героя"
+  ],
+  "disclaimer": "Вымышленная история. Это не литература АН и не юридический, медицинский или семейный совет. Игра ничего не отправляет и не запускает. План не считается одобренным оттого, что заполнен.",
+  "background": "art/scene-kitchen.webp",
+  "speakers": {
+    "n": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "stepan": {
+      "name": "Степаныч",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "questions": [
+    {
+      "id": "q.s9-saturday.1",
+      "text": "Чего я боюсь, когда думаю о возмещении?"
+    }
+  ],
+  "start": "s9-saturday-start",
+  "scenes": {
+    "s9-saturday-start": {
+      "type": "story",
+      "title": "Суббота",
+      "lines": [
+        {
+          "id": "s9-saturday.start.0",
+          "speaker": "n",
+          "text": "Кухня Степаныча. Клеёнка в клетку, сахар в банке из-под кофе."
+        },
+        {
+          "id": "s9-saturday.start.1",
+          "speaker": "n",
+          "text": "Вы договорились ещё на прошлой неделе. Ты пришёл.",
+          "if": "s8-questions.plan.meet"
+        },
+        {
+          "id": "s9-saturday.start.2",
+          "speaker": "n",
+          "text": "Ты долго носил тетрадь в кармане. Сегодня позвонил сам.",
+          "if": "s8-questions.plan.wait"
+        },
+        {
+          "id": "s9-saturday.start.3",
+          "speaker": "stepan",
+          "text": "Девятый — это не «пойти и всем сказать». Это подумать, как исправить и никому не навредить."
+        },
+        {
+          "id": "s9-saturday.start.4",
+          "speaker": "stepan",
+          "text": "У каждой строки три дороги: прямо, косвенно или пока не связываться. Все три законные."
+        },
+        {
+          "id": "s9-saturday.start.5",
+          "speaker": "voice",
+          "text": "Сейчас он заставит тебя каяться перед всеми."
+        },
+        {
+          "id": "s9-saturday.start.6",
+          "speaker": "stepan",
+          "text": "И ничего мы сегодня не делаем. Только рисуем."
+        }
+      ],
+      "next": "s9-saturday-journal"
+    },
+    "s9-saturday-journal": {
+      "type": "journal",
+      "intro": "Можно оставить одну строку или ответить позже.",
+      "questionIds": [
+        "q.s9-saturday.1"
+      ],
+      "next": "s9-saturday-end"
+    },
+    "s9-saturday-end": {
+      "type": "ending",
+      "title": "Тетрадь открыта",
+      "lines": [
+        {
+          "id": "s9-saturday.end.0",
+          "speaker": "n",
+          "text": "Степаныч надевает очки и открывает твой список."
+        }
+      ]
+    }
+  }
+}

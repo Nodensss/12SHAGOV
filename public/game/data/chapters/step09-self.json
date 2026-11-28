@@ -1,0 +1,247 @@
+{
+  "id": "step09-self",
+  "version": 1,
+  "step": 9,
+  "title": "Строка про себя",
+  "returnLabel": "К списку",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_09_Девятый.md: три маршрута, проверка вреда, план для спонсора, необязательная заметка",
+    "public/steps.js: шаг 9; оригинальная история героя"
+  ],
+  "disclaimer": "Вымышленная история. Это не литература АН и не юридический, медицинский или семейный совет. Игра ничего не отправляет и не запускает. План не считается одобренным оттого, что заполнен.",
+  "background": "art/scene-kitchen.webp",
+  "speakers": {
+    "n": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "stepan": {
+      "name": "Степаныч",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "questions": [
+    {
+      "id": "q.s9-self.fix",
+      "text": "Что можно исправить?"
+    },
+    {
+      "id": "q.s9-self.who",
+      "text": "Кого это затронет, кроме нас двоих?"
+    },
+    {
+      "id": "q.s9-self.risk",
+      "text": "Какой риск я вижу?"
+    },
+    {
+      "id": "q.s9-self.after",
+      "text": "Если однажды сделаю — что получилось? Необязательная заметка."
+    }
+  ],
+  "start": "s9-self-start",
+  "scenes": {
+    "s9-self-start": {
+      "type": "story",
+      "title": "Строка про себя",
+      "lines": [
+        {
+          "id": "s9-self.start.0",
+          "speaker": "stepan",
+          "text": "И ты сам. Что себе?"
+        },
+        {
+          "id": "s9-self.start.1",
+          "speaker": "you",
+          "text": "Записаться к стоматологу. Звучит глупо."
+        },
+        {
+          "id": "s9-self.start.2",
+          "speaker": "stepan",
+          "text": "Звучит как начало."
+        }
+      ],
+      "next": "s9-self-card"
+    },
+    "s9-self-card": {
+      "type": "journal",
+      "intro": "Можно ответить на любой вопрос или ни на один.",
+      "questionIds": [
+        "q.s9-self.fix",
+        "q.s9-self.who",
+        "q.s9-self.risk"
+      ],
+      "next": "s9-self-harm"
+    },
+    "s9-self-harm": {
+      "type": "habit-map",
+      "title": "Проверка вреда",
+      "intro": "В каждой клетке выбери то, что сейчас ближе. Это не экзамен: правильного ответа нет.",
+      "cells": [
+        {
+          "id": "s9-self.harm.0",
+          "title": "Мне",
+          "options": [
+            {
+              "id": "s9-self.harm.0.risk",
+              "text": "Вижу риск: я могу начать всё сразу и выдохнуться."
+            },
+            {
+              "id": "s9-self.harm.0.none",
+              "text": "Сейчас риска здесь не вижу или не знаю"
+            }
+          ]
+        },
+        {
+          "id": "s9-self.harm.1",
+          "title": "Тому человеку",
+          "options": [
+            {
+              "id": "s9-self.harm.1.risk",
+              "text": "Вижу риск: деньги на себя — вдруг это отнимет у долгов перед другими."
+            },
+            {
+              "id": "s9-self.harm.1.none",
+              "text": "Сейчас риска здесь не вижу или не знаю"
+            }
+          ]
+        },
+        {
+          "id": "s9-self.harm.2",
+          "title": "Другим людям",
+          "options": [
+            {
+              "id": "s9-self.harm.2.risk",
+              "text": "Вижу риск: мне может стать стыдно, и я брошу."
+            },
+            {
+              "id": "s9-self.harm.2.none",
+              "text": "Сейчас риска здесь не вижу или не знаю"
+            }
+          ]
+        },
+        {
+          "id": "s9-self.harm.3",
+          "title": "Хватит ли сил",
+          "options": [
+            {
+              "id": "s9-self.harm.3.risk",
+              "text": "Сейчас сил может не хватить"
+            },
+            {
+              "id": "s9-self.harm.3.none",
+              "text": "Силы есть, если не один"
+            }
+          ]
+        }
+      ],
+      "continueLabel": "К дорогам",
+      "next": "s9-self-road"
+    },
+    "s9-self-road": {
+      "type": "story",
+      "title": "Три дороги",
+      "lines": [
+        {
+          "id": "s9-self.road.0",
+          "speaker": "stepan",
+          "text": "Риск, который видишь, — это уже ответ. Не говорю: нет. Говорю: смотри.",
+          "ifAny": [
+            "s9-self.harm.0.risk",
+            "s9-self.harm.1.risk",
+            "s9-self.harm.2.risk",
+            "s9-self.harm.3.risk"
+          ]
+        },
+        {
+          "id": "s9-self.road.1",
+          "speaker": "stepan",
+          "text": "Ну что, какую дорогу пока рисуем? Это черновик, не обещание."
+        }
+      ],
+      "choice": {
+        "id": "s9-self.route",
+        "prompt": "Какая дорога",
+        "options": [
+          {
+            "id": "s9-self.route.direct",
+            "label": "Прямо: сказать и исправить самому",
+            "next": "s9-self-direct"
+          },
+          {
+            "id": "s9-self.route.indirect",
+            "label": "Косвенно: исправить делом, не напоминая о себе",
+            "next": "s9-self-indirect"
+          },
+          {
+            "id": "s9-self.route.wait",
+            "label": "Пока не связываться",
+            "next": "s9-self-wait"
+          }
+        ]
+      }
+    },
+    "s9-self-after": {
+      "type": "journal",
+      "intro": "Эту страницу можно заполнить потом, после настоящего дела. Или никогда.",
+      "questionIds": [
+        "q.s9-self.after"
+      ],
+      "next": "s9-self-end"
+    },
+    "s9-self-end": {
+      "type": "ending",
+      "title": "Дорога на бумаге",
+      "lines": [
+        {
+          "id": "s9-self.end.0",
+          "speaker": "n",
+          "text": "Степаныч ставит карандашом маленькую стрелку у строки. Никто никуда не идёт."
+        }
+      ]
+    },
+    "s9-self-direct": {
+      "type": "story",
+      "title": "Три дороги",
+      "lines": [
+        {
+          "id": "s9-self.direct.0",
+          "speaker": "stepan",
+          "text": "Записаться на этой неделе. Один пункт, а не десять."
+        }
+      ],
+      "next": "s9-self-after"
+    },
+    "s9-self-indirect": {
+      "type": "story",
+      "title": "Три дороги",
+      "lines": [
+        {
+          "id": "s9-self.indirect.0",
+          "speaker": "stepan",
+          "text": "Высыпаться и есть горячее. Скучно, но работает."
+        }
+      ],
+      "next": "s9-self-after"
+    },
+    "s9-self-wait": {
+      "type": "story",
+      "title": "Три дороги",
+      "lines": [
+        {
+          "id": "s9-self.wait.0",
+          "speaker": "stepan",
+          "text": "Можно и подождать. Но не забывай, что ты тоже в списке."
+        }
+      ],
+      "next": "s9-self-after"
+    }
+  }
+}

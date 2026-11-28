@@ -1,0 +1,284 @@
+{
+  "id": "step09-plan",
+  "version": 1,
+  "step": 9,
+  "title": "План на бумаге",
+  "returnLabel": "К списку",
+  "basedOn": [
+    "docs/materials/ТЗ_Модуль_Шаг_09_Девятый.md: три маршрута, проверка вреда, план для спонсора, необязательная заметка",
+    "public/steps.js: шаг 9; оригинальная история героя"
+  ],
+  "disclaimer": "Вымышленная история. Это не литература АН и не юридический, медицинский или семейный совет. Игра ничего не отправляет и не запускает. План не считается одобренным оттого, что заполнен.",
+  "background": "art/scene-night-notebook.webp",
+  "speakers": {
+    "n": {
+      "name": "",
+      "role": "narrator"
+    },
+    "you": {
+      "name": "Ты",
+      "role": "player"
+    },
+    "stepan": {
+      "name": "Степаныч",
+      "role": "character"
+    },
+    "voice": {
+      "name": "Голос в голове",
+      "role": "character"
+    }
+  },
+  "questions": [
+    {
+      "id": "q.s9-plan.1",
+      "text": "С какой строки я начну, когда Степаныч скажет «можно»?"
+    },
+    {
+      "id": "q.s9-plan.2",
+      "text": "Что я буду делать, если станет тяжело после разговора?"
+    }
+  ],
+  "start": "s9-plan-start",
+  "scenes": {
+    "s9-plan-start": {
+      "type": "story",
+      "title": "План на бумаге",
+      "lines": [
+        {
+          "id": "s9-plan.start.0",
+          "speaker": "stepan",
+          "text": "Посмотрим, что нарисовали."
+        },
+        {
+          "id": "s9-plan.start.1",
+          "speaker": "n",
+          "text": "Строка про Лену: пока не связываться.",
+          "if": "s9-lena.route.wait"
+        },
+        {
+          "id": "s9-plan.start.2",
+          "speaker": "n",
+          "text": "Строка про Лену: косвенно.",
+          "if": "s9-lena.route.indirect"
+        },
+        {
+          "id": "s9-plan.start.3",
+          "speaker": "n",
+          "text": "Строка про Лену: прямо — обсудить ещё раз.",
+          "if": "s9-lena.route.direct"
+        },
+        {
+          "id": "s9-plan.start.4",
+          "speaker": "n",
+          "text": "Строка про Тимку: пока не связываться.",
+          "if": "s9-tim.route.wait"
+        },
+        {
+          "id": "s9-plan.start.5",
+          "speaker": "n",
+          "text": "Строка про Тимку: косвенно.",
+          "if": "s9-tim.route.indirect"
+        },
+        {
+          "id": "s9-plan.start.6",
+          "speaker": "n",
+          "text": "Строка про Тимку: прямо — обсудить ещё раз.",
+          "if": "s9-tim.route.direct"
+        },
+        {
+          "id": "s9-plan.start.7",
+          "speaker": "n",
+          "text": "Строка про маму: пока не связываться.",
+          "if": "s9-mother.route.wait"
+        },
+        {
+          "id": "s9-plan.start.8",
+          "speaker": "n",
+          "text": "Строка про маму: косвенно.",
+          "if": "s9-mother.route.indirect"
+        },
+        {
+          "id": "s9-plan.start.9",
+          "speaker": "n",
+          "text": "Строка про маму: прямо — обсудить ещё раз.",
+          "if": "s9-mother.route.direct"
+        },
+        {
+          "id": "s9-plan.start.10",
+          "speaker": "n",
+          "text": "Строка про Коляна: пока не связываться.",
+          "if": "s9-work.route.wait"
+        },
+        {
+          "id": "s9-plan.start.11",
+          "speaker": "n",
+          "text": "Строка про Коляна: косвенно.",
+          "if": "s9-work.route.indirect"
+        },
+        {
+          "id": "s9-plan.start.12",
+          "speaker": "n",
+          "text": "Строка про Коляна: прямо — обсудить ещё раз.",
+          "if": "s9-work.route.direct"
+        },
+        {
+          "id": "s9-plan.start.13",
+          "speaker": "n",
+          "text": "Строка про тётю Валю: пока не связываться.",
+          "if": "s9-neighbor.route.wait"
+        },
+        {
+          "id": "s9-plan.start.14",
+          "speaker": "n",
+          "text": "Строка про тётю Валю: косвенно.",
+          "if": "s9-neighbor.route.indirect"
+        },
+        {
+          "id": "s9-plan.start.15",
+          "speaker": "n",
+          "text": "Строка про тётю Валю: прямо — обсудить ещё раз.",
+          "if": "s9-neighbor.route.direct"
+        },
+        {
+          "id": "s9-plan.start.16",
+          "speaker": "n",
+          "text": "Строка про Сиплого: пока не связываться.",
+          "if": "s9-siply.route.wait"
+        },
+        {
+          "id": "s9-plan.start.17",
+          "speaker": "n",
+          "text": "Строка про Сиплого: косвенно.",
+          "if": "s9-siply.route.indirect"
+        },
+        {
+          "id": "s9-plan.start.18",
+          "speaker": "n",
+          "text": "Строка про Сиплого: прямо — обсудить ещё раз.",
+          "if": "s9-siply.route.direct"
+        },
+        {
+          "id": "s9-plan.start.19",
+          "speaker": "n",
+          "text": "Строка про себя: пока не связываться.",
+          "if": "s9-self.route.wait"
+        },
+        {
+          "id": "s9-plan.start.20",
+          "speaker": "n",
+          "text": "Строка про себя: косвенно.",
+          "if": "s9-self.route.indirect"
+        },
+        {
+          "id": "s9-plan.start.21",
+          "speaker": "n",
+          "text": "Строка про себя: прямо — обсудить ещё раз.",
+          "if": "s9-self.route.direct"
+        },
+        {
+          "id": "s9-plan.start.22",
+          "speaker": "n",
+          "text": "Строка своего окна: пока не связываться.",
+          "if": "s9-own.route.wait"
+        },
+        {
+          "id": "s9-plan.start.23",
+          "speaker": "n",
+          "text": "Строка своего окна: косвенно.",
+          "if": "s9-own.route.indirect"
+        },
+        {
+          "id": "s9-plan.start.24",
+          "speaker": "n",
+          "text": "Строка своего окна: прямо — обсудить ещё раз.",
+          "if": "s9-own.route.direct"
+        },
+        {
+          "id": "s9-plan.start.25",
+          "speaker": "stepan",
+          "text": "Запомни одно: заполненный план — ещё не одобренный. Перед каждым делом звонишь мне."
+        },
+        {
+          "id": "s9-plan.start.26",
+          "speaker": "stepan",
+          "text": "Если где-то угроза — тебе или им — мы туда не идём. Ни по какому плану."
+        },
+        {
+          "id": "s9-plan.start.27",
+          "speaker": "you",
+          "text": "А если сделаю и выйдет плохо?"
+        },
+        {
+          "id": "s9-plan.start.28",
+          "speaker": "stepan",
+          "text": "Тогда придёшь и расскажешь. Возмещение — не про то, чтобы тебя простили."
+        }
+      ],
+      "choice": {
+        "id": "s9-plan.next",
+        "prompt": "Что дальше?",
+        "options": [
+          {
+            "id": "s9-plan.next.call",
+            "label": "Позвонить Степанычу перед первым делом",
+            "next": "s9-plan-call"
+          },
+          {
+            "id": "s9-plan.next.pause",
+            "label": "Неделю ничего не делать и пожить с планом",
+            "next": "s9-plan-pause"
+          }
+        ]
+      }
+    },
+    "s9-plan-call": {
+      "type": "story",
+      "title": "Звонок",
+      "lines": [
+        {
+          "id": "s9-plan.call.0",
+          "speaker": "stepan",
+          "text": "Звони в любое время. Даже если передумаешь."
+        }
+      ],
+      "next": "s9-plan-journal"
+    },
+    "s9-plan-pause": {
+      "type": "story",
+      "title": "Неделя",
+      "lines": [
+        {
+          "id": "s9-plan.pause.0",
+          "speaker": "stepan",
+          "text": "Хорошая неделя. План от неё только окрепнет."
+        }
+      ],
+      "next": "s9-plan-journal"
+    },
+    "s9-plan-journal": {
+      "type": "journal",
+      "intro": "Эти ответы видишь только ты.",
+      "questionIds": [
+        "q.s9-plan.1",
+        "q.s9-plan.2"
+      ],
+      "next": "s9-plan-end"
+    },
+    "s9-plan-end": {
+      "type": "ending",
+      "title": "Каждый день",
+      "lines": [
+        {
+          "id": "s9-plan.end.0",
+          "speaker": "n",
+          "text": "Дома ты кладёшь тетрадь на полку. Не прячешь — просто кладёшь."
+        },
+        {
+          "id": "s9-plan.end.1",
+          "speaker": "n",
+          "text": "Дальше — каждый день смотреть, где ты сегодня. Десятый шаг уже близко."
+        }
+      ]
+    }
+  }
+}
